@@ -15,7 +15,7 @@ namespace Brig {
 
 	static void wakeup_handle(uv_async_t *wakeup, int status)
 	{
-		printf("events %d\n", qGlobalPostedEventsCount());
+		//printf("events %d\n", qGlobalPostedEventsCount());
 
 //		uv_close((uv_handle_t *)mainloop, NULL);
 		//BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(mainloop->data);
@@ -32,41 +32,41 @@ namespace Brig {
 		wakeup = new uv_async_t;
 		wakeup->data = (void *)this;
 		uv_async_init(mainloop, wakeup, wakeup_handle);
-		printf("Initializing event dispatcher\n");
+		//printf("Initializing event dispatcher\n");
 	}
 
 	BrigEventDispatcher::~BrigEventDispatcher(void)
 	{
-		printf("RELEASE\n");
+		//printf("RELEASE\n");
 	}
 
 	void BrigEventDispatcher::wakeUp(void)
 	{
-		printf("wakeUp\n");
+		//printf("wakeUp\n");
 		uv_async_send(wakeup);
 	}
 
 	void BrigEventDispatcher::interrupt(void)
 	{
 		wakeUp();
-		printf("interrupt\n");
+		//printf("interrupt\n");
 	}
 
 	void BrigEventDispatcher::flush(void)
 	{
-		printf("flush\n");
+		//printf("flush\n");
 	}
 
 	bool BrigEventDispatcher::processEvents(QEventLoop::ProcessEventsFlags flags)
 	{
-printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
+//printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
 		emit awake();
 
 		QCoreApplication::sendPostedEvents();
 		QWindowSystemInterface::sendWindowSystemEvents(flags);
 
 		emit aboutToBlock();
-printf("ProcessEvents %d\n", qGlobalPostedEventsCount());
+//printf("ProcessEvents %d\n", qGlobalPostedEventsCount());
 
 		return (qGlobalPostedEventsCount()) ? true : false;
 	}
@@ -78,7 +78,7 @@ printf("ProcessEvents %d\n", qGlobalPostedEventsCount());
 
 	void socket_watcher_handle(uv_poll_t *req, int status, int events)
 	{
-printf("socket_watcher_handle\n");
+//printf("socket_watcher_handle\n");
 		BrigWatcher *_watcher = static_cast<BrigWatcher *>(req->data);
 
 		if (events & UV_READABLE) {
@@ -92,7 +92,7 @@ printf("socket_watcher_handle\n");
 
 	void socket_watcher_close(uv_handle_t *handle)
 	{
-printf("socket_watcher_close\n");
+//printf("socket_watcher_close\n");
 		uv_poll_t *watcher = (uv_poll_t *)handle;
 
 		delete static_cast<BrigWatcher *>(watcher->data);
@@ -101,7 +101,7 @@ printf("socket_watcher_close\n");
 
 	void BrigEventDispatcher::registerSocketNotifier(QSocketNotifier *notifier)
 	{
-printf("registerSocketNotifier\n");
+//printf("registerSocketNotifier\n");
 		int type = -1;
 		if (notifier->type() == QSocketNotifier::Read) {
 			type = UV_READABLE;
@@ -119,7 +119,7 @@ printf("registerSocketNotifier\n");
 			watcher = new uv_poll_t;
 			BrigWatcher *_watcher = new BrigWatcher;
 			_watcher->callback = [notifier] {
-printf("Socket NOTIFIER CALLBACK\n");
+//printf("Socket NOTIFIER CALLBACK\n");
 				QEvent event(QEvent::SockAct);
 				QCoreApplication::sendEvent(notifier, &event);
 			};
@@ -143,7 +143,7 @@ printf("Socket NOTIFIER CALLBACK\n");
 
 	void BrigEventDispatcher::unregisterSocketNotifier(QSocketNotifier *notifier)
 	{
-printf("unregisterSocketNotifier\n");
+//printf("unregisterSocketNotifier\n");
 		int type = -1;
 		if (notifier->type() == QSocketNotifier::Read) {
 			type = UV_READABLE;
@@ -180,7 +180,7 @@ printf("unregisterSocketNotifier\n");
 
 	void timer_handle(uv_timer_t *handle, int status)
 	{
-printf("timer_handle\n");
+//printf("timer_handle\n");
 		BrigHandle *_timer = static_cast<BrigHandle *>(handle->data);
 
 		_timer->callback();
@@ -188,7 +188,7 @@ printf("timer_handle\n");
 
 	void timer_close(uv_handle_t *handle)
 	{
-printf("timer_close\n");
+//printf("timer_close\n");
 		uv_timer_t *timer = (uv_timer_t *)handle;
 
 		delete static_cast<BrigHandle *>(timer->data);
@@ -198,7 +198,7 @@ printf("timer_close\n");
 	void BrigEventDispatcher::registerTimer(int timerId, int interval, Qt::TimerType timerType, QObject *object)
 	{
 		BrigTimer *timer;
-printf("registerTimer\n");
+//printf("registerTimer\n");
 
 		std::map<int, BrigTimer *>::iterator it = timers.find(timerId);
 		if (it == timers.end()) {
@@ -213,7 +213,7 @@ printf("registerTimer\n");
 				timer->timestamp = uv_hrtime() / 1000000;
 				QTimerEvent event(timer->Id);
 				QCoreApplication::sendEvent(timer->object, &event);
-				printf("TIMER CALLBACK\n");
+				//printf("TIMER CALLBACK\n");
 			};
 			timer->handle->data = (void *)_timer;
 			
@@ -238,7 +238,7 @@ printf("registerTimer\n");
 
 	bool BrigEventDispatcher::unregisterTimer(int timerId)
 	{
-printf("unregisterTimer\n");
+//printf("unregisterTimer\n");
 
 		std::map<int, BrigTimer *>::iterator it = timers.find(timerId);
 		if (it == timers.end())
@@ -268,7 +268,7 @@ printf("unregisterTimer\n");
 
 	bool BrigEventDispatcher::unregisterTimers(QObject* object)
 	{
-		printf("unregisterTimers\n");
+		//printf("unregisterTimers\n");
 
 		bool ret = true;
 		for (auto info : registeredTimers(object)) {
@@ -279,7 +279,7 @@ printf("unregisterTimer\n");
 
 	QList<QAbstractEventDispatcher::TimerInfo> BrigEventDispatcher::registeredTimers(QObject* object) const
 	{
-		printf("registeredTimers\n");
+		//printf("registeredTimers\n");
 
 		auto it = object_timers.find(object);
 		if (it == object_timers.end())
@@ -292,7 +292,7 @@ printf("unregisterTimer\n");
 
 	int BrigEventDispatcher::remainingTime(int timerId)
 	{
-		printf("remainingTime\n");
+		//printf("remainingTime\n");
 
 		BrigTimer *timer = timers[timerId];
 		return timer->interval + timer->timestamp - (uv_hrtime() / 1000000);

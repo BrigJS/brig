@@ -76,7 +76,7 @@ namespace Brig {
 		EventLoop *eventloop = static_cast<EventLoop *>(handle->data);
 		QGuiApplication *app = eventloop->GetApp();
 
-		printf("PREPARE %d\n", status);
+//		printf("PREPARE %d\n", status);
 
 #if 1
 //		if (app->hasPendingEvents())
