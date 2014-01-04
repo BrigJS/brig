@@ -11,11 +11,17 @@ namespace Brig {
 	class QmlEngineWrap;
 	class QmlContextWrap;
 	class QmlComponentWrap;
+	class QuickViewWrap;
+
+	typedef enum {
+		BRIG_CONTAINER_NATIVE
+	} BrigContainerType;
 }
 
 #include "qapplication.h"
 #include "qmlengine.h"
 #include "qmlcontext.h"
 #include "qmlcomponent.h"
+#include "quickview.h"
 
 #endif

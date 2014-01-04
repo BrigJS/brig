@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <node.h>
 #include <QtGui>
 #include <QObject>
@@ -12,24 +13,7 @@ namespace Brig {
 
 	QmlEngineWrap::QmlEngineWrap() : ObjectWrap()
 	{
-/*
-		Isolate *isolate = Isolate::New();
-		Persistent<Context> context;
-*/
-		{
-/*
-			Locker locker(isolate);
-			Isolate::Scope isolate_scope(isolate);
-			isolate->Enter();
-
-			HandleScope handle_scope;
-
-			context = Context::New();
-			Context::Scope context_scope(context);
-			context->Enter();
-*/
-			obj = new QQmlEngine();
-		}
+		obj = new QQmlEngine();
 	}
 
 	QmlEngineWrap::~QmlEngineWrap()
@@ -72,9 +56,11 @@ namespace Brig {
 
 		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
 
-		QQmlContext *context = obj_wrap->GetObject()->rootContext();
-		QmlContextWrap *context_wrap = new QmlContextWrap(context);
+		QQmlEngine *engine = obj_wrap->GetObject();
+		QQmlContext *context = engine->rootContext();
+		//QmlContextWrap *context_wrap = new QmlContextWrap(context);
+		Handle<Value> instance = QmlContextWrap::NewInstance(context);
 
-		return scope.Close(Undefined());
+		return scope.Close(instance);
 	}
 }

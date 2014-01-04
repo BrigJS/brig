@@ -28,11 +28,14 @@ namespace Brig {
 
 			/* Methods */
 			static Handle<Value> Exec(const Arguments& args);
+			static Handle<Value> Test(const Arguments& args);
 
 			QGuiApplication *app;
 			int app_argc;
 			char **app_argv;
 			EventLoop *eventloop;
+
+			QQuickView *quickview;
 	};
 
 }

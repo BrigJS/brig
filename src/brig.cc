@@ -14,6 +14,7 @@ namespace Brig {
 			QmlEngineWrap::Initialize(target);
 			QmlContextWrap::Initialize(target);
 			QmlComponentWrap::Initialize(target);
+			QuickViewWrap::Initialize(target);
 		}
 
 		NODE_MODULE(brig, Init)

@@ -14,6 +14,7 @@ namespace Brig {
 
 		public:
 			QmlComponentWrap(QmlEngineWrap *);
+			QmlComponentWrap(QmlEngineWrap *, Local<Value>);
 			~QmlComponentWrap();
 
 			static Persistent<Function> constructor;

@@ -19,6 +19,7 @@ namespace Brig {
 
 			static Persistent<Function> constructor;
 			static void Initialize(Handle<Object> target);
+			static Handle<Value> NewInstance(QQmlContext *context);
 
 			QQmlContext *GetObject() const { return obj; };
 

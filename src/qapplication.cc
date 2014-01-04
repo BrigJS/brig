@@ -1,8 +1,10 @@
 #include <node.h>
 #include <QtGui>
 #include <QObject>
+#include <uv.h>
 #include "qapplication.h"
 #include "eventloop.h"
+#include "eventdispatcher/eventdispatcher.h"
 
 namespace Brig {
 
@@ -15,10 +17,13 @@ namespace Brig {
 	{
 		app_argc = 0;
 		app_argv = NULL;
+		BrigEventDispatcher *dispatcher = new BrigEventDispatcher;
+		QGuiApplication::setEventDispatcher(dispatcher);
 		app = new QGuiApplication(app_argc, app_argv);
 
 		// Initializing event loop
 		eventloop = new EventLoop(app);
+		eventloop->Main();
 	}
 
 	QApplicationWrap::~QApplicationWrap()
@@ -39,6 +44,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -60,7 +66,37 @@ namespace Brig {
 		HandleScope scope;
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
-		app_wrap->GetEventLoop()->Main();
+		app_wrap->quickview->show();
+//		app_wrap->GetEventLoop()->Main();
+//		app_wrap->app->processEvents();
+//		app_wrap->app->exec();
+
+//		while(1) {
+//			app_wrap->app->processEvents(QEventLoop::WaitForMoreEvents);
+//		}
+
+printf("EXEC\n");
+
+		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QApplicationWrap::Test(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
+printf("4\n");
+//		QQuickView view;
+//		view.setSource(QUrl::fromLocalFile("application.qml"));
+//		view.show();
+		app_wrap->quickview = new QQuickView;
+		app_wrap->quickview->setSource(QUrl::fromLocalFile("application.qml"));
+printf("5\n");
+#if 0
+//		app_wrap->app->processEvents(QEventLoop::WaitForMoreEvents);
+
+//		app_wrap->app->exec();
+#endif
 
 		return scope.Close(Undefined());
 	}

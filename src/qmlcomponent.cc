@@ -15,6 +15,12 @@ namespace Brig {
 		obj = new QQmlComponent(engine_wrap->GetObject());
 	}
 
+	QmlComponentWrap::QmlComponentWrap(QmlEngineWrap *engine_wrap, Local<Value> filename) : ObjectWrap()
+	{
+		String::Utf8Value filename_str(filename->ToString());
+		obj = new QQmlComponent(engine_wrap->GetObject(), *filename_str);
+	}
+
 	QmlComponentWrap::~QmlComponentWrap()
 	{
 		delete obj;
@@ -44,7 +50,12 @@ namespace Brig {
 		HandleScope scope;
 
 		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args[0]->ToObject());
-		QmlComponentWrap *obj_wrap = new QmlComponentWrap(engine_wrap);
+		QmlComponentWrap *obj_wrap;
+		if (args.Length() == 1) {
+			obj_wrap = new QmlComponentWrap(engine_wrap);
+		} else {
+			obj_wrap = new QmlComponentWrap(engine_wrap, args[1]);
+		}
 		obj_wrap->Wrap(args.This());
 
 		return args.This();
