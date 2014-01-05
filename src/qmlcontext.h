@@ -15,11 +15,12 @@ namespace Brig {
 		public:
 			QmlContextWrap(QmlContextWrap *);
 			QmlContextWrap(QQmlContext *context);
+			QmlContextWrap(Handle<Value> qobject);
 			~QmlContextWrap();
 
 			static Persistent<Function> constructor;
 			static void Initialize(Handle<Object> target);
-			static Handle<Value> NewInstance(QQmlContext *context);
+			static Handle<Value> NewInstance(QQmlContext *);
 
 			QQmlContext *GetObject() const { return obj; };
 
@@ -27,6 +28,7 @@ namespace Brig {
 
 			static Handle<Value> New(const Arguments& args);
 
+			Handle<Value> prototype_object;
 			QQmlContext *obj;
 	};
 

@@ -7,10 +7,12 @@
 			'src/eventdispatcher/eventdispatcher.cc',
 			'src/qapplication.cc',
 			'src/eventloop.cc',
+			'src/qobject.cc',
 			'src/qmlengine.cc',
 			'src/qmlcontext.cc',
 			'src/qmlcomponent.cc',
 			'src/quickview.cc',
+			'src/quickwindow.cc',
 			'<!@(tools/genmoc.sh)'
 		],
 		'conditions': [

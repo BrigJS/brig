@@ -28,7 +28,9 @@ namespace Brig {
 
 			/* Methods */
 			static Handle<Value> create(const Arguments& args);
+			static Handle<Value> setData(const Arguments& args);
 
+			Handle<Value> prototype_object;
 			QQmlComponent *obj;
 	};
 

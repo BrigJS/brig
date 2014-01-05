@@ -13,12 +13,14 @@ namespace Brig {
 	QmlComponentWrap::QmlComponentWrap(QmlEngineWrap *engine_wrap) : ObjectWrap()
 	{
 		obj = new QQmlComponent(engine_wrap->GetObject());
+		prototype_object = QObjectWrap::NewInstance(obj);
 	}
 
 	QmlComponentWrap::QmlComponentWrap(QmlEngineWrap *engine_wrap, Local<Value> filename) : ObjectWrap()
 	{
 		String::Utf8Value filename_str(filename->ToString());
 		obj = new QQmlComponent(engine_wrap->GetObject(), *filename_str);
+		prototype_object = QObjectWrap::NewInstance(obj);
 	}
 
 	QmlComponentWrap::~QmlComponentWrap()
@@ -39,6 +41,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "create", QmlComponentWrap::create);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setData", QmlComponentWrap::setData);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -71,7 +74,29 @@ namespace Brig {
 		QQmlContext *context = context_wrap->GetObject();
 		QObject *obj = obj_wrap->GetObject()->create(context);
 
-		// TODO: wrap and return object
+		return scope.Close(QObjectWrap::NewInstance(obj));
+	}
+
+	Handle<Value> QmlComponentWrap::setData(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QUrl url;
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		if (args[1]->IsString()) {
+			String::Utf8Value url_str(args[1]->ToString());
+			url = QUrl::fromLocalFile(*url_str);
+		} else {
+			url = QUrl();
+		}
+
+		String::Utf8Value data_str(args[0]->ToString());
+
+		QmlComponentWrap *obj_wrap = ObjectWrap::Unwrap<QmlComponentWrap>(args.This());
+		obj_wrap->GetObject()->setData(*data_str, url); 
 
 		return scope.Close(Undefined());
 	}

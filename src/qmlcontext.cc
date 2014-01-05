@@ -13,11 +13,26 @@ namespace Brig {
 	QmlContextWrap::QmlContextWrap(QmlContextWrap *context_wrap) : ObjectWrap()
 	{
 		obj = new QQmlContext(context_wrap->GetObject());
+		prototype_object = QObjectWrap::NewInstance(obj);
 	}
 
 	QmlContextWrap::QmlContextWrap(QQmlContext *context) : ObjectWrap()
 	{
 		obj = new QQmlContext(context);
+		prototype_object = QObjectWrap::NewInstance(obj);
+	}
+
+	QmlContextWrap::QmlContextWrap(Handle<Value> object) : ObjectWrap()
+	{
+		if (strcmp(*String::Utf8Value(object->ToObject()->GetConstructorName()), "QmlContext") == 0) {
+			QmlContextWrap *wrap = ObjectWrap::Unwrap<QmlContextWrap>(object->ToObject());
+			obj = wrap->GetObject();
+		} else {
+			QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(object->ToObject());
+			obj = qobject_cast<QQmlContext *>(wrap->GetObject());
+		}
+
+		prototype_object = object;
 	}
 
 	QmlContextWrap::~QmlContextWrap()
@@ -45,19 +60,8 @@ namespace Brig {
 	{
 		HandleScope scope;
 
-		if (args[0]->ToObject()->InternalFieldCount() >= 2) {
-			BrigContainerType type = static_cast<BrigContainerType>(args[0]->ToObject()->GetInternalField(1)->ToInteger()->Value());
-
-			if (type == BRIG_CONTAINER_NATIVE) {
-				QQmlContext *context = ObjectWrap::Unwrap<QQmlContext>(args[0]->ToObject());
-				QmlContextWrap *obj_wrap = new QmlContextWrap(context);
-				obj_wrap->Wrap(args.This());
-			}
-		} else {
-			QmlContextWrap *context_wrap = ObjectWrap::Unwrap<QmlContextWrap>(args[0]->ToObject());
-			QmlContextWrap *obj_wrap = new QmlContextWrap(context_wrap);
-			obj_wrap->Wrap(args.This());
-		}
+		QmlContextWrap *obj_wrap = new QmlContextWrap(args[0]);
+		obj_wrap->Wrap(args.This());
 
 		return args.This();
 	}
@@ -66,17 +70,10 @@ namespace Brig {
 	{
 		HandleScope scope;
 
-		Handle<ObjectTemplate> object_template = ObjectTemplate::New();
-		object_template->SetInternalFieldCount(2);
-		Persistent<ObjectTemplate> object_instance = Persistent<ObjectTemplate>::New(object_template);
-		Local<Object> obj = object_instance->NewInstance();
-		obj->SetInternalField(0, External::New(context));
-		obj->SetInternalField(1, Integer::New(BRIG_CONTAINER_NATIVE));
-
 		const unsigned argc = 1;
+		Handle<Value> obj = QObjectWrap::NewInstance(context);
 		Handle<Value> argv[argc] = { obj };
-
-		Local<Object> instance = constructor->NewInstance(argc, argv);
+		Handle<Value> instance = constructor->NewInstance(argc, argv);
 
 		return scope.Close(instance);
 	}

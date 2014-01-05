@@ -10,11 +10,13 @@ namespace Brig {
 	extern "C" {
 		static void Init(Handle<Object> target)
 		{
+			QObjectWrap::Initialize(target);
 			QApplicationWrap::Initialize(target);
 			QmlEngineWrap::Initialize(target);
 			QmlContextWrap::Initialize(target);
 			QmlComponentWrap::Initialize(target);
 			QuickViewWrap::Initialize(target);
+			QuickWindowWrap::Initialize(target);
 		}
 
 		NODE_MODULE(brig, Init)

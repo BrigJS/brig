@@ -58,7 +58,7 @@ namespace Brig {
 
 		QQmlEngine *engine = obj_wrap->GetObject();
 		QQmlContext *context = engine->rootContext();
-		//QmlContextWrap *context_wrap = new QmlContextWrap(context);
+
 		Handle<Value> instance = QmlContextWrap::NewInstance(context);
 
 		return scope.Close(instance);
