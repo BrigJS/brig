@@ -42,6 +42,7 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "create", QmlComponentWrap::create);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setData", QmlComponentWrap::setData);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "isReady", QmlComponentWrap::isReady);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -68,11 +69,16 @@ namespace Brig {
 	{
 		HandleScope scope;
 
+		QObject *obj;
 		QmlComponentWrap *obj_wrap = ObjectWrap::Unwrap<QmlComponentWrap>(args.This());
-		QmlContextWrap *context_wrap = ObjectWrap::Unwrap<QmlContextWrap>(args[0]->ToObject());
 
-		QQmlContext *context = context_wrap->GetObject();
-		QObject *obj = obj_wrap->GetObject()->create(context);
+		if (args[0]->IsObject()) {
+			QmlContextWrap *context_wrap = ObjectWrap::Unwrap<QmlContextWrap>(args[0]->ToObject());
+			QQmlContext *context = context_wrap->GetObject();
+			obj = obj_wrap->GetObject()->create(context);
+		} else {
+			obj = obj_wrap->GetObject()->create();
+		}
 
 		return scope.Close(QObjectWrap::NewInstance(obj));
 	}
@@ -99,5 +105,14 @@ namespace Brig {
 		obj_wrap->GetObject()->setData(*data_str, url); 
 
 		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QmlComponentWrap::isReady(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QmlComponentWrap *obj_wrap = ObjectWrap::Unwrap<QmlComponentWrap>(args.This());
+
+		return scope.Close(Boolean::New(obj_wrap->GetObject()->isReady()));
 	}
 }

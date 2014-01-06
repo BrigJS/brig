@@ -7,6 +7,13 @@ namespace Brig {
 	using namespace node;
 	using namespace v8;
 
+	Handle<Value> Cast(const Arguments& args)
+	{
+		HandleScope scope;
+
+		return Undefined();
+	}
+
 	extern "C" {
 		static void Init(Handle<Object> target)
 		{
@@ -17,6 +24,9 @@ namespace Brig {
 			QmlComponentWrap::Initialize(target);
 			QuickViewWrap::Initialize(target);
 			QuickWindowWrap::Initialize(target);
+
+			// Cast
+			NODE_SET_METHOD(target, "cast", Cast);
 		}
 
 		NODE_MODULE(brig, Init)

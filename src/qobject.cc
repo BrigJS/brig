@@ -37,7 +37,7 @@ namespace Brig {
 		tpl->SetClassName(name);
 
 		/* Prototype */
-//		NODE_SET_PROTOTYPE_METHOD(tpl, "show", QObjectWrap::show);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickWindow", QObjectWrap::toQuickWindow);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -88,17 +88,17 @@ namespace Brig {
 		return scope.Close(instance);
 	}
 
-#if 0
-	Handle<Value> QObjectWrap::show(const Arguments& args)
+	Handle<Value> QObjectWrap::toQuickWindow(const Arguments& args)
 	{
 		HandleScope scope;
 
 		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
 
-		QObject *view = obj_wrap->GetObject();
-		view->show();
+		// It's not a window component
+		if (!obj_wrap->GetObject()->isWindowType())
+			return ThrowException(Exception::Error(String::New("Not a QuickWindow")));
 
-		return scope.Close(Undefined());
+		return scope.Close(QuickWindowWrap::NewInstance(args.This()));
 	}
-#endif
+
 }

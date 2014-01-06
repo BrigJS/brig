@@ -16,6 +16,19 @@ namespace Brig {
 		obj = new QQuickWindow();
 	}
 
+	QuickWindowWrap::QuickWindowWrap(Handle<Value> object) : ObjectWrap()
+	{
+		if (strcmp(*String::Utf8Value(object->ToObject()->GetConstructorName()), "QuickWindow") == 0) {
+			QuickWindowWrap *wrap = ObjectWrap::Unwrap<QuickWindowWrap>(object->ToObject());
+			obj = wrap->GetObject();
+		} else {
+			QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(object->ToObject());
+			obj = qobject_cast<QQuickWindow *>(wrap->GetObject());
+		}
+
+		prototype_object = object;
+	}
+
 	QuickWindowWrap::~QuickWindowWrap()
 	{
 		delete obj;
@@ -44,10 +57,33 @@ namespace Brig {
 	{
 		HandleScope scope;
 
-		QuickWindowWrap *obj_wrap = new QuickWindowWrap();
+		QuickWindowWrap *obj_wrap = new QuickWindowWrap(args[0]);
 		obj_wrap->Wrap(args.This());
 
 		return args.This();
+	}
+
+	Handle<Value> QuickWindowWrap::NewInstance(QObject *object)
+	{
+		HandleScope scope;
+
+		const unsigned argc = 1;
+		Handle<Value> obj = QObjectWrap::NewInstance(object);
+		Handle<Value> argv[argc] = { obj };
+		Handle<Value> instance = constructor->NewInstance(argc, argv);
+
+		return scope.Close(instance);
+	}
+
+	Handle<Value> QuickWindowWrap::NewInstance(Handle<Value> object)
+	{
+		HandleScope scope;
+
+		const unsigned argc = 1;
+		Handle<Value> argv[argc] = { object };
+		Handle<Value> instance = constructor->NewInstance(argc, argv);
+
+		return scope.Close(instance);
 	}
 
 	Handle<Value> QuickWindowWrap::show(const Arguments& args)
@@ -57,6 +93,7 @@ namespace Brig {
 		QuickWindowWrap *obj_wrap = ObjectWrap::Unwrap<QuickWindowWrap>(args.This());
 
 		QQuickWindow *view = obj_wrap->GetObject();
+		view->setFormat(view->requestedFormat());
 		view->show();
 
 		return scope.Close(Undefined());

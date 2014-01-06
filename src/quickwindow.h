@@ -14,10 +14,13 @@ namespace Brig {
 
 		public:
 			QuickWindowWrap();
+			QuickWindowWrap(Handle<Value> qobject);
 			~QuickWindowWrap();
 
 			static Persistent<Function> constructor;
 			static void Initialize(Handle<Object> target);
+			static Handle<Value> NewInstance(QObject *);
+			static Handle<Value> NewInstance(Handle<Value>);
 
 			QQuickWindow *GetObject() const { return obj; };
 
@@ -28,6 +31,7 @@ namespace Brig {
 			/* Methods */
 			static Handle<Value> show(const Arguments& args);
 
+			Handle<Value> prototype_object;
 			QQuickWindow *obj;
 	};
 
