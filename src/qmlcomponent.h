@@ -21,6 +21,7 @@ namespace Brig {
 			static void Initialize(Handle<Object> target);
 
 			QQmlComponent *GetObject() const { return obj; };
+			Handle<Value> GetPrototypeObject() const { return prototype_object; };
 
 		private:
 
@@ -30,6 +31,7 @@ namespace Brig {
 			static Handle<Value> create(const Arguments& args);
 			static Handle<Value> setData(const Arguments& args);
 			static Handle<Value> isReady(const Arguments& args);
+			static Handle<Value> toObject(const Arguments& args);
 
 			Handle<Value> prototype_object;
 			QQmlComponent *obj;

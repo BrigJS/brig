@@ -38,6 +38,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickWindow", QObjectWrap::toQuickWindow);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QObjectWrap::setParent);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -86,6 +87,18 @@ namespace Brig {
 		Local<Object> instance = constructor->NewInstance(argc, argv);
 
 		return scope.Close(instance);
+	}
+
+	Handle<Value> QObjectWrap::setParent(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+		QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(args[0]->ToObject());
+
+		obj_wrap->GetObject()->setParent(wrap->GetObject());
+
+		return scope.Close(Undefined());
 	}
 
 	Handle<Value> QObjectWrap::toQuickWindow(const Arguments& args)

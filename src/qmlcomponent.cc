@@ -43,6 +43,7 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "create", QmlComponentWrap::create);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setData", QmlComponentWrap::setData);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "isReady", QmlComponentWrap::isReady);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QmlComponentWrap::toObject);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -114,5 +115,14 @@ namespace Brig {
 		QmlComponentWrap *obj_wrap = ObjectWrap::Unwrap<QmlComponentWrap>(args.This());
 
 		return scope.Close(Boolean::New(obj_wrap->GetObject()->isReady()));
+	}
+
+	Handle<Value> QmlComponentWrap::toObject(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QmlComponentWrap *obj_wrap = ObjectWrap::Unwrap<QmlComponentWrap>(args.This());
+
+		return scope.Close(obj_wrap->GetPrototypeObject());
 	}
 }
