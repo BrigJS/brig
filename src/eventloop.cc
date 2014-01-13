@@ -37,7 +37,7 @@ namespace Brig {
 		EventLoop *eventloop = static_cast<EventLoop *>(handle->data);
 		QGuiApplication *app = eventloop->GetApp();
 
-		if (app->hasPendingEvents())
-			app->processEvents();
+//		if (app->hasPendingEvents())
+//			app->processEvents();
 	}
 }

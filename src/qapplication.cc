@@ -1,6 +1,7 @@
 #include <node.h>
 #include <QtGui>
 #include <QObject>
+#include <QTextCodec>
 #include <uv.h>
 #include "qapplication.h"
 #include "eventloop.h"
@@ -19,11 +20,13 @@ namespace Brig {
 		app_argv = NULL;
 		BrigEventDispatcher *dispatcher = new BrigEventDispatcher;
 		QGuiApplication::setEventDispatcher(dispatcher);
+
 		app = new QGuiApplication(app_argc, app_argv);
+		QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
 		// Initializing event loop
-		eventloop = new EventLoop(app);
-		eventloop->Main();
+//		eventloop = new EventLoop(app);
+//		eventloop->Main();
 	}
 
 	QApplicationWrap::~QApplicationWrap()

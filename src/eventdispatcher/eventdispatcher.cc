@@ -15,11 +15,10 @@ namespace Brig {
 
 	static void wakeup_handle(uv_async_t *wakeup, int status)
 	{
-		//printf("events %d\n", qGlobalPostedEventsCount());
+		BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(wakeup->data);
 
-//		uv_close((uv_handle_t *)mainloop, NULL);
-		//BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(mainloop->data);
-		//dispatcher->processEvents(NULL);
+		if (dispatcher->hasPendingEvents())
+			dispatcher->processEvents(NULL);
 	}
 
 	BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
@@ -210,10 +209,11 @@ namespace Brig {
 			// Create timer handler
 			BrigHandle *_timer = new BrigHandle;
 			_timer->callback = [timer] {
+//				printf("TIMER CALLBACK %d\n", timer->Id);
 				timer->timestamp = uv_hrtime() / 1000000;
 				QTimerEvent event(timer->Id);
 				QCoreApplication::sendEvent(timer->object, &event);
-				//printf("TIMER CALLBACK\n");
+//				printf("TIMER CALLBACK FINISHED %d\n", timer->Id);
 			};
 			timer->handle->data = (void *)_timer;
 			
@@ -238,7 +238,7 @@ namespace Brig {
 
 	bool BrigEventDispatcher::unregisterTimer(int timerId)
 	{
-//printf("unregisterTimer\n");
+//printf("unregisterTimer %d\n", timerId);
 
 		std::map<int, BrigTimer *>::iterator it = timers.find(timerId);
 		if (it == timers.end())
