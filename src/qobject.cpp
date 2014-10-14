@@ -128,7 +128,7 @@ namespace Brig {
 
 		String::Utf8Value name(args[0]->ToString());
 
-		// Set property
+		// Get property
 		QVariant v = obj_wrap->GetObject()->property(*name);
 		if (v.isNull())
 			return scope.Close(Null());
@@ -150,6 +150,8 @@ namespace Brig {
 			return scope.Close(Number::New(v.toULongLong()));
 		case QMetaType::QString:
 			return scope.Close(String::New(v.toString().toUtf8().constData()));
+		case QMetaType::QColor:
+			return scope.Close(String::New(v.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
 		}
 
 		return scope.Close(Undefined());
