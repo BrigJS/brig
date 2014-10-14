@@ -11,4 +11,7 @@ var context = new brig.QmlContext(rootContext);
 
 // Loading QML file
 var component = new brig.QmlComponent(engine, 'application.qml');
-component.create(context);
+var item = component.create(context);
+
+// Set window title
+item.setProperty('title', 'Helloooooo Brig');

@@ -39,6 +39,7 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickWindow", QObjectWrap::toQuickWindow);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QObjectWrap::setParent);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -114,4 +115,34 @@ namespace Brig {
 		return scope.Close(QuickWindowWrap::NewInstance(args.This()));
 	}
 
+	Handle<Value> QObjectWrap::setProperty(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		String::Utf8Value name(args[0]->ToString());
+		Handle<Value> value(args[1]);
+		QVariant v;
+
+		// Check data type
+		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
+			v.setValue(QVariant(value->ToBoolean()->Value()));
+		} else if (value->IsNumber()) {
+			v.setValue(QVariant(value->NumberValue()));
+		} else if (value->IsInt32()) {
+			v.setValue(QVariant(value->ToInt32()->Value()));
+		} else if (value->IsString()) {
+			String::Utf8Value _v(value->ToString());
+			v.setValue(QVariant(static_cast<char *>(*_v)));
+		}
+
+		// Set property
+		obj_wrap->GetObject()->setProperty(*name, v);
+
+		return scope.Close(Undefined());
+	}
 }
