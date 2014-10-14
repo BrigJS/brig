@@ -1,12 +1,7 @@
 #include <QCoreApplication>
 #include <QSocketNotifier>
 
-#if (QT_VERSION == QT_VERSION_CHECK(5, 1, 1))
-#include <5.1.1/QtGui/qpa/qwindowsysteminterface.h>
-#elif (QT_VERSION == QT_VERSION_CHECK(5, 2, 0))
-#include <5.2.0/QtGui/qpa/qwindowsysteminterface.h>
-#endif
-
+#include <internal/qwindowsysteminterface.h>
 #include "eventdispatcher.h"
 
 extern uint qGlobalPostedEventsCount();

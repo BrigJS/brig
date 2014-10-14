@@ -77,4 +77,16 @@ namespace Brig {
 
 		return scope.Close(instance);
 	}
+/*
+	Handle<Value> QmlContextWrap::contextProperty(const Arguments& args)
+	{
+		HandleScope scope;
+
+		String::Utf8Value name(args[0]->ToString());
+
+		QVariant variant = obj->contextProperty(QString(*name));
+
+		return args.This();
+	}
+*/
 }
