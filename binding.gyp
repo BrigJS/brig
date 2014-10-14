@@ -5,16 +5,16 @@
 		'sources': [
 			'<!@(tools/internal.sh)',
 			'<!@(tools/genmoc.sh)',
-			'src/brig.cc',
-			'src/eventdispatcher/eventdispatcher.cc',
-			'src/qapplication.cc',
-			'src/eventloop.cc',
-			'src/qobject.cc',
-			'src/qmlengine.cc',
-			'src/qmlcontext.cc',
-			'src/qmlcomponent.cc',
-			'src/quickview.cc',
-			'src/quickwindow.cc'
+			'src/brig.cpp',
+			'src/eventdispatcher/eventdispatcher.cpp',
+			'src/qapplication.cpp',
+			'src/eventloop.cpp',
+			'src/qobject.cpp',
+			'src/qmlengine.cpp',
+			'src/qmlcontext.cpp',
+			'src/qmlcomponent.cpp',
+			'src/quickview.cpp',
+			'src/quickwindow.cpp'
 		],
 		'conditions': [
 			['OS=="linux"', {
