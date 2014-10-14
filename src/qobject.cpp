@@ -39,6 +39,7 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickWindow", QObjectWrap::toQuickWindow);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QObjectWrap::setParent);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QObjectWrap::getProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
@@ -113,6 +114,42 @@ namespace Brig {
 			return ThrowException(Exception::Error(String::New("Not a QuickWindow")));
 
 		return scope.Close(QuickWindowWrap::NewInstance(args.This()));
+	}
+
+	Handle<Value> QObjectWrap::getProperty(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		String::Utf8Value name(args[0]->ToString());
+
+		// Set property
+		QVariant v = obj_wrap->GetObject()->property(*name);
+		if (v.isNull())
+			return scope.Close(Null());
+
+		switch(v.userType()) {
+		case QMetaType::Bool:
+			return scope.Close(Boolean::New(v.toBool()));
+		case QMetaType::Int:
+			return scope.Close(Number::New(v.toInt()));
+		case QMetaType::UInt:
+			return scope.Close(Number::New(v.toUInt()));
+		case QMetaType::Float:
+			return scope.Close(Number::New(v.toFloat()));
+		case QMetaType::LongLong:
+			return scope.Close(Number::New(v.toLongLong()));
+		case QMetaType::ULongLong:
+			return scope.Close(Number::New(v.toULongLong()));
+		case QMetaType::QString:
+			return scope.Close(String::New(v.toString().toUtf8().constData()));
+		}
+
+		return scope.Close(Undefined());
 	}
 
 	Handle<Value> QObjectWrap::setProperty(const Arguments& args)

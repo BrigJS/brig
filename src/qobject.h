@@ -30,6 +30,7 @@ namespace Brig {
 			/* Methods */
 			static Handle<Value> setParent(const Arguments& args);
 			static Handle<Value> toQuickWindow(const Arguments& args);
+			static Handle<Value> getProperty(const Arguments& args);
 			static Handle<Value> setProperty(const Arguments& args);
 
 			QObject *obj;

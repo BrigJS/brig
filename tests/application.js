@@ -15,3 +15,5 @@ var item = component.create(context);
 
 // Set window title
 item.setProperty('title', 'Helloooooo Brig');
+
+console.log(item.getProperty('width'));
