@@ -41,6 +41,7 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QObjectWrap::setParent);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QObjectWrap::getProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "getPropertyNames", QObjectWrap::getPropertyNames);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -141,6 +142,8 @@ namespace Brig {
 			return scope.Close(Number::New(v.toUInt()));
 		case QMetaType::Float:
 			return scope.Close(Number::New(v.toFloat()));
+		case QMetaType::Double:
+			return scope.Close(Number::New(v.toDouble()));
 		case QMetaType::LongLong:
 			return scope.Close(Number::New(v.toLongLong()));
 		case QMetaType::ULongLong:
@@ -181,5 +184,22 @@ namespace Brig {
 		obj_wrap->GetObject()->setProperty(*name, v);
 
 		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QObjectWrap::getPropertyNames(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		Handle<Array> keys = Array::New();
+
+		// Getting property names
+		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+		for (int i = 0; i < meta->propertyCount(); i++) {
+			keys->Set(i, String::New(QString(meta->property(i).name()).toUtf8().constData()));
+		}
+
+		return scope.Close(keys);
 	}
 }

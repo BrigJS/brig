@@ -16,4 +16,9 @@ var item = component.create(context);
 // Set window title
 item.setProperty('title', 'Helloooooo Brig');
 
-console.log(item.getProperty('width'));
+// Get all properties
+var keys = item.getPropertyNames();
+for (var index in keys) {
+	var key = keys[index];
+	console.log(key, ":", item.getProperty(key));
+}
