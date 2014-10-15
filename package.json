@@ -1,7 +1,7 @@
 {
 	"name": "brig",
-	"version": "0.0.1",
-	"author": "Fred Chiend <fred@mandice.com>",
+	"version": "0.0.2",
+	"author": "Fred Chiend <cfsghost@gmail.com>",
 	"description": "Graphical render engine for Node.js",
 	"repository": {
 		"type": "git",
