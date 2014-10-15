@@ -38,6 +38,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickWindow", QObjectWrap::toQuickWindow);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toQuickItem", QObjectWrap::toQuickItem);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QObjectWrap::setParent);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QObjectWrap::getProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
@@ -112,9 +113,22 @@ namespace Brig {
 
 		// It's not a window component
 		if (!obj_wrap->GetObject()->isWindowType())
-			return ThrowException(Exception::Error(String::New("Not a QuickWindow")));
+			return ThrowException(Exception::Error(String::New("Not a QuickWindow object")));
 
 		return scope.Close(QuickWindowWrap::NewInstance(args.This()));
+	}
+
+	Handle<Value> QObjectWrap::toQuickItem(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		// It's not a window component
+		if (!obj_wrap->GetObject()->inherits("QQuickItem"))
+			return ThrowException(Exception::Error(String::New("Not a QuickItem object")));
+
+		return scope.Close(QuickItemWrap::NewInstance(args.This()));
 	}
 
 	Handle<Value> QObjectWrap::getProperty(const Arguments& args)

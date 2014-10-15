@@ -24,6 +24,7 @@ namespace Brig {
 			QmlComponentWrap::Initialize(target);
 			QuickViewWrap::Initialize(target);
 			QuickWindowWrap::Initialize(target);
+			QuickItemWrap::Initialize(target);
 
 			// Cast
 			NODE_SET_METHOD(target, "cast", Cast);

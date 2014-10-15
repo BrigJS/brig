@@ -14,6 +14,7 @@ namespace Brig {
 	class QmlComponentWrap;
 	class QuickViewWrap;
 	class QuickWindowWrap;
+	class QuickItemWrap;
 
 	typedef enum {
 		BRIG_CONTAINER_NATIVE
@@ -27,5 +28,6 @@ namespace Brig {
 #include "qmlcomponent.h"
 #include "quickview.h"
 #include "quickwindow.h"
+#include "quickitem.h"
 
 #endif
