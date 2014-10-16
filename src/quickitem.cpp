@@ -46,6 +46,7 @@ namespace Brig {
 		tpl->SetClassName(name);
 
 		/* Prototype */
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QuickItemWrap::toObject);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setParentItem", QuickItemWrap::setParentItem);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setVisible", QuickItemWrap::setVisible);
 
@@ -85,6 +86,16 @@ namespace Brig {
 		Handle<Value> instance = constructor->NewInstance(argc, argv);
 
 		return scope.Close(instance);
+	}
+
+	Handle<Value> QuickItemWrap::toObject(const Arguments& args)
+	{
+		HandleScope scope;
+		
+		QuickItemWrap *obj_wrap = QuickItemWrap::Unwrap<QuickItemWrap>(args.This());
+		QObject *obj = qobject_cast<QObject *>(obj_wrap->GetObject());
+
+		return scope.Close(QObjectWrap::NewInstance(obj));
 	}
 
 	Handle<Value> QuickItemWrap::setParentItem(const Arguments& args)

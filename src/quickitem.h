@@ -29,6 +29,7 @@ namespace Brig {
 			static Handle<Value> New(const Arguments& args);
 
 			/* Methods */
+			static Handle<Value> toObject(const Arguments& args);
 			static Handle<Value> setParentItem(const Arguments& args);
 			static Handle<Value> setVisible(const Arguments& args);
 
