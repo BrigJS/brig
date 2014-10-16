@@ -1,6 +1,6 @@
 "use strict";
 
-var Brig = require('../');
+var Brig = require('../../');
 
 var brig = new Brig();
 
