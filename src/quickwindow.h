@@ -30,6 +30,7 @@ namespace Brig {
 
 			/* Methods */
 			static Handle<Value> show(const Arguments& args);
+			static Handle<Value> toObject(const Arguments& args);
 
 			Handle<Value> prototype_object;
 			QQuickWindow *obj;

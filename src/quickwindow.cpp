@@ -47,6 +47,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "show", QuickWindowWrap::show);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QuickWindowWrap::toObject);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -97,5 +98,15 @@ namespace Brig {
 		view->show();
 
 		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QuickWindowWrap::toObject(const Arguments& args)
+	{
+		HandleScope scope;
+		
+		QuickWindowWrap *obj_wrap = QuickWindowWrap::Unwrap<QuickWindowWrap>(args.This());
+		QObject *obj = qobject_cast<QObject *>(obj_wrap->GetObject());
+
+		return scope.Close(QObjectWrap::NewInstance(obj));
 	}
 }
