@@ -54,6 +54,7 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QmlContextWrap::toObject);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "contextProperty", QmlContextWrap::contextProperty);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setContextProperty", QmlContextWrap::setContextProperty);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -101,7 +102,7 @@ namespace Brig {
 
 		String::Utf8Value name(args[0]->ToString());
 
-		QVariant v = obj->contextProperty(QString(*name));
+		QVariant v = obj->contextProperty(*name);
 
 		// Convert Qvariant to V8 data type
 		if (v.isNull())
@@ -131,4 +132,35 @@ namespace Brig {
 		return Undefined();
 	}
 
+
+	Handle<Value> QmlContextWrap::setContextProperty(const Arguments& args)
+	{
+		HandleScope scope;
+		
+		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
+		QQmlContext *obj = obj_wrap->GetObject();
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		String::Utf8Value name(args[0]->ToString());
+		Handle<Value> value(args[1]);
+		QVariant v;
+
+		// Convert V8 data type to QVariant
+		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
+			v.setValue(QVariant(value->ToBoolean()->Value()));
+		} else if (value->IsNumber()) {
+			v.setValue(QVariant(value->NumberValue()));
+		} else if (value->IsInt32()) {
+			v.setValue(QVariant(value->ToInt32()->Value()));
+		} else if (value->IsString()) {
+			String::Utf8Value _v(value->ToString());
+			v.setValue(QVariant(static_cast<char *>(*_v)));
+		}
+
+		obj->setContextProperty(*name, v);
+
+		return Undefined();
+	}
 }
