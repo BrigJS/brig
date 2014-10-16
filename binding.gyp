@@ -6,6 +6,7 @@
 			'<!@(tools/internal.sh)',
 			'<!@(tools/genmoc.sh)',
 			'src/brig.cpp',
+			'src/utils.cpp',
 			'src/eventdispatcher/eventdispatcher.cpp',
 			'src/qapplication.cpp',
 			'src/eventloop.cpp',

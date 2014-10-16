@@ -8,6 +8,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
+	class Utils;
 	class QObjectWrap;
 	class QmlEngineWrap;
 	class QmlContextWrap;
@@ -21,6 +22,7 @@ namespace Brig {
 	} BrigContainerType;
 }
 
+#include "utils.h"
 #include "qobject.h"
 #include "qapplication.h"
 #include "qmlengine.h"
