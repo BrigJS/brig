@@ -51,6 +51,9 @@ namespace Brig {
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);
 		tpl->SetClassName(name);
 
+		/* Prototype */
+		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QmlContextWrap::toObject);
+
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
 		target->Set(name, constructor);
@@ -76,6 +79,16 @@ namespace Brig {
 		Handle<Value> instance = constructor->NewInstance(argc, argv);
 
 		return scope.Close(instance);
+	}
+
+	Handle<Value> QmlContextWrap::toObject(const Arguments& args)
+	{
+		HandleScope scope;
+		
+		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
+		QObject *obj = obj_wrap->GetObject()->contextObject();
+
+		return scope.Close(QObjectWrap::NewInstance(obj));
 	}
 /*
 	Handle<Value> QmlContextWrap::contextProperty(const Arguments& args)

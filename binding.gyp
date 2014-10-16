@@ -14,7 +14,8 @@
 			'src/qmlcontext.cpp',
 			'src/qmlcomponent.cpp',
 			'src/quickview.cpp',
-			'src/quickwindow.cpp'
+			'src/quickwindow.cpp',
+			'src/quickitem.cpp'
 		],
 		'conditions': [
 			['OS=="linux"', {

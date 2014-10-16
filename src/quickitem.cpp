@@ -46,7 +46,8 @@ namespace Brig {
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		//NODE_SET_PROTOTYPE_METHOD(tpl, "show", QuickItemWrap::show);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setParentItem", QuickItemWrap::setParentItem);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setVisible", QuickItemWrap::setVisible);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -85,18 +86,29 @@ namespace Brig {
 
 		return scope.Close(instance);
 	}
-#if 0
-	Handle<Value> QuickItemWrap::show(const Arguments& args)
+
+	Handle<Value> QuickItemWrap::setParentItem(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QuickItemWrap *obj_wrap = ObjectWrap::Unwrap<QuickItemWrap>(args.This());
+		QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(args[0]->ToObject());
+
+		QQuickItem *item = obj_wrap->GetObject();
+		item->setParentItem(qobject_cast<QQuickItem *>(wrap->GetObject()));
+
+		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QuickItemWrap::setVisible(const Arguments& args)
 	{
 		HandleScope scope;
 
 		QuickItemWrap *obj_wrap = ObjectWrap::Unwrap<QuickItemWrap>(args.This());
 
-		QQuickItem *view = obj_wrap->GetObject();
-		view->setFormat(view->requestedFormat());
-		view->show();
+		QQuickItem *item = obj_wrap->GetObject();
+		item->setVisible(args[0]->ToBoolean()->Value());
 
 		return scope.Close(Undefined());
 	}
-#endif
 }

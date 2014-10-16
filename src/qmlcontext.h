@@ -27,6 +27,7 @@ namespace Brig {
 		private:
 
 			static Handle<Value> New(const Arguments& args);
+			static Handle<Value> toObject(const Arguments& args);
 
 			Handle<Value> prototype_object;
 			QQmlContext *obj;
