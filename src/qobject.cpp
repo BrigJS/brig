@@ -144,6 +144,8 @@ namespace Brig {
 
 		// Get property
 		QVariant v = obj_wrap->GetObject()->property(*name);
+
+		// Convert Qvariant to V8 data type
 		if (v.isNull())
 			return scope.Close(Null());
 

@@ -53,6 +53,7 @@ namespace Brig {
 
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QmlContextWrap::toObject);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "contextProperty", QmlContextWrap::contextProperty);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -90,16 +91,44 @@ namespace Brig {
 
 		return scope.Close(QObjectWrap::NewInstance(obj));
 	}
-/*
+
 	Handle<Value> QmlContextWrap::contextProperty(const Arguments& args)
 	{
 		HandleScope scope;
+		
+		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
+		QQmlContext *obj = obj_wrap->GetObject();
 
 		String::Utf8Value name(args[0]->ToString());
 
-		QVariant variant = obj->contextProperty(QString(*name));
+		QVariant v = obj->contextProperty(QString(*name));
 
-		return args.This();
+		// Convert Qvariant to V8 data type
+		if (v.isNull())
+			return scope.Close(Null());
+
+		switch(v.userType()) {
+		case QMetaType::Bool:
+			return scope.Close(Boolean::New(v.toBool()));
+		case QMetaType::Int:
+			return scope.Close(Number::New(v.toInt()));
+		case QMetaType::UInt:
+			return scope.Close(Number::New(v.toUInt()));
+		case QMetaType::Float:
+			return scope.Close(Number::New(v.toFloat()));
+		case QMetaType::Double:
+			return scope.Close(Number::New(v.toDouble()));
+		case QMetaType::LongLong:
+			return scope.Close(Number::New(v.toLongLong()));
+		case QMetaType::ULongLong:
+			return scope.Close(Number::New(v.toULongLong()));
+		case QMetaType::QString:
+			return scope.Close(String::New(v.toString().toUtf8().constData()));
+		case QMetaType::QColor:
+			return scope.Close(String::New(v.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
+		}
+
+		return Undefined();
 	}
-*/
+
 }
