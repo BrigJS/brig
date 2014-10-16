@@ -34,6 +34,8 @@ namespace Brig {
 			static Handle<Value> getProperty(const Arguments& args);
 			static Handle<Value> setProperty(const Arguments& args);
 			static Handle<Value> getPropertyNames(const Arguments& args);
+			static Handle<Value> getMethods(const Arguments& args);
+			static Handle<Value> invokeMethod(const Arguments& args);
 
 			QObject *obj;
 	};

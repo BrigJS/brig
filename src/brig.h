@@ -8,7 +8,6 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	class Utils;
 	class QObjectWrap;
 	class QmlEngineWrap;
 	class QmlContextWrap;

@@ -10,11 +10,9 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	class Utils {
-		public:
-			Utils();
-			~Utils(void);
-	};
+	namespace Utils {
+		QVariant V8ToQVariant(Handle<Value> value);
+	}
 }
 
 #endif

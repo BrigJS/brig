@@ -43,6 +43,8 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QObjectWrap::getProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getPropertyNames", QObjectWrap::getPropertyNames);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "getMethods", QObjectWrap::getMethods);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "invokeMethod", QObjectWrap::invokeMethod);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -219,5 +221,143 @@ namespace Brig {
 		}
 
 		return scope.Close(keys);
+	}
+
+	Handle<Value> QObjectWrap::getMethods(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		Handle<Object> obj = Object::New();
+
+		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+		for(int i = meta->methodOffset(); i < meta->methodCount(); ++i)
+			obj->Set(i, String::New(meta->method(i).methodSignature().data()));
+
+		return scope.Close(obj);		
+	}
+
+	Handle<Value> QObjectWrap::invokeMethod(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		// Method name
+		String::Utf8Value methodSig(args[0]->ToString());
+
+		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+		int methodIndex = meta->indexOfMethod(*methodSig);
+		QMetaMethod method = meta->method(methodIndex);
+
+		QVariant returnedValue;
+		int argsLen = args.Length() - 1;
+
+		// It supports only 10 arguments, the limitation by Qt
+		if (argsLen == 0) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue));
+		} else if (argsLen == 1) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])));
+		} else if (argsLen == 2) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])));
+		} else if (argsLen == 3) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])));
+		} else if (argsLen == 4) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])));
+		} else if (argsLen == 5) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])));
+		} else if (argsLen == 6) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])));
+		} else if (argsLen == 7) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])));
+		} else if (argsLen == 8) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])));
+		} else if (argsLen == 9) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[9])));
+		} else if (argsLen == 10) {
+			method.invoke(obj_wrap->GetObject(),
+				Qt::DirectConnection,
+				Q_RETURN_ARG(QVariant, returnedValue),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
+				Q_ARG(QVariant, Utils::V8ToQVariant(args[10])));
+		}
+
+		return scope.Close(Undefined());
 	}
 }
