@@ -105,8 +105,16 @@ namespace Brig {
 		QuickItemWrap *obj_wrap = ObjectWrap::Unwrap<QuickItemWrap>(args.This());
 		QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(args[0]->ToObject());
 
+		// Getting content item if it is window object
+		QQuickItem *parentItem = NULL;
+		if (wrap->GetObject()->isWindowType()) {
+			parentItem = qobject_cast<QQuickWindow *>(wrap->GetObject())->contentItem();
+		} else {
+			parentItem = qobject_cast<QQuickItem *>(wrap->GetObject());
+		}
+
 		QQuickItem *item = obj_wrap->GetObject();
-		item->setParentItem(qobject_cast<QQuickItem *>(wrap->GetObject()));
+		item->setParentItem(parentItem);
 
 		return scope.Close(Undefined());
 	}
