@@ -350,106 +350,20 @@ namespace Brig {
 		QVariant returnedValue;
 		int argsLen = args.Length() - 1;
 
-		// It supports only 10 arguments, the limitation by Qt
-		if (argsLen == 0) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue));
-		} else if (argsLen == 1) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])));
-		} else if (argsLen == 2) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])));
-		} else if (argsLen == 3) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])));
-		} else if (argsLen == 4) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])));
-		} else if (argsLen == 5) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])));
-		} else if (argsLen == 6) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])));
-		} else if (argsLen == 7) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])));
-		} else if (argsLen == 8) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])));
-		} else if (argsLen == 9) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[9])));
-		} else if (argsLen == 10) {
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-				Qt::DirectConnection,
-				Q_RETURN_ARG(QVariant, returnedValue),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
-				Q_ARG(QVariant, Utils::V8ToQVariant(args[10])));
-		}
+		// It supports only 10 arguments with limitation of Qt
+		QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
+			Qt::DirectConnection,
+			Q_RETURN_ARG(QVariant, returnedValue),
+			(argsLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[1])) : QGenericArgument(),
+			(argsLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[2])) : QGenericArgument(),
+			(argsLen > 2) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[3])) : QGenericArgument(),
+			(argsLen > 3) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[4])) : QGenericArgument(),
+			(argsLen > 4) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[5])) : QGenericArgument(),
+			(argsLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[6])) : QGenericArgument(),
+			(argsLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[7])) : QGenericArgument(),
+			(argsLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[8])) : QGenericArgument(),
+			(argsLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[8])) : QGenericArgument(),
+			(argsLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[9])) : QGenericArgument());
 
 		// Convert Qvariant to V8 data type
 		if (returnedValue.isNull())
