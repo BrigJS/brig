@@ -44,6 +44,7 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QObjectWrap::setProperty);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getPropertyNames", QObjectWrap::getPropertyNames);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "getMethods", QObjectWrap::getMethods);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "emit", QObjectWrap::emitEvent);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "invokeMethod", QObjectWrap::invokeMethod);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
@@ -232,10 +233,106 @@ namespace Brig {
 		Handle<Object> obj = Object::New();
 
 		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
-		for(int i = meta->methodOffset(); i < meta->methodCount(); ++i)
+		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i)
+//		for(int i = 0; i < meta->methodCount(); ++i)
 			obj->Set(i, String::New(meta->method(i).methodSignature().data()));
 
 		return scope.Close(obj);		
+	}
+
+	Handle<Value> QObjectWrap::emitEvent(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		// Method name
+		String::Utf8Value methodSig(args[0]->ToString());
+
+		QVariant returnedValue;
+		int argsLen = args.Length() - 1;
+
+		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+//		int methodIndex = meta->indexOfMethod(*methodSig);
+//		QMetaMethod method = meta->method(methodIndex);
+//
+		// Getting currect context
+		QQmlContext *thisContext = QQmlEngine::contextForObject(obj_wrap->GetObject());
+
+		// Preparing parameter and ensure QJSValue have individual memory
+		QJSValue val[argsLen];
+		QList<QGenericArgument> parameters;
+		QList<Utils::ParamData> dataList;
+
+		// Getting signature
+		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
+			const char *sig = meta->method(i).methodSignature().data();
+
+			// Check method name
+			if (strncmp(sig, *methodSig, args[0]->ToString()->Length()) != 0)
+				continue;
+
+			if (*(sig + args[0]->ToString()->Length()) != '(')
+				continue;
+
+			// Getting method object with signature
+			int methodIndex = meta->indexOfMethod(sig);
+			QMetaMethod method = meta->method(methodIndex);
+
+			// Getting parameter types
+			for (int j = 0; j < method.parameterCount(); j++) {
+				int type = method.parameterType(j);
+
+				if (j >= args.Length())
+					break;
+
+				Handle<Value> value = args[j + 1];
+
+				// Type is "var" in QML, which is different from QVariant
+				if (type == qMetaTypeId<QJSValue>()) {
+					val[j] = Utils::V8ToQJSValue(thisContext->engine(), value);
+
+					// Undefined
+					parameters << QGenericArgument("QJSValue", static_cast<const void *>(&val[j]));
+					continue;
+				}
+
+				// Making arguments
+				Utils::ParamData *data = Utils::MakeParameter(type, value);
+				if (data == NULL) {
+					// Unknown type, set Undefined to this parameter
+					parameters << QGenericArgument();
+					continue;
+				}
+
+				dataList << data;
+				parameters << QGenericArgument(QMetaType::typeName(type), data->ptr);
+			}
+
+			// Invoke
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
+				Qt::QueuedConnection,
+				(argsLen > 0) ? parameters[0] : QGenericArgument(),
+				(argsLen > 1) ? parameters[1] : QGenericArgument(),
+				(argsLen > 2) ? parameters[2] : QGenericArgument(),
+				(argsLen > 3) ? parameters[3] : QGenericArgument(),
+				(argsLen > 4) ? parameters[4] : QGenericArgument(),
+				(argsLen > 5) ? parameters[5] : QGenericArgument(),
+				(argsLen > 6) ? parameters[6] : QGenericArgument(),
+				(argsLen > 7) ? parameters[7] : QGenericArgument(),
+				(argsLen > 8) ? parameters[8] : QGenericArgument(),
+				(argsLen > 9) ? parameters[9] : QGenericArgument());
+
+			// Release
+			dataList.clear();
+
+			break;
+		}
+
+		return Undefined();
 	}
 
 	Handle<Value> QObjectWrap::invokeMethod(const Arguments& args)
@@ -250,38 +347,34 @@ namespace Brig {
 		// Method name
 		String::Utf8Value methodSig(args[0]->ToString());
 
-		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
-		int methodIndex = meta->indexOfMethod(*methodSig);
-		QMetaMethod method = meta->method(methodIndex);
-
 		QVariant returnedValue;
 		int argsLen = args.Length() - 1;
 
 		// It supports only 10 arguments, the limitation by Qt
 		if (argsLen == 0) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue));
 		} else if (argsLen == 1) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])));
 		} else if (argsLen == 2) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])));
 		} else if (argsLen == 3) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[2])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])));
 		} else if (argsLen == 4) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -289,7 +382,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[3])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])));
 		} else if (argsLen == 5) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -298,7 +391,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[4])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])));
 		} else if (argsLen == 6) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -308,7 +401,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[5])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])));
 		} else if (argsLen == 7) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -319,7 +412,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[6])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])));
 		} else if (argsLen == 8) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -331,7 +424,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])));
 		} else if (argsLen == 9) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -344,7 +437,7 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[9])));
 		} else if (argsLen == 10) {
-			method.invoke(obj_wrap->GetObject(),
+			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
 				Qt::DirectConnection,
 				Q_RETURN_ARG(QVariant, returnedValue),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[1])),
@@ -356,6 +449,31 @@ namespace Brig {
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[7])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[8])),
 				Q_ARG(QVariant, Utils::V8ToQVariant(args[10])));
+		}
+
+		// Convert Qvariant to V8 data type
+		if (returnedValue.isNull())
+			return scope.Close(Null());
+
+		switch(returnedValue.userType()) {
+		case QMetaType::Bool:
+			return scope.Close(Boolean::New(returnedValue.toBool()));
+		case QMetaType::Int:
+			return scope.Close(Number::New(returnedValue.toInt()));
+		case QMetaType::UInt:
+			return scope.Close(Number::New(returnedValue.toUInt()));
+		case QMetaType::Float:
+			return scope.Close(Number::New(returnedValue.toFloat()));
+		case QMetaType::Double:
+			return scope.Close(Number::New(returnedValue.toDouble()));
+		case QMetaType::LongLong:
+			return scope.Close(Number::New(returnedValue.toLongLong()));
+		case QMetaType::ULongLong:
+			return scope.Close(Number::New(returnedValue.toULongLong()));
+		case QMetaType::QString:
+			return scope.Close(String::New(returnedValue.toString().toUtf8().constData()));
+		case QMetaType::QColor:
+			return scope.Close(String::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
 		}
 
 		return scope.Close(Undefined());

@@ -10,5 +10,6 @@ ApplicationWindow {
 
 	function hello(x, y) {
 		console.log('invoked method');
+		return x + y;
 	}
 }
