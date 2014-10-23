@@ -269,18 +269,13 @@ namespace Brig {
 
 		// Getting signature
 		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
-			const char *sig = meta->method(i).methodSignature().data();
-
-			// Check method name
-			if (strncmp(sig, *methodSig, args[0]->ToString()->Length()) != 0)
+			QMetaMethod method = meta->method(i);
+			const char *methodName = method.name().data();
+			if (strcmp(*methodSig, methodName) != 0)
 				continue;
 
-			if (*(sig + args[0]->ToString()->Length()) != '(')
-				continue;
-
-			// Getting method object with signature
-			int methodIndex = meta->indexOfMethod(sig);
-			QMetaMethod method = meta->method(methodIndex);
+			if (!method.isValid())
+				break;
 
 			// Getting parameter types
 			for (int j = 0; j < method.parameterCount(); j++) {
@@ -313,7 +308,7 @@ namespace Brig {
 			}
 
 			// Invoke
-			QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
+			method.invoke(obj_wrap->GetObject(),
 				Qt::QueuedConnection,
 				(argsLen > 0) ? parameters[0] : QGenericArgument(),
 				(argsLen > 1) ? parameters[1] : QGenericArgument(),
@@ -328,6 +323,7 @@ namespace Brig {
 
 			// Release
 			dataList.clear();
+			parameters.clear();
 
 			break;
 		}
@@ -352,7 +348,7 @@ namespace Brig {
 
 		// It supports only 10 arguments with limitation of Qt
 		QMetaObject::invokeMethod(obj_wrap->GetObject(), *methodSig,
-			Qt::DirectConnection,
+			Qt::AutoConnection,
 			Q_RETURN_ARG(QVariant, returnedValue),
 			(argsLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[1])) : QGenericArgument(),
 			(argsLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[2])) : QGenericArgument(),
