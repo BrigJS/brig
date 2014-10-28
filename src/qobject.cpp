@@ -3,6 +3,8 @@
 #include <QtGui>
 #include <QObject>
 #include "qobject.h"
+#include "signal_handler.h"
+#include "callback.h"
 
 namespace Brig {
 
@@ -13,6 +15,7 @@ namespace Brig {
 
 	QObjectWrap::QObjectWrap() : ObjectWrap()
 	{
+		SignalHandler *signalHandler = new SignalHandler(obj_wrap);
 	}
 
 	QObjectWrap::QObjectWrap(QObject *object) : ObjectWrap()
@@ -22,6 +25,7 @@ namespace Brig {
 
 	QObjectWrap::~QObjectWrap()
 	{
+
 		delete obj;
 	}
 
@@ -387,5 +391,38 @@ namespace Brig {
 		}
 
 		return scope.Close(Undefined());
+	}
+
+	Handle<Value> QObjectWrap::connect(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QObjectWrap *obj_wrap = ObjectWrap::Unwrap<QObjectWrap>(args.This());
+		QObject *obj = obj_wrap->GetObject();
+
+		// Signal name
+		String::Utf8Value methodSig(args[0]->ToString());
+
+		// Callback
+		Callback *callback = new Callback();
+		callback->handler = Persistent<Function>::New(Handle<Function>::Cast(args[1]));
+
+		// Finding index of signal
+		static const QMetaObject *meta = obj->metaObject();
+		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
+			QMetaMethod method = meta->method(i);
+			const char *methodName = method.name().data();
+			if (strcmp(*methodSig, methodName) != 0)
+				continue;
+
+			// Create signal handler
+			SignalHandler *signalHandler = new SignalHandler(obj_wrap);
+
+			// Setup handler
+			QMetaObject::connect(obj, i, signalHandler, QObject::metaObject()->methodCount() + callbacks.count());
+			
+		}
+
+		return Undefined();
 	}
 }

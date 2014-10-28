@@ -33,7 +33,7 @@ namespace Brig {
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
+//		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -49,7 +49,7 @@ namespace Brig {
 
 		return args.This();
 	}
-
+/*
 	Handle<Value> QmlEngineWrap::rootContext(const Arguments& args)
 	{
 		HandleScope scope;
@@ -63,4 +63,5 @@ namespace Brig {
 
 		return scope.Close(instance);
 	}
+*/
 }

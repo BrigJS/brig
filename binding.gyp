@@ -10,13 +10,8 @@
 			'src/eventdispatcher/eventdispatcher.cpp',
 			'src/qapplication.cpp',
 			'src/eventloop.cpp',
-			'src/qobject.cpp',
 			'src/qmlengine.cpp',
-			'src/qmlcontext.cpp',
-			'src/qmlcomponent.cpp',
-			'src/quickview.cpp',
-			'src/quickwindow.cpp',
-			'src/quickitem.cpp'
+			'src/QmlComponent.cpp'
 		],
 		'conditions': [
 			['OS=="linux"', {

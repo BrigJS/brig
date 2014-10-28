@@ -8,13 +8,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	class QObjectWrap;
 	class QmlEngineWrap;
-	class QmlContextWrap;
-	class QmlComponentWrap;
-	class QuickViewWrap;
-	class QuickWindowWrap;
-	class QuickItemWrap;
 
 	typedef enum {
 		BRIG_CONTAINER_NATIVE
@@ -22,13 +16,8 @@ namespace Brig {
 }
 
 #include "utils.h"
-#include "qobject.h"
 #include "qapplication.h"
 #include "qmlengine.h"
-#include "qmlcontext.h"
-#include "qmlcomponent.h"
-#include "quickview.h"
-#include "quickwindow.h"
-#include "quickitem.h"
+#include "QmlComponent.h"
 
 #endif

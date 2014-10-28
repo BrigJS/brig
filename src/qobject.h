@@ -3,6 +3,7 @@
 
 #include <node.h>
 #include <QObject>
+#include <QVector>
 #include "brig.h"
 
 namespace Brig {
@@ -39,6 +40,7 @@ namespace Brig {
 			static Handle<Value> invokeMethod(const Arguments& args);
 
 			QObject *obj;
+			SignalHandler *signalHandler;
 	};
 
 }
