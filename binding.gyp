@@ -11,7 +11,8 @@
 			'src/qapplication.cpp',
 			'src/eventloop.cpp',
 			'src/qmlengine.cpp',
-			'src/QmlComponent.cpp'
+			'src/QmlComponent.cpp',
+			'src/QuickItem.cpp'
 		],
 		'conditions': [
 			['OS=="linux"', {

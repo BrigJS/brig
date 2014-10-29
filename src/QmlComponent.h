@@ -28,7 +28,6 @@ namespace Brig {
 			/* Methods */
 			static Handle<Value> setEngine(const Arguments& args);
 			static Handle<Value> loadUrl(const Arguments& args);
-			static Handle<Value> create(const Arguments& args);
 
 			QmlEngineWrap *engine;
 			QQmlComponent *obj;

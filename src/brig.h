@@ -9,6 +9,8 @@ namespace Brig {
 	using namespace node;
 
 	class QmlEngineWrap;
+	class QmlComponent;
+	class QuickItem;
 
 	typedef enum {
 		BRIG_CONTAINER_NATIVE
@@ -19,5 +21,6 @@ namespace Brig {
 #include "qapplication.h"
 #include "qmlengine.h"
 #include "QmlComponent.h"
+#include "QuickItem.h"
 
 #endif

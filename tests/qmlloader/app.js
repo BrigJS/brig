@@ -5,7 +5,6 @@ var Brig = require('../../');
 var brig = new Brig();
 
 brig.on('ready', function(brig) {
-console.log('QQQ');
 	var window = brig.open('application.qml');
 });
 /*

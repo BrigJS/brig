@@ -21,6 +21,8 @@ namespace Brig {
 			QApplicationWrap::Initialize(target);
 			QmlEngineWrap::Initialize(target);
 			QmlComponent::Initialize(target);
+			QuickItem::Initialize(target);
+
 //			QmlContextWrap::Initialize(target);
 //			QmlComponentWrap::Initialize(target);
 //			QuickViewWrap::Initialize(target);
