@@ -15,6 +15,7 @@ namespace Brig {
 	{
 		obj = NULL;
 		engine = NULL;
+		signal = NULL;
 	}
 
 	QmlComponent::~QmlComponent()
@@ -40,6 +41,11 @@ namespace Brig {
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
 		target->Set(name, constructor);
+	}
+
+	void QmlComponent::continueLoading()
+	{
+		printf("CCCCC\n");
 	}
 
 	// Prototype Constructor
@@ -76,7 +82,14 @@ namespace Brig {
 		String::Utf8Value url(args[0]->ToString());
 
 		obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject(), *url);
+		obj_wrap->signal = new SignalHandler(obj_wrap->obj);
 
+#if 0
+		if (obj_wrap->obj->isLoading())
+			QObject::connect(obj_wrap->obj, SIGNAL(statusChanged(QQmlComponent::Status)), obj_wrap, SLOT(QmlComponent::continueLoading()));
+		else
+			QmlComponent::continueLoading();
+#endif
 		return args.This();
 	}
 }

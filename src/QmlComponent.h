@@ -23,6 +23,8 @@ namespace Brig {
 
 		private:
 
+			static void continueLoading();
+
 			static Handle<Value> New(const Arguments& args);
 
 			/* Methods */
@@ -31,6 +33,7 @@ namespace Brig {
 
 			QmlEngineWrap *engine;
 			QQmlComponent *obj;
+			SignalHandler *signal;
 	};
 
 }

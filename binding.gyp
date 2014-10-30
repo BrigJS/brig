@@ -10,6 +10,8 @@
 			'src/eventdispatcher/eventdispatcher.cpp',
 			'src/qapplication.cpp',
 			'src/eventloop.cpp',
+			'src/callback.cpp',
+			'src/signal_handler.cpp',
 			'src/qmlengine.cpp',
 			'src/QmlComponent.cpp',
 			'src/QuickItem.cpp'
