@@ -88,6 +88,7 @@ namespace Brig {
 			};
 		};
 
+		Handle<Value> QDataToV8(int type, void *value);
 		QVariant V8ToQVariant(Handle<Value> value);
 		QJSValue V8ToQJSValue(QQmlEngine *engine, Handle<Value> value);
 		ParamData *MakeParameter(int type, Handle<Value> value);

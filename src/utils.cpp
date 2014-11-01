@@ -9,6 +9,52 @@ namespace Brig {
 
 	namespace Utils {
 
+		Handle<Value> QDataToV8(int type, void *value)
+		{
+			HandleScope scope;
+
+			Handle<Value> result = Null();
+
+			switch(type) {
+			case QMetaType::Bool:
+				result = Number::New(QVariant::fromValue(value).value<bool>());
+				break;
+
+			case QMetaType::Int:
+				result = Number::New(QVariant::fromValue(value).value<int>());
+				break;
+
+			case QMetaType::UInt:
+				result = Number::New(QVariant::fromValue(value).value<unsigned int>());
+				break;
+
+			case QMetaType::Float:
+				result = Number::New(QVariant::fromValue(value).value<float>());
+				break;
+
+			case QMetaType::Double:
+				result = Number::New(QVariant::fromValue(value).value<double>());
+				break;
+
+			case QMetaType::LongLong:
+
+				result = Number::New(QVariant::fromValue(value).value<long long>());
+				break;
+
+			case QMetaType::ULongLong:
+				result = Number::New(QVariant::fromValue(value).value<unsigned long long>());
+				break;
+
+			case QMetaType::QString:
+				result = String::New(static_cast<QString *>(value)->toUtf8().constData());
+				break;
+
+//			case QMetaType::QVariant:
+			}
+
+			return scope.Close(result);
+		}
+
 		QVariant V8ToQVariant(Handle<Value> value)
 		{
 			QVariant v;

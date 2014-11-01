@@ -15,11 +15,12 @@ namespace Brig {
 	{
 		obj = NULL;
 		engine = NULL;
-		signal = NULL;
+		signal = new SignalHandler();
 	}
 
 	QmlComponent::~QmlComponent()
 	{
+		delete signal;
 		delete obj;
 	}
 
@@ -37,15 +38,11 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlComponent::setEngine);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "loadUrl", QmlComponent::loadUrl);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlComponent::on);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
 		target->Set(name, constructor);
-	}
-
-	void QmlComponent::continueLoading()
-	{
-		printf("CCCCC\n");
 	}
 
 	// Prototype Constructor
@@ -81,15 +78,36 @@ namespace Brig {
 
 		String::Utf8Value url(args[0]->ToString());
 
-		obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject(), *url);
-		obj_wrap->signal = new SignalHandler(obj_wrap->obj);
+		obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject());
+		obj_wrap->obj->loadUrl(QUrl(*url), QQmlComponent::Asynchronous);
+		obj_wrap->signal->setObject(obj_wrap->obj);
 
+		if (obj_wrap->obj->isLoading())
+			printf("LOADING\n");
+//		obj_wrap->signal->connect();
+
+//		QObject::connect(obj_wrap->obj, SIGNAL(statusChanged(QQmlComponent::Status)), obj_wrap, SLOT(QmlComponent::continueLoading()));
 #if 0
 		if (obj_wrap->obj->isLoading())
 			QObject::connect(obj_wrap->obj, SIGNAL(statusChanged(QQmlComponent::Status)), obj_wrap, SLOT(QmlComponent::continueLoading()));
 		else
 			QmlComponent::continueLoading();
 #endif
+		return args.This();
+	}
+
+	Handle<Value> QmlComponent::on(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
+
+		// Signal name
+		String::Utf8Value url(args[0]->ToString());
+
+		int id = obj_wrap->signal->addCallback(*url, args[1]->ToObject());
+printf("COOL %d\n", id);
+
 		return args.This();
 	}
 }

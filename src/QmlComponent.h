@@ -23,13 +23,12 @@ namespace Brig {
 
 		private:
 
-			static void continueLoading();
-
 			static Handle<Value> New(const Arguments& args);
 
 			/* Methods */
 			static Handle<Value> setEngine(const Arguments& args);
 			static Handle<Value> loadUrl(const Arguments& args);
+			static Handle<Value> on(const Arguments& args);
 
 			QmlEngineWrap *engine;
 			QQmlComponent *obj;

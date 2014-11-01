@@ -11,11 +11,13 @@ namespace Brig {
 	using namespace node;
 
 	struct Callback {
+		char *signal;
 		Persistent<Function> handler;
 
 		~Callback() {
 			handler.Dispose();
 			handler.Clear();
+			delete signal;
 		}
 	};
 

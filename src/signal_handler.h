@@ -13,11 +13,14 @@ namespace Brig {
 	class SignalHandler : public QObject {
 
 		public:
+			SignalHandler();
 			SignalHandler(QObject *);
 			~SignalHandler();
 
 			int qt_metacall(QMetaObject::Call call, int id, void **arguments);
-			int addCallback(Handle<Value> cb);
+			int findSignalId(const char *signal);
+			bool setObject(QObject *_obj);
+			int addCallback(const char *signal, Handle<Value> cb);
 			bool connectToSignal(char *signal, QObject *obj, char *slot);
 
 		private:
