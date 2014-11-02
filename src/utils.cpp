@@ -1,5 +1,7 @@
 #include <QObject>
 #include <QVariant>
+#include <QMetaType>
+#include <QQmlComponent>
 #include "utils.h"
 
 namespace Brig {
@@ -13,41 +15,50 @@ namespace Brig {
 		{
 			HandleScope scope;
 
+			QVariant v = QVariant(type, value);
 			Handle<Value> result = Null();
 
 			switch(type) {
 			case QMetaType::Bool:
-				result = Number::New(QVariant::fromValue(value).value<bool>());
+				result = Boolean::New(v.toBool());
 				break;
 
 			case QMetaType::Int:
-				result = Number::New(QVariant::fromValue(value).value<int>());
+				result = Number::New(v.toInt());
 				break;
 
 			case QMetaType::UInt:
-				result = Number::New(QVariant::fromValue(value).value<unsigned int>());
+				result = Number::New(v.toUInt());
 				break;
 
 			case QMetaType::Float:
-				result = Number::New(QVariant::fromValue(value).value<float>());
+				result = Number::New(v.toFloat());
 				break;
 
 			case QMetaType::Double:
-				result = Number::New(QVariant::fromValue(value).value<double>());
+				result = Number::New(v.toDouble());
 				break;
 
 			case QMetaType::LongLong:
 
-				result = Number::New(QVariant::fromValue(value).value<long long>());
+				result = Number::New(v.toLongLong());
 				break;
 
 			case QMetaType::ULongLong:
-				result = Number::New(QVariant::fromValue(value).value<unsigned long long>());
+				result = Number::New(v.toULongLong());
 				break;
 
 			case QMetaType::QString:
-				result = String::New(static_cast<QString *>(value)->toUtf8().constData());
+				result = String::New(v.toString().toUtf8().constData());
 				break;
+
+			default:
+
+				if (type == qMetaTypeId<QQmlComponent::Status>()) {
+					result = Number::New(v.toInt());
+				} else if (type == qMetaTypeId<qreal>()) {
+					result = Number::New(v.toDouble());
+				}
 
 //			case QMetaType::QVariant:
 			}

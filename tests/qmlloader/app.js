@@ -5,7 +5,9 @@ var Brig = require('../../');
 var brig = new Brig();
 
 brig.on('ready', function(brig) {
-	var window = brig.open('application.qml');
+	brig.open('application.qml', function(err, window) {
+
+	});
 });
 /*
 // Create Engine

@@ -17,11 +17,10 @@ namespace Brig {
 			SignalHandler(QObject *);
 			~SignalHandler();
 
-			int qt_metacall(QMetaObject::Call call, int id, void **arguments);
+			virtual int qt_metacall(QMetaObject::Call call, int id, void **arguments);
 			int findSignalId(const char *signal);
 			bool setObject(QObject *_obj);
 			int addCallback(const char *signal, Handle<Value> cb);
-			bool connectToSignal(char *signal, QObject *obj, char *slot);
 
 		private:
 
