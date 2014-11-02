@@ -38,6 +38,7 @@ namespace Brig {
 		/* Prototype */
 		NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlComponent::setEngine);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "loadUrl", QmlComponent::loadUrl);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setData", QmlComponent::setData);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlComponent::on);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "progress", QmlComponent::progress);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "status", QmlComponent::status);
@@ -85,6 +86,35 @@ namespace Brig {
 		obj_wrap->obj->loadUrl(QUrl(QString(*url)), QQmlComponent::Asynchronous);
 
 		return args.This();
+	}
+
+	Handle<Value> QmlComponent::setData(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QUrl url;
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		if (args[1]->IsString()) {
+			String::Utf8Value url_str(args[1]->ToString());
+			url = QUrl::fromLocalFile(*url_str);
+		} else {
+			url = QUrl();
+		}
+
+		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
+
+		if (!obj_wrap->obj) {
+			obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject());
+			obj_wrap->signal->setObject(obj_wrap->obj);
+		}
+
+		String::Utf8Value data_str(args[0]->ToString());
+		obj_wrap->GetObject()->setData(*data_str, url); 
+
+		return scope.Close(Undefined());
 	}
 
 	Handle<Value> QmlComponent::on(const Arguments& args)

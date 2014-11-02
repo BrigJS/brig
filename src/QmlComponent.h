@@ -28,6 +28,7 @@ namespace Brig {
 			/* Methods */
 			static Handle<Value> setEngine(const Arguments& args);
 			static Handle<Value> loadUrl(const Arguments& args);
+			static Handle<Value> setData(const Arguments& args);
 			static Handle<Value> on(const Arguments& args);
 			static Handle<Value> progress(const Arguments& args);
 			static Handle<Value> status(const Arguments& args);
