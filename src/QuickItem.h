@@ -27,6 +27,9 @@ namespace Brig {
 
 			/* Methods */
 			static Handle<Value> create(const Arguments& args);
+			static Handle<Value> getPropertyNames(const Arguments& args);
+			static Handle<Value> getProperty(const Arguments& args);
+			static Handle<Value> setProperty(const Arguments& args);
 
 			QQuickItem *obj;
 	};
