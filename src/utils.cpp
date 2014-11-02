@@ -15,55 +15,53 @@ namespace Brig {
 		{
 			HandleScope scope;
 
-			QVariant v = QVariant(type, value);
+			return scope.Close(QVariantToV8(type, QVariant(type, value)));
+		}
+
+		Handle<Value> QVariantToV8(int type, QVariant v)
+		{
+			HandleScope scope;
+
 			Handle<Value> result = Null();
 
 			switch(type) {
 			case QMetaType::Bool:
-				result = Boolean::New(v.toBool());
-				break;
+				return scope.Close(Boolean::New(v.toBool()));
 
 			case QMetaType::Int:
-				result = Number::New(v.toInt());
-				break;
+				return scope.Close(Number::New(v.toInt()));
 
 			case QMetaType::UInt:
-				result = Number::New(v.toUInt());
-				break;
+				return scope.Close(Number::New(v.toUInt()));
 
 			case QMetaType::Float:
-				result = Number::New(v.toFloat());
-				break;
+				return scope.Close(Number::New(v.toFloat()));
 
 			case QMetaType::Double:
-				result = Number::New(v.toDouble());
-				break;
+				return scope.Close(Number::New(v.toDouble()));
 
 			case QMetaType::LongLong:
 
-				result = Number::New(v.toLongLong());
-				break;
+				return scope.Close(Number::New(v.toLongLong()));
 
 			case QMetaType::ULongLong:
-				result = Number::New(v.toULongLong());
-				break;
+				return scope.Close(Number::New(v.toULongLong()));
 
 			case QMetaType::QString:
-				result = String::New(v.toString().toUtf8().constData());
-				break;
+				return scope.Close(String::New(v.toString().toUtf8().constData()));
 
 			default:
 
 				if (type == qMetaTypeId<QQmlComponent::Status>()) {
-					result = Number::New(v.toInt());
+					return scope.Close(Number::New(v.toInt()));
 				} else if (type == qMetaTypeId<qreal>()) {
-					result = Number::New(v.toDouble());
+					return scope.Close(Number::New(v.toDouble()));
 				}
 
 //			case QMetaType::QVariant:
 			}
 
-			return scope.Close(result);
+			return scope.Close(Undefined());
 		}
 
 		QVariant V8ToQVariant(Handle<Value> value)

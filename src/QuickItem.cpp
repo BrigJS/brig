@@ -104,28 +104,7 @@ namespace Brig {
 		if (v.isNull())
 			return scope.Close(Null());
 
-		switch(v.userType()) {
-		case QMetaType::Bool:
-			return scope.Close(Boolean::New(v.toBool()));
-		case QMetaType::Int:
-			return scope.Close(Number::New(v.toInt()));
-		case QMetaType::UInt:
-			return scope.Close(Number::New(v.toUInt()));
-		case QMetaType::Float:
-			return scope.Close(Number::New(v.toFloat()));
-		case QMetaType::Double:
-			return scope.Close(Number::New(v.toDouble()));
-		case QMetaType::LongLong:
-			return scope.Close(Number::New(v.toLongLong()));
-		case QMetaType::ULongLong:
-			return scope.Close(Number::New(v.toULongLong()));
-		case QMetaType::QString:
-			return scope.Close(String::New(v.toString().toUtf8().constData()));
-		case QMetaType::QColor:
-			return scope.Close(String::New(v.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
-		}
-
-		return scope.Close(Undefined());
+		return scope.Close(Utils::QVariantToV8(v.userType(), v));
 	}
 
 	Handle<Value> QuickItem::setProperty(const Arguments& args)
