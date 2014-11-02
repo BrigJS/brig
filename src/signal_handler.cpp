@@ -45,7 +45,7 @@ namespace Brig {
 		QMetaMethod method = meta->method(methodId);
 		int argc = method.parameterCount();
 
-		Handle<Value> argv[argc];
+		Handle<Value> *argv = new Handle<Value>[argc];
 		for (int i = 0; i < method.parameterCount(); ++i) {
 			int type = method.parameterType(i);
 

@@ -20,8 +20,10 @@ elif [ "$1" == "--cflags" ]; then
 elif [ "$1" == "--libs" ]; then
 	shift 1
 
+	echo -F$QT_LIBS_PATH
+
 	for i in $@; do
-		echo -framework $i
+		echo $QT_LIBS_PATH/${i}.framework
 	done
 
 elif [ "$1" == '--internal' ]; then
