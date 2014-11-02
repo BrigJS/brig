@@ -2,131 +2,138 @@
 #include <node.h>
 #include <QtGui>
 #include <QObject>
-#include "quickitem.h"
+#include "QuickItem.h"
 
 namespace Brig {
 
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QuickItemWrap::constructor;
+	Persistent<Function> QuickItem::constructor;
 
-	QuickItemWrap::QuickItemWrap() : ObjectWrap()
+	QuickItem::QuickItem() : ObjectWrap()
 	{
-		obj = new QQuickItem();
+		obj = NULL;
 	}
 
-	QuickItemWrap::QuickItemWrap(Handle<Value> object) : ObjectWrap()
-	{
-		if (strcmp(*String::Utf8Value(object->ToObject()->GetConstructorName()), "QuickItem") == 0) {
-			QuickItemWrap *wrap = ObjectWrap::Unwrap<QuickItemWrap>(object->ToObject());
-			obj = wrap->GetObject();
-		} else {
-			QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(object->ToObject());
-			obj = qobject_cast<QQuickItem *>(wrap->GetObject());
-		}
-
-		prototype_object = object;
-	}
-
-	QuickItemWrap::~QuickItemWrap()
+	QuickItem::~QuickItem()
 	{
 		delete obj;
 	}
 
-	void QuickItemWrap::Initialize(Handle<Object> target)
+	void QuickItem::Initialize(Handle<Object> target)
 	{
 		HandleScope scope;
 
 		Local<String> name = String::NewSymbol("QuickItem");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QuickItemWrap::New));
+		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QuickItem::New));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QuickItemWrap::toObject);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "setParentItem", QuickItemWrap::setParentItem);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "setVisible", QuickItemWrap::setVisible);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "create", QuickItem::create);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "getPropertyNames", QuickItem::getPropertyNames);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QuickItem::getProperty);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QuickItem::setProperty);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
 		target->Set(name, constructor);
 	}
 
-	Handle<Value> QuickItemWrap::New(const Arguments& args)
+	// Prototype Constructor
+	Handle<Value> QuickItem::New(const Arguments& args)
 	{
 		HandleScope scope;
 
-		QuickItemWrap *obj_wrap = new QuickItemWrap(args[0]);
+		QuickItem *obj_wrap = new QuickItem();
 		obj_wrap->Wrap(args.This());
 
 		return args.This();
 	}
 
-	Handle<Value> QuickItemWrap::NewInstance(QObject *object)
+	// Method
+	Handle<Value> QuickItem::create(const Arguments& args)
 	{
 		HandleScope scope;
 
-		const unsigned argc = 1;
-		Handle<Value> obj = QObjectWrap::NewInstance(object);
-		Handle<Value> argv[argc] = { obj };
-		Handle<Value> instance = constructor->NewInstance(argc, argv);
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
-		return scope.Close(instance);
+		QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(args[0]->ToObject());
+
+		// Create QuickItem with component
+		obj_wrap->obj = static_cast<QQuickItem *>(component->GetObject()->create());
+
+		return Undefined();
 	}
 
-	Handle<Value> QuickItemWrap::NewInstance(Handle<Value> object)
+	Handle<Value> QuickItem::getPropertyNames(const Arguments& args)
 	{
 		HandleScope scope;
 
-		const unsigned argc = 1;
-		Handle<Value> argv[argc] = { object };
-		Handle<Value> instance = constructor->NewInstance(argc, argv);
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
-		return scope.Close(instance);
-	}
+		Handle<Array> keys = Array::New();
 
-	Handle<Value> QuickItemWrap::toObject(const Arguments& args)
-	{
-		HandleScope scope;
-		
-		QuickItemWrap *obj_wrap = QuickItemWrap::Unwrap<QuickItemWrap>(args.This());
-		QObject *obj = qobject_cast<QObject *>(obj_wrap->GetObject());
-
-		return scope.Close(QObjectWrap::NewInstance(obj));
-	}
-
-	Handle<Value> QuickItemWrap::setParentItem(const Arguments& args)
-	{
-		HandleScope scope;
-
-		QuickItemWrap *obj_wrap = ObjectWrap::Unwrap<QuickItemWrap>(args.This());
-		QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(args[0]->ToObject());
-
-		// Getting content item if it is window object
-		QQuickItem *parentItem = NULL;
-		if (wrap->GetObject()->isWindowType()) {
-			parentItem = qobject_cast<QQuickWindow *>(wrap->GetObject())->contentItem();
-		} else {
-			parentItem = qobject_cast<QQuickItem *>(wrap->GetObject());
+		// Getting property names
+		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+		for (int i = 0; i < meta->propertyCount(); i++) {
+			keys->Set(i, String::New(QString(meta->property(i).name()).toUtf8().constData()));
 		}
 
-		QQuickItem *item = obj_wrap->GetObject();
-		item->setParentItem(parentItem);
-
-		return scope.Close(Undefined());
+		return scope.Close(keys);
 	}
 
-	Handle<Value> QuickItemWrap::setVisible(const Arguments& args)
+	Handle<Value> QuickItem::getProperty(const Arguments& args)
 	{
 		HandleScope scope;
 
-		QuickItemWrap *obj_wrap = ObjectWrap::Unwrap<QuickItemWrap>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
-		QQuickItem *item = obj_wrap->GetObject();
-		item->setVisible(args[0]->ToBoolean()->Value());
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		String::Utf8Value name(args[0]->ToString());
+
+		// Get property
+		QVariant v = obj_wrap->GetObject()->property(*name);
+
+		// Convert Qvariant to V8 data type
+		if (v.isNull())
+			return scope.Close(Null());
+
+		return scope.Close(Utils::QVariantToV8(v.userType(), v));
+	}
+
+	Handle<Value> QuickItem::setProperty(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+
+		if (!args[0]->IsString())
+			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+
+		String::Utf8Value name(args[0]->ToString());
+		Handle<Value> value(args[1]);
+		QVariant v;
+
+		// Check data type
+		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
+			v.setValue(QVariant(value->ToBoolean()->Value()));
+		} else if (value->IsNumber()) {
+			v.setValue(QVariant(value->NumberValue()));
+		} else if (value->IsInt32()) {
+			v.setValue(QVariant(value->ToInt32()->Value()));
+		} else if (value->IsString()) {
+			String::Utf8Value _v(value->ToString());
+			v.setValue(QVariant(static_cast<char *>(*_v)));
+		}
+
+		// Set property
+		obj_wrap->GetObject()->setProperty(*name, v);
 
 		return scope.Close(Undefined());
 	}

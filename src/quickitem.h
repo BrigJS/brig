@@ -1,5 +1,5 @@
-#ifndef BRIG_QUICKITEM_WRAP_H
-#define BRIG_QUICKITEM_WRAP_H
+#ifndef BRIG_QUICKITEM_H
+#define BRIG_QUICKITEM_H
 
 #include <node.h>
 #include <QQuickItem>
@@ -10,17 +10,14 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	class QuickItemWrap : public ObjectWrap {
+	class QuickItem : public ObjectWrap {
 
 		public:
-			QuickItemWrap();
-			QuickItemWrap(Handle<Value> qobject);
-			~QuickItemWrap();
+			QuickItem();
+			~QuickItem();
 
 			static Persistent<Function> constructor;
 			static void Initialize(Handle<Object> target);
-			static Handle<Value> NewInstance(QObject *);
-			static Handle<Value> NewInstance(Handle<Value>);
 
 			QQuickItem *GetObject() const { return obj; };
 
@@ -29,11 +26,11 @@ namespace Brig {
 			static Handle<Value> New(const Arguments& args);
 
 			/* Methods */
-			static Handle<Value> toObject(const Arguments& args);
-			static Handle<Value> setParentItem(const Arguments& args);
-			static Handle<Value> setVisible(const Arguments& args);
+			static Handle<Value> create(const Arguments& args);
+			static Handle<Value> getPropertyNames(const Arguments& args);
+			static Handle<Value> getProperty(const Arguments& args);
+			static Handle<Value> setProperty(const Arguments& args);
 
-			Handle<Value> prototype_object;
 			QQuickItem *obj;
 	};
 
