@@ -56,6 +56,9 @@ namespace Brig {
 		// Invoke
 		MakeCallback(callback->handler, callback->handler, argc, argv);
 
+		// Release
+		delete [] argv;
+
 		return -1;
 	}
 
