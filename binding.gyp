@@ -3,7 +3,6 @@
 	{
 		'target_name': 'brig',
 		'sources': [
-			'<!@(tools/internal.sh)',
 			'<!@(tools/genmoc.sh)',
 			'src/brig.cpp',
 			'src/utils.cpp',
@@ -18,6 +17,9 @@
 		],
 		'conditions': [
 			['OS=="linux"', {
+				'sources': [
+					'<!@(tools/internal.sh)',
+				],
 				'cflags': [
 					'-std=c++11',
 					'-I./src',
@@ -29,7 +31,31 @@
 				'libraries': [
 					'<!@(pkg-config --libs-only-l Qt5Core Qt5Quick Qt5Qml Qt5Multimedia)'
 				]
-			}]        
+			}],      
+			['OS=="mac"', {
+				'sources': [
+					'<!@(tools/mac-config.sh --internal)',
+				],
+				'xcode_settings': {
+					'OTHER_CPLUSPLUSFLAGS': [
+						'-stdlib=libc++',
+						'-std=c++11',
+						'-mmacosx-version-min=10.7',
+						'<!@(tools/mac-config.sh --cflags)'
+					],
+					'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+				},
+				'defines': [
+					'__MACOSX_CORE__'
+				],
+				'include_dirs': [
+					'build/src',
+					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia)'
+				],
+				'libraries': [
+					'<!@(tools/mac-config.sh --libs QtGui QtCore QtQuick QtQml QtMultimedia)'
+				]
+			}]
 		]
 	}
 	]
