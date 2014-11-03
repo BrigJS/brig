@@ -28,6 +28,7 @@ namespace Brig {
 			static void PrepareHandle(uv_prepare_t *handle, int status);
 
 			QGuiApplication *app;
+			QEventLoop *eventloop;
 			uv_async_t *mainloop;
 	};
 

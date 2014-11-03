@@ -4,6 +4,7 @@
 #include <node.h>
 #include <QGuiApplication>
 #include <QQuickView>
+#include "eventdispatcher/eventdispatcher.h"
 #include "eventloop.h"
 
 namespace Brig {
@@ -34,6 +35,7 @@ namespace Brig {
 			int app_argc;
 			char **app_argv;
 			EventLoop *eventloop;
+			BrigEventDispatcher *dispatcher;
 
 			QQuickView *quickview;
 	};

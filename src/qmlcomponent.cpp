@@ -20,6 +20,7 @@ namespace Brig {
 
 	QmlComponent::~QmlComponent()
 	{
+printf("RELEASE Component\n");
 		delete signal;
 		delete obj;
 	}

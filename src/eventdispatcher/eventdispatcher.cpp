@@ -32,6 +32,7 @@ namespace Brig {
 	BrigEventDispatcher::~BrigEventDispatcher(void)
 	{
 		//printf("RELEASE\n");
+		uv_close((uv_handle_t *)&wakeup, NULL);
 	}
 
 	void BrigEventDispatcher::wakeUp(void)

@@ -18,6 +18,7 @@ namespace Brig {
 
 	QuickItem::~QuickItem()
 	{
+printf("RELEASE QuickItem\n");
 		delete obj;
 	}
 

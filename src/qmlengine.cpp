@@ -18,6 +18,7 @@ namespace Brig {
 
 	QmlEngineWrap::~QmlEngineWrap()
 	{
+printf("RELEASE ENGINE\n");
 		delete obj;
 	}
 

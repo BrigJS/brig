@@ -12,6 +12,7 @@ namespace Brig {
 	EventLoop::EventLoop(QGuiApplication *_app) : QObject()
 	{
 		app = _app;
+		eventloop = new QEventLoop;
 	}
 
 	EventLoop::~EventLoop()
@@ -20,10 +21,12 @@ namespace Brig {
 
 	void EventLoop::Main()
 	{
+/*
 		uv_prepare_t *prepare = new uv_prepare_t;
 		prepare->data = (void *)this;
 		uv_prepare_init(uv_default_loop(), prepare);
 		uv_prepare_start(prepare, EventLoop::PrepareHandle);
+*/
 	}
 
 	void EventLoop::PrepareHandle(uv_prepare_t *handle, int status)
