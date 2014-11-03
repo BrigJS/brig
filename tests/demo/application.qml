@@ -4,24 +4,25 @@ import QtQuick.Controls 1.0
 ApplicationWindow {
 	visible: true;
 	color: 'black';
-	title: 'OwaViwer';
+	title: 'Brig Demo';
 	width: 640;
 	height: 480;
 
 	Text {
 		anchors.centerIn: parent;
-		text: 'OwaViewer';
+		text: 'Brig';
 		font.family: 'Helvetica';
 		font.bold: true;
-		font.pointSize: 48;
+		font.pointSize: 72;
 		color: '#00ffcc';
 		scale: 0;
 		opacity: 0;
 
 		Text {
+			anchors.topMargin: 10;
 			anchors.top: parent.bottom; 
 			anchors.horizontalCenter: parent.horizontalCenter;
-			text: 'Show off your amazing UI here';
+			text: 'QML Application in Node.js';
 			font.family: 'Helvetica';
 			font.pointSize: 16;
 			color: '#e6fffa';
