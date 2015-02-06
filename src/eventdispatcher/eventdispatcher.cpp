@@ -20,10 +20,12 @@ namespace Brig {
 			dispatcher->processEvents(NULL);
 	}
 
+#ifdef __MACOSX_CORE__
 void idle(uv_idle_t *idle, int status)
 {
 	wakeUpApplication();
 }
+#endif
 
 BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
 	{
@@ -37,12 +39,14 @@ BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispat
 		uv_async_init(mainloop, wakeup, wakeup_handle);
 		//printf("Initializing event dispatcher\n");
 
+#ifdef __MACOSX_CORE__
 		uv_idle_t *idler = new uv_idle_t;
 		idler->data = (void *)this;
 		uv_idle_init(mainloop, idler);
 		uv_idle_start(idler, idle);
 
 		initApplication();
+#endif
 	}
 
 	BrigEventDispatcher::~BrigEventDispatcher(void)
@@ -73,7 +77,9 @@ BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispat
 //printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
 		emit awake();
 
+#ifdef __MACOSX_CORE__
 		wakeUpApplication();
+#endif
 		QCoreApplication::sendPostedEvents();
 		QWindowSystemInterface::sendWindowSystemEvents(flags);
 
