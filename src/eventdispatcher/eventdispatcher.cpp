@@ -1,6 +1,10 @@
 #include <QCoreApplication>
 #include <QSocketNotifier>
 
+#ifdef __MACOSX_CORE__
+#include "platform/mac.h"
+#endif
+
 #include <internal/qwindowsysteminterface.h>
 #include "eventdispatcher.h"
 
@@ -16,7 +20,12 @@ namespace Brig {
 			dispatcher->processEvents(NULL);
 	}
 
-	BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
+void idle(uv_idle_t *idle, int status)
+{
+	wakeUpApplication();
+}
+
+BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
 	{
 		// Create a new mainloop
 		//mainloop = uv_loop_new();
@@ -27,6 +36,13 @@ namespace Brig {
 		wakeup->data = (void *)this;
 		uv_async_init(mainloop, wakeup, wakeup_handle);
 		//printf("Initializing event dispatcher\n");
+
+		uv_idle_t *idler = new uv_idle_t;
+		idler->data = (void *)this;
+		uv_idle_init(mainloop, idler);
+		uv_idle_start(idler, idle);
+
+		initApplication();
 	}
 
 	BrigEventDispatcher::~BrigEventDispatcher(void)
@@ -49,7 +65,7 @@ namespace Brig {
 
 	void BrigEventDispatcher::flush(void)
 	{
-		//printf("flush\n");
+//		printf("flush\n");
 	}
 
 	bool BrigEventDispatcher::processEvents(QEventLoop::ProcessEventsFlags flags)
@@ -57,6 +73,7 @@ namespace Brig {
 //printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
 		emit awake();
 
+		wakeUpApplication();
 		QCoreApplication::sendPostedEvents();
 		QWindowSystemInterface::sendWindowSystemEvents(flags);
 
@@ -68,7 +85,7 @@ namespace Brig {
 
 	bool BrigEventDispatcher::hasPendingEvents(void)
 	{
-		return (qGlobalPostedEventsCount()) ? true : false;
+		return qGlobalPostedEventsCount();
 	}
 
 	void socket_watcher_handle(uv_poll_t *req, int status, int events)

@@ -35,6 +35,7 @@
 			['OS=="mac"', {
 				'sources': [
 					'<!@(tools/mac-config.sh --internal)',
+					'src/eventdispatcher/platform/mac.mm'
 				],
 				'xcode_settings': {
 					'OTHER_CPLUSPLUSFLAGS': [
