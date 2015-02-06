@@ -21,38 +21,45 @@ namespace Brig {
 	}
 
 #ifdef __MACOSX_CORE__
-void idle(uv_idle_t *idle, int status)
-{
-	wakeUpApplication();
-}
+	void keepaliveHandler(uv_timer_t *keepalive, int status)
+	{
+		if (isPowerSaveMode())
+			uv_timer_set_repeat(keepalive, 100);
+		else
+			uv_timer_set_repeat(keepalive, 15);
+
+		respondMacWindowSystem();
+	}
 #endif
 
-BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
+	BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
 	{
 		// Create a new mainloop
 		//mainloop = uv_loop_new();
 		mainloop = uv_default_loop();
+
+#ifdef __MACOSX_CORE__
+
+		prepareMacWindowSystem();
+
+		keepalive = new uv_timer_t;
+		keepalive->data = (void *)this;
+		uv_timer_init(mainloop, keepalive);
+		uv_timer_start(keepalive, keepaliveHandler, 0, 50);
+#endif
 
 		// Initializing handle
 		wakeup = new uv_async_t;
 		wakeup->data = (void *)this;
 		uv_async_init(mainloop, wakeup, wakeup_handle);
 		//printf("Initializing event dispatcher\n");
-
-#ifdef __MACOSX_CORE__
-		uv_idle_t *idler = new uv_idle_t;
-		idler->data = (void *)this;
-		uv_idle_init(mainloop, idler);
-		uv_idle_start(idler, idle);
-
-		initApplication();
-#endif
 	}
 
 	BrigEventDispatcher::~BrigEventDispatcher(void)
 	{
 		//printf("RELEASE\n");
 		uv_close((uv_handle_t *)&wakeup, NULL);
+		uv_close((uv_handle_t *)&keepalive, NULL);
 	}
 
 	void BrigEventDispatcher::wakeUp(void)
@@ -77,10 +84,8 @@ BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispat
 //printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
 		emit awake();
 
-#ifdef __MACOSX_CORE__
-		wakeUpApplication();
-#endif
 		QCoreApplication::sendPostedEvents();
+
 		QWindowSystemInterface::sendWindowSystemEvents(flags);
 
 		emit aboutToBlock();

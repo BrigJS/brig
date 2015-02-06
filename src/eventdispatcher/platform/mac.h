@@ -2,8 +2,9 @@
 #define BRIG_EVENTDISPATCHER_MAC_H
 
 #ifdef __MACOSX_CORE__
-void initApplication();
-void wakeUpApplication();
+void prepareMacWindowSystem();
+void respondMacWindowSystem();
+bool isPowerSaveMode();
 #endif
 
 #endif
