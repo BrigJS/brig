@@ -1,8 +1,9 @@
-#ifndef BRIG_SIGNAL_HANDLER_H
-#define BRIG_SIGNAL_HANDLER_H
+#ifndef BRIG_DYNAMIC_QOBJECT_H
+#define BRIG_DYNAMIC_QOBJECT_H
 
 #include <node.h>
 #include <QObject>
+#include <internal/qmetaobjectbuilder_p.h>
 #include "brig.h"
 
 namespace Brig {
@@ -10,12 +11,11 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	class SignalHandler : public QObject {
+	class DynamicQObject : public QObject {
 
 		public:
-			SignalHandler(void);
-			SignalHandler(QObject *);
-			~SignalHandler(void);
+			DynamicQObject(QMetaObject *metaobject);
+			~DynamicQObject(void);
 
 			QObject *GetObject() const { return obj; };
 
@@ -27,10 +27,13 @@ namespace Brig {
 		private:
 
 			QObject *obj;
+			QMetaObject *_metaObject;
+			QMetaObjectBuilder *_builder;
 
 		protected:
 
-			QVector<Callback *> callbacks;
+			QVector<Callback *> _methods;
+			QVector<Callback *> _signals;
 	};
 
 }

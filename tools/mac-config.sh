@@ -29,7 +29,10 @@ elif [ "$1" == "--libs" ]; then
 elif [ "$1" == '--internal' ]; then
 	OUT=build/src
 	QTVERSION=`qmake -query QT_VERSION`
-	FILES=$QT_LIBS_PATH/QtGui.framework/Versions/Current/Headers/$QTVERSION/QtGui/qpa/qwindowsysteminterface.h
+	FILES="
+		$QT_LIBS_PATH/QtGui.framework/Versions/Current/Headers/$QTVERSION/QtGui/qpa/qwindowsysteminterface.h
+		$QT_LIBS_PATH/QtCore.framework/Versions/Current/Headers/$QTVERSION/QtCore/private/qmetaobjectbuilder_p.h
+	"
 
 	mkdir -p $OUT/internal
 

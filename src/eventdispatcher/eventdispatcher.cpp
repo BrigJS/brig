@@ -45,7 +45,7 @@ namespace Brig {
 		keepalive = new uv_timer_t;
 		keepalive->data = (void *)this;
 		uv_timer_init(mainloop, keepalive);
-		uv_timer_start(keepalive, keepaliveHandler, 0, 50);
+		uv_timer_start(keepalive, keepaliveHandler, 0, 15);
 #endif
 
 		// Initializing handle

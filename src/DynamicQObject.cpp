@@ -1,38 +1,47 @@
 #include <QObject>
-#include "signal_handler.h"
+#include "DynamicQObject.h"
 
 namespace Brig {
 
-	SignalHandler::SignalHandler()
+	DynamicQObject::DynamicQObject(QMetaObject *metaobject) : _metaObject(NULL)
 	{
 		obj = NULL;
+		_builder = new QMetaObjectBuilder();
+		_metaObject = metaobject;
 	}
-
-	SignalHandler::SignalHandler(QObject *_obj)
+/*
+	DynamicQObject::DynamicQObject(QObject *_obj)
 	{
 		obj = _obj;
+		_builder = new QMetaObjectBuilder();
 	}
-
-	SignalHandler::~SignalHandler()
+*/
+	DynamicQObject::~DynamicQObject()
 	{
 		// Disconnect all
 		QMetaObject::disconnect(obj, 0, 0, 0);
-
+#if 0
 		// Release all callbacks
 		for (Callback *callback : callbacks) {
 			delete callback;
 		}
 
 		callbacks.clear();
+#endif
+		delete _builder;
+		delete _metaObject;
 	}
 
-	int SignalHandler::qt_metacall(QMetaObject::Call call, int id, void **arguments)
+
+	int DynamicQObject::qt_metacall(QMetaObject::Call call, int id, void **arguments)
 	{
+printf("%d\n", call);
 		// Call default handlers in QObject first
 		id = QObject::qt_metacall(call, id, arguments);
 		if (id == -1 || call != QMetaObject::InvokeMetaMethod)
 			return id;
 
+#if 0
 		Q_ASSERT(id < callbacks.count());
 		Callback *callback = callbacks[id];
 
@@ -58,12 +67,13 @@ namespace Brig {
 
 		// Release
 		delete [] argv;
-
+#endif
 		return -1;
 	}
 
-	int SignalHandler::findSignalId(const char *signal)
+	int DynamicQObject::findSignalId(const char *signal)
 	{
+#if 0
 		const QMetaObject *meta = obj->metaObject();
 
 		// Finding signal id
@@ -74,12 +84,13 @@ namespace Brig {
 			if (strcmp(signal, methodName) == 0)
 				return i;
 		}
-
+#endif
 		return -1;
 	}
 
-	bool SignalHandler::setObject(QObject *_obj)
+	bool DynamicQObject::setObject(QObject *_obj)
 	{
+#if 0
 		// It's already set up
 		if (obj != NULL)
 			return false;
@@ -95,13 +106,14 @@ namespace Brig {
 			QMetaObject::connect(obj, id, this, id + QObject::metaObject()->methodCount());
 		}
 
+#endif
 		return true;
 	}
 
-	int SignalHandler::addCallback(const char *signal, Handle<Value> cb)
+	int DynamicQObject::addCallback(const char *signal, Handle<Value> cb)
 	{
 		HandleScope scope;
-
+#if 0
 		int slotId = callbacks.count();
 
 		// Create a new callback
@@ -122,5 +134,6 @@ namespace Brig {
 		QMetaObject::connect(obj, signalId, this, slotId + QObject::metaObject()->methodCount());
 
 		return signalId;
+#endif
 	}
 }

@@ -11,9 +11,13 @@
 			'src/eventloop.cpp',
 			'src/callback.cpp',
 			'src/signal_handler.cpp',
-			'src/qmlengine.cpp',
+			'src/QmlEngine.cpp',
 			'src/QmlComponent.cpp',
-			'src/QuickItem.cpp'
+			'src/QmlContext.cpp',
+			'src/QuickItem.cpp',
+			'src/DynamicQMetaObjectBuilder.cpp',
+			'src/DynamicQObject.cpp',
+			'src/QmlTypeBuilder.cpp'
 		],
 		'conditions': [
 			['OS=="linux"', {

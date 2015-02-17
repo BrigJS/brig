@@ -1,166 +1,62 @@
+#include <unistd.h>
 #include <node.h>
 #include <QtGui>
 #include <QObject>
-#include "qmlcontext.h"
+#include "QmlContext.h"
 
 namespace Brig {
 
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QmlContextWrap::constructor;
+	Persistent<Function> QmlContext::constructor;
 
-	QmlContextWrap::QmlContextWrap(QmlContextWrap *context_wrap) : ObjectWrap()
+	QmlContext::QmlContext() : ObjectWrap()
 	{
-		obj = new QQmlContext(context_wrap->GetObject());
-		prototype_object = QObjectWrap::NewInstance(obj);
+		obj = NULL;
 	}
 
-	QmlContextWrap::QmlContextWrap(QQmlContext *context) : ObjectWrap()
-	{
-		obj = new QQmlContext(context);
-		prototype_object = QObjectWrap::NewInstance(obj);
-	}
-
-	QmlContextWrap::QmlContextWrap(Handle<Value> object) : ObjectWrap()
-	{
-		if (strcmp(*String::Utf8Value(object->ToObject()->GetConstructorName()), "QmlContext") == 0) {
-			QmlContextWrap *wrap = ObjectWrap::Unwrap<QmlContextWrap>(object->ToObject());
-			obj = wrap->GetObject();
-		} else {
-			QObjectWrap *wrap = ObjectWrap::Unwrap<QObjectWrap>(object->ToObject());
-			obj = qobject_cast<QQmlContext *>(wrap->GetObject());
-		}
-
-		prototype_object = object;
-	}
-
-	QmlContextWrap::~QmlContextWrap()
+	QmlContext::~QmlContext()
 	{
 		delete obj;
 	}
 
-	void QmlContextWrap::Initialize(Handle<Object> target)
+	void QmlContext::Initialize(Handle<Object> target)
 	{
 		HandleScope scope;
 
 		Local<String> name = String::NewSymbol("QmlContext");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlContextWrap::New));
-		tpl->InstanceTemplate()->SetInternalFieldCount(1);
+		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlContext::New));
+		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "toObject", QmlContextWrap::toObject);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "contextProperty", QmlContextWrap::contextProperty);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "setContextProperty", QmlContextWrap::setContextProperty);
+		//NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlContext::setEngine);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
 		target->Set(name, constructor);
 	}
 
-	Handle<Value> QmlContextWrap::New(const Arguments& args)
+	// Prototype Constructor
+	Handle<Value> QmlContext::New(const Arguments& args)
 	{
 		HandleScope scope;
 
-		QmlContextWrap *obj_wrap = new QmlContextWrap(args[0]);
+		if (args.Length() == 0)
+			return Undefined();
+
+		// Using Engine to initialize QQmlContext
+		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args[0]->ToObject());
+
+		QmlContext *obj_wrap = new QmlContext();
+		obj_wrap->obj = new QQmlContext(engine_wrap->GetObject()->rootContext());
 		obj_wrap->Wrap(args.This());
 
 		return args.This();
 	}
 
-	Handle<Value> QmlContextWrap::NewInstance(QQmlContext *context)
-	{
-		HandleScope scope;
-
-		const unsigned argc = 1;
-		Handle<Value> obj = QObjectWrap::NewInstance(context);
-		Handle<Value> argv[argc] = { obj };
-		Handle<Value> instance = constructor->NewInstance(argc, argv);
-
-		return scope.Close(instance);
-	}
-
-	Handle<Value> QmlContextWrap::toObject(const Arguments& args)
-	{
-		HandleScope scope;
-		
-		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
-		QObject *obj = obj_wrap->GetObject()->contextObject();
-
-		return scope.Close(QObjectWrap::NewInstance(obj));
-	}
-
-	Handle<Value> QmlContextWrap::contextProperty(const Arguments& args)
-	{
-		HandleScope scope;
-		
-		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
-		QQmlContext *obj = obj_wrap->GetObject();
-
-		String::Utf8Value name(args[0]->ToString());
-
-		QVariant v = obj->contextProperty(*name);
-
-		// Convert Qvariant to V8 data type
-		if (v.isNull())
-			return scope.Close(Null());
-
-		switch(v.userType()) {
-		case QMetaType::Bool:
-			return scope.Close(Boolean::New(v.toBool()));
-		case QMetaType::Int:
-			return scope.Close(Number::New(v.toInt()));
-		case QMetaType::UInt:
-			return scope.Close(Number::New(v.toUInt()));
-		case QMetaType::Float:
-			return scope.Close(Number::New(v.toFloat()));
-		case QMetaType::Double:
-			return scope.Close(Number::New(v.toDouble()));
-		case QMetaType::LongLong:
-			return scope.Close(Number::New(v.toLongLong()));
-		case QMetaType::ULongLong:
-			return scope.Close(Number::New(v.toULongLong()));
-		case QMetaType::QString:
-			return scope.Close(String::New(v.toString().toUtf8().constData()));
-		case QMetaType::QColor:
-			return scope.Close(String::New(v.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
-		}
-
-		return Undefined();
-	}
-
-
-	Handle<Value> QmlContextWrap::setContextProperty(const Arguments& args)
-	{
-		HandleScope scope;
-		
-		QmlContextWrap *obj_wrap = QmlContextWrap::Unwrap<QmlContextWrap>(args.This());
-		QQmlContext *obj = obj_wrap->GetObject();
-
-		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
-
-		String::Utf8Value name(args[0]->ToString());
-		Handle<Value> value(args[1]);
-		QVariant v;
-
-		// Convert V8 data type to QVariant
-		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
-			v.setValue(QVariant(value->ToBoolean()->Value()));
-		} else if (value->IsNumber()) {
-			v.setValue(QVariant(value->NumberValue()));
-		} else if (value->IsInt32()) {
-			v.setValue(QVariant(value->ToInt32()->Value()));
-		} else if (value->IsString()) {
-			String::Utf8Value _v(value->ToString());
-			v.setValue(QVariant(static_cast<char *>(*_v)));
-		}
-
-		obj->setContextProperty(*name, v);
-
-		return Undefined();
-	}
+	// Method
 }

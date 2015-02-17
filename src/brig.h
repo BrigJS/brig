@@ -13,7 +13,11 @@ namespace Brig {
 	class SignalHandler;
 	class QmlEngineWrap;
 	class QmlComponent;
+	class QmlContext;
 	class QuickItem;
+	class QmlTypeBuilder;
+	class DynamicQObject;
+	class DynamicQMetaObjectBuilder;
 
 	typedef enum {
 		BRIG_CONTAINER_NATIVE
@@ -24,8 +28,12 @@ namespace Brig {
 #include "qapplication.h"
 #include "callback.h"
 #include "signal_handler.h"
-#include "qmlengine.h"
+#include "DynamicQMetaObjectBuilder.h"
+#include "DynamicQObject.h"
+#include "QmlEngine.h"
 #include "QmlComponent.h"
+#include "QmlContext.h"
 #include "QuickItem.h"
+#include "QmlTypeBuilder.h"
 
 #endif
