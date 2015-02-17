@@ -2,7 +2,7 @@
 #include <node.h>
 #include <QtGui>
 #include <QObject>
-#include "qmlengine.h"
+#include "QmlEngine.h"
 
 namespace Brig {
 

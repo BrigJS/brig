@@ -319,10 +319,11 @@ printf("RELEASE QuickItem\n");
 			dataList.clear();
 			parameters.clear();
 
-			return scope.Close(Boolean::New(TRUE));
+			//return scope.Close(Boolean::New(True));
+			return scope.Close(True());
 		}
 
-		return scope.Close(Boolean::New(FALSE));
+		return scope.Close(False());
 	}
 
 	Handle<Value> QuickItem::on(const Arguments& args)
