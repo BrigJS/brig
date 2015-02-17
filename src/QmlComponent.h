@@ -20,6 +20,7 @@ namespace Brig {
 			static void Initialize(Handle<Object> target);
 
 			QQmlComponent *GetObject() const { return obj; };
+			QmlEngineWrap *GetEngine() const { return engine; };
 
 		private:
 
