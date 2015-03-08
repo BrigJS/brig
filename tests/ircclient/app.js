@@ -6,21 +6,21 @@ var Brig = require('../../');
 
 var brig = new Brig();
 
-brig.on('ready', function(brig) {
+var curColor = 0;
+var colors = [
+	'#A4C400', '#60A917',
+	'#008A00', '#00ABA9',
+	'#1BA1E2', '#0050EF',
+	'#6A00FF', '#AA00FF',
+	'#F472D0', '#D80073',
+	'#A20025', '#E51400',
+	'#FA6800', '#F0A30A',
+	'#E3C800', '#825A2C',
+	'#6D8764', '#647687',
+	'#76608A', '#87794E'
+];
 
-	var curColor = 0;
-	var colors = [
-		'#A4C400', '#60A917',
-		'#008A00', '#00ABA9',
-		'#1BA1E2', '#0050EF',
-		'#6A00FF', '#AA00FF',
-		'#F472D0', '#D80073',
-		'#A20025', '#E51400',
-		'#FA6800', '#F0A30A',
-		'#E3C800', '#825A2C',
-		'#6D8764', '#647687',
-		'#76608A', '#87794E'
-	];
+brig.on('ready', function(brig) {
 
 	function getUserColor() {
 
@@ -38,6 +38,7 @@ brig.on('ready', function(brig) {
 
 		var names = {};
 		var ircMsg = [];
+		ircMsg.length = 20;
 
 		var channelName = '#HackathonTaiwan5th';
 		var stream = net.connect({
@@ -58,6 +59,8 @@ brig.on('ready', function(brig) {
 
 		client.on('notice', function(msg) {
 			console.log(msg.message);
+
+			ircMsg.shift();
 			ircMsg.push(msg.message);
 		});
 
@@ -69,13 +72,14 @@ brig.on('ready', function(brig) {
 			var msg = e.from + ': ' + e.message;
 			console.log(msg);
 
-			var color = names[msg.from];
+			var color = names[e.from];
 			if (!color) {
 				color = getUserColor();
-				names[msg.from] = color;
+				names[e.from] = color;
 			}
-
 			var msgRich = '&lt; <font color="' + color + '">' + e.from + '</font> &gt; ' + e.message;
+
+			ircMsg.shift();
 			ircMsg.push(msgRich);
 		});
 

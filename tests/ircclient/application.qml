@@ -19,6 +19,7 @@ ApplicationWindow {
 			color: '#f0ffffff';	
 			style: Text.Outline;
 			styleColor: '#33ffffff';
+			wrapMode: Text.WordWrap;
 			textFormat: Text.RichText;
 			text: 'Initializing ...';
 		}
