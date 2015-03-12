@@ -82,8 +82,13 @@ printf("RELEASE Component\n");
 
 		String::Utf8Value url(args[0]->ToString());
 
+		// Create component
 		obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject());
+
+		// Setup signal handler
 		obj_wrap->signal->setObject(obj_wrap->obj);
+
+		// Loading specific file
 		obj_wrap->obj->loadUrl(QUrl(QString(*url)), QQmlComponent::Asynchronous);
 
 		return args.This();

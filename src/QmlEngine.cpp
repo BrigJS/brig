@@ -14,11 +14,14 @@ namespace Brig {
 	QmlEngineWrap::QmlEngineWrap() : ObjectWrap()
 	{
 		obj = new QQmlEngine();
+		obj->setOutputWarningsToStandardError(false);
+		signal = new SignalHandler(obj);
 	}
 
 	QmlEngineWrap::~QmlEngineWrap()
 	{
 printf("RELEASE ENGINE\n");
+		delete signal;
 		delete obj;
 	}
 
@@ -34,6 +37,7 @@ printf("RELEASE ENGINE\n");
 		tpl->SetClassName(name);
 
 		/* Prototype */
+		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlEngineWrap::on);
 //		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
@@ -47,6 +51,20 @@ printf("RELEASE ENGINE\n");
 
 		QmlEngineWrap *obj_wrap = new QmlEngineWrap();
 		obj_wrap->Wrap(args.This());
+
+		return args.This();
+	}
+
+	Handle<Value> QmlEngineWrap::on(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
+
+		// Signal name
+		String::Utf8Value url(args[0]->ToString());
+
+		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
 		return args.This();
 	}

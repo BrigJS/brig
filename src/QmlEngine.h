@@ -26,9 +26,11 @@ namespace Brig {
 			static Handle<Value> New(const Arguments& args);
 
 			/* Methods */
-			static Handle<Value> rootContext(const Arguments& args);
+			static Handle<Value> on(const Arguments& args);
+			//static Handle<Value> rootContext(const Arguments& args);
 
 			QQmlEngine *obj;
+			SignalHandler *signal;
 	};
 
 }
