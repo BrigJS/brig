@@ -43,6 +43,7 @@ printf("RELEASE Component\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlComponent::on);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "progress", QmlComponent::progress);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "status", QmlComponent::status);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "errors", QmlComponent::errors);
 
 		constructor = Persistent<Function>::New(tpl->GetFunction());
 
@@ -153,5 +154,24 @@ printf("RELEASE Component\n");
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
 		return scope.Close(Number::New(obj_wrap->obj->status()));
+	}
+
+	Handle<Value> QmlComponent::errors(const Arguments& args)
+	{
+		HandleScope scope;
+
+		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
+
+		// Getting errors
+		QList<QQmlError> errs = obj_wrap->GetObject()->errors();
+
+		// Create an array
+		Handle<Array> errArr = Array::New();
+
+		for (int i = 0; i < errs.length(); i++) {
+			errArr->Set(i, String::New(errs[i].toString().toUtf8().constData()));
+		}
+
+		return scope.Close(errArr);
 	}
 }

@@ -33,6 +33,7 @@ namespace Brig {
 			static Handle<Value> on(const Arguments& args);
 			static Handle<Value> progress(const Arguments& args);
 			static Handle<Value> status(const Arguments& args);
+			static Handle<Value> errors(const Arguments& args);
 
 			QmlEngineWrap *engine;
 			QQmlComponent *obj;
