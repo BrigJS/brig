@@ -54,7 +54,8 @@ namespace Brig {
 		}
 
 		// Invoke
-		MakeCallback(callback->handler, callback->handler, argc, argv);
+//		MakeCallback(callback->handler, callback->handler, argc, argv);
+		callback->handler->Call(argc, argv);
 
 		// Release
 		delete [] argv;
@@ -107,7 +108,8 @@ namespace Brig {
 		// Create a new callback
 		Callback *callback = new Callback();
 		callback->signal = strdup(signal);
-		callback->handler = Persistent<Function>::New(Handle<Function>::Cast(cb));
+		callback->handler = new NanCallback(cb.As<Function>());
+//		Persistent<Function>::New(Handle<Function>::Cast(cb));
 		callbacks.append(callback);
 
 		// No object can be hooked yet
