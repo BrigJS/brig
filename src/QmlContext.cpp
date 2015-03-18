@@ -41,9 +41,9 @@ namespace Brig {
 	}
 
 	// Prototype Constructor
-	Handle<Value> QmlContext::New(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlContext::New) {
+		NanScope();
 
 		if (args.Length() == 0)
 			return Undefined();
@@ -55,7 +55,7 @@ namespace Brig {
 		obj_wrap->obj = new QQmlContext(engine_wrap->GetObject()->rootContext());
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
 	// Method
