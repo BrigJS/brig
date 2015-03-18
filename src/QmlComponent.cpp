@@ -51,20 +51,18 @@ printf("RELEASE Component\n");
 	}
 
 	// Prototype Constructor
-	Handle<Value> QmlComponent::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::New) {
+		NanScope();
 
 		QmlComponent *obj_wrap = new QmlComponent();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
 	// Method
-	Handle<Value> QmlComponent::setEngine(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::setEngine) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -72,12 +70,11 @@ printf("RELEASE Component\n");
 
 		obj_wrap->engine = engine_wrap;
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
-	Handle<Value> QmlComponent::loadUrl(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::loadUrl) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -92,12 +89,11 @@ printf("RELEASE Component\n");
 		// Loading specific file
 		obj_wrap->obj->loadUrl(QUrl(QString(*url)), QQmlComponent::Asynchronous);
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
-	Handle<Value> QmlComponent::setData(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::setData) {
+		NanScope();
 
 		QUrl url;
 
@@ -121,12 +117,12 @@ printf("RELEASE Component\n");
 		String::Utf8Value data_str(args[0]->ToString());
 		obj_wrap->GetObject()->setData(*data_str, url); 
 
-		return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QmlComponent::on(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlComponent::on) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -135,30 +131,27 @@ printf("RELEASE Component\n");
 
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
-	Handle<Value> QmlComponent::progress(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::progress) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		return scope.Close(Number::New(obj_wrap->obj->progress()));
+		NanReturnValue(Number::New(obj_wrap->obj->progress()));
 	}
 
-	Handle<Value> QmlComponent::status(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::status) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		return scope.Close(Number::New(obj_wrap->obj->status()));
+		NanReturnValue(Number::New(obj_wrap->obj->status()));
 	}
 
-	Handle<Value> QmlComponent::errors(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::errors) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -172,6 +165,6 @@ printf("RELEASE Component\n");
 			errArr->Set(i, String::New(errs[i].toString().toUtf8().constData()));
 		}
 
-		return scope.Close(errArr);
+		NanReturnValue(errArr);
 	}
 }

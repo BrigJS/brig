@@ -1,4 +1,5 @@
 #include <node.h>
+#include <nan.h>
 #include <QtGui>
 #include <QObject>
 #include <QTextCodec>
@@ -58,19 +59,21 @@ printf("RELEASE QApplication\n");
 		target->Set(name, constructor);
 	}
 
-	Handle<Value> QApplicationWrap::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::New) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = new QApplicationWrap();
 		app_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
-
+/*
 	Handle<Value> QApplicationWrap::Exec(const Arguments& args)
 	{
-		HandleScope scope;
+*/
+	NAN_METHOD(QApplicationWrap::Exec) {
+		NanScope();
+//		HandleScope scope;
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
 		app_wrap->quickview->show();
@@ -84,12 +87,12 @@ printf("RELEASE QApplication\n");
 
 printf("EXEC\n");
 
-		return scope.Close(Undefined());
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QApplicationWrap::Test(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::Test) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
 		app_wrap->dispatcher->wakeUp();
@@ -107,6 +110,7 @@ printf("5\n");
 //		app_wrap->app->exec();
 #endif
 #endif
-		return scope.Close(Undefined());
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 }
