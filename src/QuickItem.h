@@ -23,17 +23,17 @@ namespace Brig {
 
 		private:
 
-			static Handle<Value> New(const Arguments& args);
+			static NAN_METHOD(New);
 
 			/* Methods */
-			static Handle<Value> create(const Arguments& args);
-			static Handle<Value> getPropertyNames(const Arguments& args);
-			static Handle<Value> getProperty(const Arguments& args);
-			static Handle<Value> setProperty(const Arguments& args);
-			static Handle<Value> setParent(const Arguments& args);
-			static Handle<Value> invokeMethod(const Arguments& args);
-			static Handle<Value> emitEvent(const Arguments& args);
-			static Handle<Value> on(const Arguments& args);
+			static NAN_METHOD(create);
+			static NAN_METHOD(getPropertyNames);
+			static NAN_METHOD(getProperty);
+			static NAN_METHOD(setProperty);
+			static NAN_METHOD(setParent);
+			static NAN_METHOD(invokeMethod);
+			static NAN_METHOD(emitEvent);
+			static NAN_METHOD(on);
 
 			QQuickItem *obj;
 			SignalHandler *signal;

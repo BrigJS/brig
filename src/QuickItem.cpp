@@ -313,10 +313,10 @@ printf("RELEASE QuickItem\n");
 			parameters.clear();
 
 			//NanReturnValue(Boolean::New(True));
-			NanReturnValue(True());
+			NanReturnValue(NanTrue());
 		}
 
-		NanReturnValue(False());
+		NanReturnValue(NanFalse());
 	}
 
 	NAN_METHOD(QuickItem::on) {

@@ -23,10 +23,10 @@ namespace Brig {
 
 		private:
 
-			static Handle<Value> New(const Arguments& args);
+			static NAN_METHOD(New);
 
 			/* Methods */
-			static Handle<Value> setEngine(const Arguments& args);
+			static NAN_METHOD(setEngine);
 
 			QQmlContext *obj;
 	};
