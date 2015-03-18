@@ -39,7 +39,7 @@ namespace Brig {
 		int methodId = findSignalId(callback->signal);
 
 		// Convert parameters
-		HandleScope scope;
+		NanScope();
 
 		const QMetaObject *meta = obj->metaObject();
 		QMetaMethod method = meta->method(methodId);
@@ -101,7 +101,7 @@ namespace Brig {
 
 	int SignalHandler::addCallback(const char *signal, Handle<Value> cb)
 	{
-		HandleScope scope;
+		NanScope();
 
 		int slotId = callbacks.count();
 

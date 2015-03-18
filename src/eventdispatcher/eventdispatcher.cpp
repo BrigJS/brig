@@ -1,3 +1,4 @@
+#include <uv.h>
 #include <QCoreApplication>
 #include <QSocketNotifier>
 
@@ -12,7 +13,8 @@ extern uint qGlobalPostedEventsCount();
 
 namespace Brig {
 
-	static void wakeup_handle(uv_async_t *wakeup, int status)
+	//static void wakeup_handle(uv_async_t *wakeup, int status)
+	static void wakeup_handle(uv_async_t *wakeup)
 	{
 		BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(wakeup->data);
 
@@ -21,7 +23,8 @@ namespace Brig {
 	}
 
 #ifdef __MACOSX_CORE__
-	void keepaliveHandler(uv_timer_t *keepalive, int status)
+	//void keepaliveHandler(uv_timer_t *keepalive, int status)
+	void keepaliveHandler(uv_timer_t *keepalive)
 	{
 		if (isPowerSaveMode())
 			uv_timer_set_repeat(keepalive, 100);
@@ -201,7 +204,8 @@ namespace Brig {
 		uv_poll_start(watcher, _watcher->events, socket_watcher_handle);
 	}
 
-	void timer_handle(uv_timer_t *handle, int status)
+	//void timer_handle(uv_timer_t *handle, int status)
+	void timer_handle(uv_timer_t *handle)
 	{
 //printf("timer_handle\n");
 		BrigHandle *_timer = static_cast<BrigHandle *>(handle->data);

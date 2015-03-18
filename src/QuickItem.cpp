@@ -26,12 +26,12 @@ printf("RELEASE QuickItem\n");
 
 	void QuickItem::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QuickItem");
+		Local<String> name = NanNew("QuickItem");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QuickItem::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QuickItem::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -45,9 +45,9 @@ printf("RELEASE QuickItem\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "emitEvent", QuickItem::emitEvent);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QuickItem::on);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor
@@ -81,12 +81,12 @@ printf("RELEASE QuickItem\n");
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
-		Handle<Array> keys = Array::New();
+		Handle<Array> keys = NanNew<Array>();
 
 		// Getting property names
 		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
 		for (int i = 0; i < meta->propertyCount(); i++) {
-			keys->Set(i, String::New(QString(meta->property(i).name()).toUtf8().constData()));
+			keys->Set(i, NanNew(QString(meta->property(i).name()).toUtf8().constData()));
 		}
 
 		NanReturnValue(keys);
@@ -98,7 +98,7 @@ printf("RELEASE QuickItem\n");
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		String::Utf8Value name(args[0]->ToString());
 
@@ -118,7 +118,7 @@ printf("RELEASE QuickItem\n");
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		String::Utf8Value name(args[0]->ToString());
 		Handle<Value> value(args[1]);
@@ -172,7 +172,7 @@ printf("RELEASE QuickItem\n");
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		// Method name
 		String::Utf8Value methodSig(args[0]->ToString());
@@ -201,23 +201,23 @@ printf("RELEASE QuickItem\n");
 
 		switch(returnedValue.userType()) {
 		case QMetaType::Bool:
-			NanReturnValue(Boolean::New(returnedValue.toBool()));
+			NanReturnValue(NanNew<Boolean>(returnedValue.toBool()));
 		case QMetaType::Int:
-			NanReturnValue(Number::New(returnedValue.toInt()));
+			NanReturnValue(NanNew<Number>(returnedValue.toInt()));
 		case QMetaType::UInt:
-			NanReturnValue(Number::New(returnedValue.toUInt()));
+			NanReturnValue(NanNew<Number>(returnedValue.toUInt()));
 		case QMetaType::Float:
-			NanReturnValue(Number::New(returnedValue.toFloat()));
+			NanReturnValue(NanNew<Number>(returnedValue.toFloat()));
 		case QMetaType::Double:
-			NanReturnValue(Number::New(returnedValue.toDouble()));
+			NanReturnValue(NanNew<Number>(returnedValue.toDouble()));
 		case QMetaType::LongLong:
-			NanReturnValue(Number::New(returnedValue.toLongLong()));
+			NanReturnValue(NanNew<Number>(returnedValue.toLongLong()));
 		case QMetaType::ULongLong:
-			NanReturnValue(Number::New(returnedValue.toULongLong()));
+			NanReturnValue(NanNew<Number>(returnedValue.toULongLong()));
 		case QMetaType::QString:
-			NanReturnValue(String::New(returnedValue.toString().toUtf8().constData()));
+			NanReturnValue(NanNew(returnedValue.toString().toUtf8().constData()));
 		case QMetaType::QColor:
-			NanReturnValue(String::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
+			NanReturnValue(NanNew(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
 		}
 
 		NanReturnUndefined();
@@ -230,7 +230,7 @@ printf("RELEASE QuickItem\n");
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		// Method name
 		String::Utf8Value methodSig(args[0]->ToString());
@@ -312,7 +312,7 @@ printf("RELEASE QuickItem\n");
 			dataList.clear();
 			parameters.clear();
 
-			//NanReturnValue(Boolean::New(True));
+			//NanReturnValue(NanNew<Boolean>(True));
 			NanReturnValue(NanTrue());
 		}
 

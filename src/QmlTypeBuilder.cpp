@@ -23,12 +23,12 @@ namespace Brig {
 
 	void QmlTypeBuilder::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlTypeBuilder");
+		Local<String> name = NanNew("QmlTypeBuilder");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlTypeBuilder::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlTypeBuilder::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -36,9 +36,9 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "addSignal", QmlTypeBuilder::addSignal);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "build", QmlTypeBuilder::build);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	NAN_METHOD(QmlTypeBuilder::New) {
@@ -72,9 +72,9 @@ namespace Brig {
 		NanReturnUndefined();
 	}
 
-	Handle<Value> QmlTypeBuilder::addSignal(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlTypeBuilder::addSignal) {
+		NanScope();
 
 		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
 

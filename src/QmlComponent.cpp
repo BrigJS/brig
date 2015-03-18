@@ -27,12 +27,12 @@ printf("RELEASE Component\n");
 
 	void QmlComponent::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlComponent");
+		Local<String> name = NanNew("QmlComponent");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlComponent::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlComponent::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -45,9 +45,9 @@ printf("RELEASE Component\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "status", QmlComponent::status);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "errors", QmlComponent::errors);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor
@@ -98,7 +98,7 @@ printf("RELEASE Component\n");
 		QUrl url;
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		if (args[1]->IsString()) {
 			String::Utf8Value url_str(args[1]->ToString());
@@ -139,7 +139,7 @@ printf("RELEASE Component\n");
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		NanReturnValue(Number::New(obj_wrap->obj->progress()));
+		NanReturnValue(NanNew<Number>(obj_wrap->obj->progress()));
 	}
 
 	NAN_METHOD(QmlComponent::status) {
@@ -147,7 +147,7 @@ printf("RELEASE Component\n");
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		NanReturnValue(Number::New(obj_wrap->obj->status()));
+		NanReturnValue(NanNew<Number>(obj_wrap->obj->status()));
 	}
 
 	NAN_METHOD(QmlComponent::errors) {
@@ -159,10 +159,11 @@ printf("RELEASE Component\n");
 		QList<QQmlError> errs = obj_wrap->GetObject()->errors();
 
 		// Create an array
-		Handle<Array> errArr = Array::New();
+		//Handle<Array> errArr = Array::New();
+		Handle<Array> errArr = NanNew<Array>();
 
 		for (int i = 0; i < errs.length(); i++) {
-			errArr->Set(i, String::New(errs[i].toString().toUtf8().constData()));
+			errArr->Set(i, NanNew(errs[i].toString().toUtf8().constData()));
 		}
 
 		NanReturnValue(errArr);

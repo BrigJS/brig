@@ -27,12 +27,12 @@ printf("RELEASE ENGINE\n");
 
 	void QmlEngineWrap::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlEngine");
+		Local<String> name = NanNew("QmlEngine");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlEngineWrap::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlEngineWrap::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -40,9 +40,10 @@ printf("RELEASE ENGINE\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlEngineWrap::on);
 //		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		//constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	NAN_METHOD(QmlEngineWrap::New) {

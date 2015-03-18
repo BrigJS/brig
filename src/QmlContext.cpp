@@ -23,21 +23,21 @@ namespace Brig {
 
 	void QmlContext::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlContext");
+		Local<String> name = NanNew("QmlContext");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlContext::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlContext::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlContext::setEngine);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor

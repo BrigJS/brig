@@ -41,12 +41,13 @@ printf("RELEASE QApplication\n");
 
 	void QApplicationWrap::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QApplication");
+		Local<String> name = NanNew("QApplication");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QApplicationWrap::New);
+//		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -54,9 +55,10 @@ printf("RELEASE QApplication\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
+//		constructor = Persistent<Function>::New(tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	NAN_METHOD(QApplicationWrap::New) {
