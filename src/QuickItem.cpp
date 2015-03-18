@@ -57,7 +57,7 @@ printf("RELEASE QuickItem\n");
 		QuickItem *obj_wrap = new QuickItem();
 		obj_wrap->Wrap(args.This());
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	// Method

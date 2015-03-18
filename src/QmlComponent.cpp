@@ -57,7 +57,7 @@ printf("RELEASE Component\n");
 		QmlComponent *obj_wrap = new QmlComponent();
 		obj_wrap->Wrap(args.This());
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	// Method
@@ -70,7 +70,7 @@ printf("RELEASE Component\n");
 
 		obj_wrap->engine = engine_wrap;
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	NAN_METHOD(QmlComponent::loadUrl) {
@@ -89,7 +89,7 @@ printf("RELEASE Component\n");
 		// Loading specific file
 		obj_wrap->obj->loadUrl(QUrl(QString(*url)), QQmlComponent::Asynchronous);
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	NAN_METHOD(QmlComponent::setData) {
@@ -131,7 +131,7 @@ printf("RELEASE Component\n");
 
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	NAN_METHOD(QmlComponent::progress) {

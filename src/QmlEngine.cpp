@@ -51,7 +51,7 @@ printf("RELEASE ENGINE\n");
 		QmlEngineWrap *obj_wrap = new QmlEngineWrap();
 		obj_wrap->Wrap(args.This());
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	NAN_METHOD(QmlEngineWrap::on) {
@@ -64,7 +64,7 @@ printf("RELEASE ENGINE\n");
 
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 /*
 	Handle<Value> QmlEngineWrap::rootContext(const Arguments& args)

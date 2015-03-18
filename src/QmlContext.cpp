@@ -55,7 +55,7 @@ namespace Brig {
 		obj_wrap->obj = new QQmlContext(engine_wrap->GetObject()->rootContext());
 		obj_wrap->Wrap(args.This());
 
-		NanReturnValue(args.This());
+		NanReturnThis();
 	}
 
 	// Method
