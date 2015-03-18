@@ -46,7 +46,7 @@ namespace Brig {
 		NanScope();
 
 		if (args.Length() == 0)
-			return Undefined();
+			NanReturnUndefined();
 
 		// Using Engine to initialize QQmlContext
 		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args[0]->ToObject());
