@@ -13,8 +13,11 @@ extern uint qGlobalPostedEventsCount();
 
 namespace Brig {
 
-	//static void wakeup_handle(uv_async_t *wakeup, int status)
+#if UV_VERSION_MAJOR == 0
+	static void wakeup_handle(uv_async_t *wakeup, int status)
+#else
 	static void wakeup_handle(uv_async_t *wakeup)
+#endif
 	{
 		BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(wakeup->data);
 
@@ -23,8 +26,12 @@ namespace Brig {
 	}
 
 #ifdef __MACOSX_CORE__
-	//void keepaliveHandler(uv_timer_t *keepalive, int status)
+
+#if UV_VERSION_MAJOR == 0
+	void keepaliveHandler(uv_timer_t *keepalive, int status)
+#else
 	void keepaliveHandler(uv_timer_t *keepalive)
+#endif
 	{
 		if (isPowerSaveMode())
 			uv_timer_set_repeat(keepalive, 100);
@@ -204,8 +211,11 @@ namespace Brig {
 		uv_poll_start(watcher, _watcher->events, socket_watcher_handle);
 	}
 
-	//void timer_handle(uv_timer_t *handle, int status)
+#if UV_VERSION_MAJOR == 0
+	void timer_handle(uv_timer_t *handle, int status)
+#else
 	void timer_handle(uv_timer_t *handle)
+#endif
 	{
 //printf("timer_handle\n");
 		BrigHandle *_timer = static_cast<BrigHandle *>(handle->data);
