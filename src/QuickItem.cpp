@@ -51,20 +51,18 @@ printf("RELEASE QuickItem\n");
 	}
 
 	// Prototype Constructor
-	Handle<Value> QuickItem::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::New) {
+		NanScope();
 
 		QuickItem *obj_wrap = new QuickItem();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
 	// Method
-	Handle<Value> QuickItem::create(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::create) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
@@ -75,12 +73,11 @@ printf("RELEASE QuickItem\n");
 		obj_wrap->signal = new SignalHandler(qobject_cast<QObject *>(obj_wrap->GetObject()));
 //		obj_wrap->signal->setObject(qobject_cast<QObject *>(obj_wrap->GetObject()));
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QuickItem::getPropertyNames(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::getPropertyNames) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
@@ -92,7 +89,7 @@ printf("RELEASE QuickItem\n");
 			keys->Set(i, String::New(QString(meta->property(i).name()).toUtf8().constData()));
 		}
 
-		return scope.Close(keys);
+		NanReturnValue(keys);
 	}
 
 	Handle<Value> QuickItem::getProperty(const Arguments& args)
@@ -111,9 +108,9 @@ printf("RELEASE QuickItem\n");
 
 		// Convert Qvariant to V8 data type
 		if (v.isNull())
-			return scope.Close(Null());
+			NanReturnNull();
 
-		return scope.Close(Utils::QVariantToV8(v.userType(), v));
+		NanReturnValue(Utils::QVariantToV8(v.userType(), v));
 	}
 
 	Handle<Value> QuickItem::setProperty(const Arguments& args)
