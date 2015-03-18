@@ -1,25 +1,28 @@
 {
-	"name": "brig",
-	"version": "0.1.0",
-	"author": "Fred Chiend <cfsghost@gmail.com>",
-	"description": "Graphical render engine for Node.js",
-	"repository": {
-		"type": "git",
-		"url": "git://github.com/cfsghost/brig.git"
-	},
-	"homepage": "http://github.com/cfsghost/brig",
-	"main": "./lib/brig.js",
-	"keywords": [
-		"gui",
-		"ui",
-		"graphics"
-	],
-	"engines": {
-		"node": ">=0.10.0"
-	},
-	"scripts": {
-		"install": "node-gyp rebuild"
-	},
-	"devDependencies": {},
-	"optionalDependencies": {}
+  "name": "brig",
+  "version": "0.1.0",
+  "author": "Fred Chiend <cfsghost@gmail.com>",
+  "description": "Graphical render engine for Node.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cfsghost/brig.git"
+  },
+  "homepage": "http://github.com/cfsghost/brig",
+  "main": "./lib/brig.js",
+  "keywords": [
+    "gui",
+    "ui",
+    "graphics"
+  ],
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "dependencies": {
+    "nan": "^1.7.0"
+  }
 }

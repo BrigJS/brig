@@ -55,6 +55,7 @@
 				],
 				'include_dirs': [
 					'build/src',
+					'<!(node -e \"require('nan')\")',
 					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia)'
 				],
 				'libraries': [
