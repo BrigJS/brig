@@ -41,21 +41,19 @@ namespace Brig {
 		target->Set(name, constructor);
 	}
 
-	Handle<Value> QmlTypeBuilder::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlTypeBuilder::New) {
+		NanScope();
 
 		String::Utf8Value typeName(args[0]->ToString());
 
 		QmlTypeBuilder *obj_wrap = new QmlTypeBuilder(*typeName);
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
-	Handle<Value> QmlTypeBuilder::build(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlTypeBuilder::build) {
+		NanScope();
 
 		String::Utf8Value uriStr(args[0]->ToString());
 		int major = static_cast<int>(args[1]->Int32Value());
@@ -71,7 +69,7 @@ namespace Brig {
 
 		qmlRegisterType<QObject>(*uriStr, major, minor, qmltype_builder->metaobject_builder->getTypeName());
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 
 	Handle<Value> QmlTypeBuilder::addSignal(const Arguments& args)
@@ -86,6 +84,6 @@ namespace Brig {
 
 		qmltype_builder->metaobject_builder->addSignal(*signature, parameterNames, args[2]);
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 }
