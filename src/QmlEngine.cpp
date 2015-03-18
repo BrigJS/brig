@@ -45,19 +45,17 @@ printf("RELEASE ENGINE\n");
 		target->Set(name, constructor);
 	}
 
-	Handle<Value> QmlEngineWrap::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlEngineWrap::New) {
+		NanScope();
 
 		QmlEngineWrap *obj_wrap = new QmlEngineWrap();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 
-	Handle<Value> QmlEngineWrap::on(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlEngineWrap::on) {
+		NanScope();
 
 		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
 
@@ -66,7 +64,7 @@ printf("RELEASE ENGINE\n");
 
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
 /*
 	Handle<Value> QmlEngineWrap::rootContext(const Arguments& args)
