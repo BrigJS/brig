@@ -1,5 +1,6 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.0
+import brig.myitem 1.0
 
 ApplicationWindow {
 	visible: true;
@@ -7,6 +8,12 @@ ApplicationWindow {
 	title: 'Brig Demo';
 	width: 640;
 	height: 480;
+
+	MyItem {
+		Component.onCompleted: {
+			this.test();
+		}
+	}
 
 	Text {
 		anchors.centerIn: parent;

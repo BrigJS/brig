@@ -7,11 +7,10 @@ namespace Brig {
 	using namespace node;
 	using namespace v8;
 
-	Handle<Value> Cast(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(Cast) {
+		NanScope();
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 
 	extern "C" {

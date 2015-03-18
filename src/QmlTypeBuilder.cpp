@@ -57,6 +57,10 @@ namespace Brig {
 	{
 		HandleScope scope;
 
+		String::Utf8Value uriStr(args[0]->ToString());
+		int major = static_cast<int>(args[1]->Int32Value());
+		int minor = static_cast<int>(args[2]->Int32Value());
+
 		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
 
 		// Generate a new QMetaObject
@@ -64,6 +68,8 @@ namespace Brig {
 
 		// Create a new QObject
 		qmltype_builder->obj = new DynamicQObject(metaobject);
+
+		qmlRegisterType<QObject>(*uriStr, major, minor, qmltype_builder->metaobject_builder->getTypeName());
 
 		return Undefined();
 	}
