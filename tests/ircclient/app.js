@@ -38,7 +38,7 @@ brig.on('ready', function(brig) {
 
 		var names = {};
 		var ircMsg = [];
-		ircMsg.length = 20;
+		ircMsg.length = 19;
 
 		var channelName = '#HackathonTaiwan5th';
 		var stream = net.connect({
