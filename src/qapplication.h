@@ -4,6 +4,7 @@
 #include <node.h>
 #include <QGuiApplication>
 #include <QQuickView>
+#include "eventdispatcher/eventdispatcher.h"
 #include "eventloop.h"
 
 namespace Brig {
@@ -24,16 +25,17 @@ namespace Brig {
 			QApplicationWrap();
 			~QApplicationWrap();
 
-			static Handle<Value> New(const Arguments& args);
+			static NAN_METHOD(New);
 
 			/* Methods */
-			static Handle<Value> Exec(const Arguments& args);
-			static Handle<Value> Test(const Arguments& args);
+			static NAN_METHOD(Exec);
+			static NAN_METHOD(Test);
 
 			QGuiApplication *app;
 			int app_argc;
 			char **app_argv;
 			EventLoop *eventloop;
+			BrigEventDispatcher *dispatcher;
 
 			QQuickView *quickview;
 	};

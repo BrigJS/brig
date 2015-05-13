@@ -4,7 +4,10 @@ OUT=build/src
 VERSIONLINE=`qmake -query | grep QT_VERSION`
 QTVERSION=${VERSIONLINE##*:}
 HEADERLINE=`qmake -query | grep QT_INSTALL_HEADERS`
-FILES=${HEADERLINE##*:}/QtGui/$QTVERSION/QtGui/qpa/qwindowsysteminterface.h
+FILES="
+	${HEADERLINE##*:}/QtGui/$QTVERSION/QtGui/qpa/qwindowsysteminterface.h
+	${HEADERLINE##*:}/QtCore/$QTVERSION/QtCore/private/qmetaobjectbuilder_p.h
+"
 
 mkdir -p $OUT/internal
 

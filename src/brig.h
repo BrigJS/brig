@@ -2,19 +2,23 @@
 #define BRIG_H
 
 #include <node.h>
+#include <nan.h>
 
 namespace Brig {
 
 	using namespace v8;
 	using namespace node;
 
-	class QObjectWrap;
+	struct Callback;
+
+	class SignalHandler;
 	class QmlEngineWrap;
-	class QmlContextWrap;
-	class QmlComponentWrap;
-	class QuickViewWrap;
-	class QuickWindowWrap;
-	class QuickItemWrap;
+	class QmlComponent;
+	class QmlContext;
+	class QuickItem;
+	class QmlTypeBuilder;
+	class DynamicQObject;
+	class DynamicQMetaObjectBuilder;
 
 	typedef enum {
 		BRIG_CONTAINER_NATIVE
@@ -22,13 +26,15 @@ namespace Brig {
 }
 
 #include "utils.h"
-#include "qobject.h"
 #include "qapplication.h"
-#include "qmlengine.h"
-#include "qmlcontext.h"
-#include "qmlcomponent.h"
-#include "quickview.h"
-#include "quickwindow.h"
-#include "quickitem.h"
+#include "callback.h"
+#include "signal_handler.h"
+#include "DynamicQMetaObjectBuilder.h"
+#include "DynamicQObject.h"
+#include "QmlEngine.h"
+#include "QmlComponent.h"
+#include "QmlContext.h"
+#include "QuickItem.h"
+#include "QmlTypeBuilder.h"
 
 #endif

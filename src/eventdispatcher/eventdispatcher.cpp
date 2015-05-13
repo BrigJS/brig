@@ -1,5 +1,10 @@
+#include <uv.h>
 #include <QCoreApplication>
 #include <QSocketNotifier>
+
+#ifdef __MACOSX_CORE__
+#include "platform/mac.h"
+#endif
 
 #include <internal/qwindowsysteminterface.h>
 #include "eventdispatcher.h"
@@ -8,7 +13,11 @@ extern uint qGlobalPostedEventsCount();
 
 namespace Brig {
 
+#if UV_VERSION_MAJOR == 0
 	static void wakeup_handle(uv_async_t *wakeup, int status)
+#else
+	static void wakeup_handle(uv_async_t *wakeup)
+#endif
 	{
 		BrigEventDispatcher *dispatcher = static_cast<BrigEventDispatcher *>(wakeup->data);
 
@@ -16,11 +25,38 @@ namespace Brig {
 			dispatcher->processEvents(NULL);
 	}
 
+#ifdef __MACOSX_CORE__
+
+#if UV_VERSION_MAJOR == 0
+	void keepaliveHandler(uv_timer_t *keepalive, int status)
+#else
+	void keepaliveHandler(uv_timer_t *keepalive)
+#endif
+	{
+		if (isPowerSaveMode())
+			uv_timer_set_repeat(keepalive, 100);
+		else
+			uv_timer_set_repeat(keepalive, 15);
+
+		respondMacWindowSystem();
+	}
+#endif
+
 	BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
 	{
 		// Create a new mainloop
 		//mainloop = uv_loop_new();
 		mainloop = uv_default_loop();
+
+#ifdef __MACOSX_CORE__
+
+		prepareMacWindowSystem();
+
+		keepalive = new uv_timer_t;
+		keepalive->data = (void *)this;
+		uv_timer_init(mainloop, keepalive);
+		uv_timer_start(keepalive, keepaliveHandler, 0, 15);
+#endif
 
 		// Initializing handle
 		wakeup = new uv_async_t;
@@ -32,6 +68,8 @@ namespace Brig {
 	BrigEventDispatcher::~BrigEventDispatcher(void)
 	{
 		//printf("RELEASE\n");
+		uv_close((uv_handle_t *)&wakeup, NULL);
+		uv_close((uv_handle_t *)&keepalive, NULL);
 	}
 
 	void BrigEventDispatcher::wakeUp(void)
@@ -48,7 +86,7 @@ namespace Brig {
 
 	void BrigEventDispatcher::flush(void)
 	{
-		//printf("flush\n");
+//		printf("flush\n");
 	}
 
 	bool BrigEventDispatcher::processEvents(QEventLoop::ProcessEventsFlags flags)
@@ -57,6 +95,7 @@ namespace Brig {
 		emit awake();
 
 		QCoreApplication::sendPostedEvents();
+
 		QWindowSystemInterface::sendWindowSystemEvents(flags);
 
 		emit aboutToBlock();
@@ -67,7 +106,7 @@ namespace Brig {
 
 	bool BrigEventDispatcher::hasPendingEvents(void)
 	{
-		return (qGlobalPostedEventsCount()) ? true : false;
+		return qGlobalPostedEventsCount();
 	}
 
 	void socket_watcher_handle(uv_poll_t *req, int status, int events)
@@ -172,7 +211,11 @@ namespace Brig {
 		uv_poll_start(watcher, _watcher->events, socket_watcher_handle);
 	}
 
+#if UV_VERSION_MAJOR == 0
 	void timer_handle(uv_timer_t *handle, int status)
+#else
+	void timer_handle(uv_timer_t *handle)
+#endif
 	{
 //printf("timer_handle\n");
 		BrigHandle *_timer = static_cast<BrigHandle *>(handle->data);

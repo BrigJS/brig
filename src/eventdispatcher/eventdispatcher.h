@@ -59,6 +59,7 @@ private:
 	bool running = false;
 	uv_loop_t *mainloop;
 	uv_async_t *wakeup;
+	uv_timer_t *keepalive;
 
 	std::map<int, uv_poll_t *> socket_watchers;
 	std::map<int, BrigTimer *> timers;

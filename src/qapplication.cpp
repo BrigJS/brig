@@ -1,11 +1,11 @@
 #include <node.h>
+#include <nan.h>
 #include <QtGui>
 #include <QObject>
 #include <QTextCodec>
 #include <uv.h>
 #include "qapplication.h"
 #include "eventloop.h"
-#include "eventdispatcher/eventdispatcher.h"
 
 namespace Brig {
 
@@ -18,30 +18,36 @@ namespace Brig {
 	{
 		app_argc = 0;
 		app_argv = NULL;
-		BrigEventDispatcher *dispatcher = new BrigEventDispatcher;
+		dispatcher = new BrigEventDispatcher;
 		QGuiApplication::setEventDispatcher(dispatcher);
 
 		app = new QGuiApplication(app_argc, app_argv);
 		QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
+//		QCoreApplication *app1 = QCoreApplication::instance();
+//		QCoreApplication::removePostedEvents(app1, QEvent::Quit);
+
 		// Initializing event loop
-//		eventloop = new EventLoop(app);
-//		eventloop->Main();
+		//eventloop = new EventLoop(app);
+		//eventloop->Main();
 	}
 
 	QApplicationWrap::~QApplicationWrap()
 	{
+printf("RELEASE QApplication\n");
 		delete app;
+		delete dispatcher;
 	}
 
 	void QApplicationWrap::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QApplication");
+		Local<String> name = NanNew("QApplication");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QApplicationWrap::New);
+//		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -49,24 +55,27 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
+//		constructor = Persistent<Function>::New(tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
-	Handle<Value> QApplicationWrap::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::New) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = new QApplicationWrap();
 		app_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
-
+/*
 	Handle<Value> QApplicationWrap::Exec(const Arguments& args)
 	{
-		HandleScope scope;
+*/
+	NAN_METHOD(QApplicationWrap::Exec) {
+		NanScope();
+//		HandleScope scope;
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
 		app_wrap->quickview->show();
@@ -80,14 +89,16 @@ namespace Brig {
 
 printf("EXEC\n");
 
-		return scope.Close(Undefined());
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QApplicationWrap::Test(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::Test) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
+		app_wrap->dispatcher->wakeUp();
+#if 0
 printf("4\n");
 //		QQuickView view;
 //		view.setSource(QUrl::fromLocalFile("application.qml"));
@@ -100,7 +111,8 @@ printf("5\n");
 
 //		app_wrap->app->exec();
 #endif
-
-		return scope.Close(Undefined());
+#endif
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 }

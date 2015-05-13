@@ -1,5 +1,8 @@
+#include <nan.h>
 #include <QObject>
 #include <QVariant>
+#include <QMetaType>
+#include <QQmlComponent>
 #include "utils.h"
 
 namespace Brig {
@@ -8,6 +11,61 @@ namespace Brig {
 	using namespace node;
 
 	namespace Utils {
+
+		Handle<Value> QDataToV8(int type, void *value)
+		{
+			NanEscapableScope();
+
+			return NanEscapeScope(QVariantToV8(type, QVariant(type, value)));
+		}
+
+		Handle<Value> QVariantToV8(int type, QVariant v)
+		{
+			NanEscapableScope();
+
+			Handle<Value> result = NanNull();
+
+			switch(type) {
+			case QMetaType::Bool:
+				//return NanEscapeScope(Boolean::New(v.toBool()));
+				return NanEscapeScope(NanNew<Boolean>(v.toBool()));
+
+			case QMetaType::Int:
+				//return NanEscapeScope(NanNew<Number>(v.toInt()));
+				return NanEscapeScope(NanNew<Number>(v.toInt()));
+
+			case QMetaType::UInt:
+				return NanEscapeScope(NanNew<Number>(v.toUInt()));
+
+			case QMetaType::Float:
+				return NanEscapeScope(NanNew<Number>(v.toFloat()));
+
+			case QMetaType::Double:
+				return NanEscapeScope(NanNew<Number>(v.toDouble()));
+
+			case QMetaType::LongLong:
+
+				return NanEscapeScope(NanNew<Number>(v.toLongLong()));
+
+			case QMetaType::ULongLong:
+				return NanEscapeScope(NanNew<Number>(v.toULongLong()));
+
+			case QMetaType::QString:
+				return NanEscapeScope(NanNew<String>(v.toString().toUtf8().constData()));
+
+			default:
+
+				if (type == qMetaTypeId<QQmlComponent::Status>()) {
+					return NanEscapeScope(NanNew<Number>(v.toInt()));
+				} else if (type == qMetaTypeId<qreal>()) {
+					return NanEscapeScope(NanNew<Number>(v.toDouble()));
+				}
+
+//			case QMetaType::QVariant:
+			}
+
+			return NanEscapeScope(NanUndefined());
+		}
 
 		QVariant V8ToQVariant(Handle<Value> value)
 		{

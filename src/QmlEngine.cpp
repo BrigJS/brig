@@ -2,7 +2,7 @@
 #include <node.h>
 #include <QtGui>
 #include <QObject>
-#include "qmlengine.h"
+#include "QmlEngine.h"
 
 namespace Brig {
 
@@ -14,42 +14,60 @@ namespace Brig {
 	QmlEngineWrap::QmlEngineWrap() : ObjectWrap()
 	{
 		obj = new QQmlEngine();
+		obj->setOutputWarningsToStandardError(false);
+		signal = new SignalHandler(obj);
 	}
 
 	QmlEngineWrap::~QmlEngineWrap()
 	{
+printf("RELEASE ENGINE\n");
+		delete signal;
 		delete obj;
 	}
 
 	void QmlEngineWrap::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlEngine");
+		Local<String> name = NanNew("QmlEngine");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlEngineWrap::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlEngineWrap::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlEngineWrap::on);
+//		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		//constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
-	Handle<Value> QmlEngineWrap::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlEngineWrap::New) {
+		NanScope();
 
 		QmlEngineWrap *obj_wrap = new QmlEngineWrap();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
+	NAN_METHOD(QmlEngineWrap::on) {
+		NanScope();
+
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
+
+		// Signal name
+		String::Utf8Value url(args[0]->ToString());
+
+		int id = obj_wrap->signal->addCallback(*url, args[1]);
+
+		NanReturnThis();
+	}
+/*
 	Handle<Value> QmlEngineWrap::rootContext(const Arguments& args)
 	{
 		HandleScope scope;
@@ -63,4 +81,5 @@ namespace Brig {
 
 		return scope.Close(instance);
 	}
+*/
 }
