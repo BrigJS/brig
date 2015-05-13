@@ -2,6 +2,7 @@
 #define BRIG_H
 
 #include <node.h>
+#include <nan.h>
 
 namespace Brig {
 

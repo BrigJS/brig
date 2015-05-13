@@ -19,6 +19,7 @@ namespace Brig {
 
 			QMetaObject *build();
 			void addSignal(const char *signature, QStringList argumentNames, Handle<Value> cb);
+			char *getTypeName() { return _typeName; };
 
 		private:
 

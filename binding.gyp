@@ -19,6 +19,9 @@
 			'src/DynamicQObject.cpp',
 			'src/QmlTypeBuilder.cpp'
 		],
+		'include_dirs': [
+			"<!(node -e \"require('nan')\")"
+		],
 		'conditions': [
 			['OS=="linux"', {
 				'sources': [

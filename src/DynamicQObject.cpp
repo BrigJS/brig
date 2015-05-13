@@ -112,7 +112,7 @@ printf("%d\n", call);
 
 	int DynamicQObject::addCallback(const char *signal, Handle<Value> cb)
 	{
-		HandleScope scope;
+		NanScope();
 #if 0
 		int slotId = callbacks.count();
 

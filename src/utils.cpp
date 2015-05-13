@@ -1,3 +1,4 @@
+#include <nan.h>
 #include <QObject>
 #include <QVariant>
 #include <QMetaType>
@@ -13,55 +14,57 @@ namespace Brig {
 
 		Handle<Value> QDataToV8(int type, void *value)
 		{
-			HandleScope scope;
+			NanEscapableScope();
 
-			return scope.Close(QVariantToV8(type, QVariant(type, value)));
+			return NanEscapeScope(QVariantToV8(type, QVariant(type, value)));
 		}
 
 		Handle<Value> QVariantToV8(int type, QVariant v)
 		{
-			HandleScope scope;
+			NanEscapableScope();
 
-			Handle<Value> result = Null();
+			Handle<Value> result = NanNull();
 
 			switch(type) {
 			case QMetaType::Bool:
-				return scope.Close(Boolean::New(v.toBool()));
+				//return NanEscapeScope(Boolean::New(v.toBool()));
+				return NanEscapeScope(NanNew<Boolean>(v.toBool()));
 
 			case QMetaType::Int:
-				return scope.Close(Number::New(v.toInt()));
+				//return NanEscapeScope(NanNew<Number>(v.toInt()));
+				return NanEscapeScope(NanNew<Number>(v.toInt()));
 
 			case QMetaType::UInt:
-				return scope.Close(Number::New(v.toUInt()));
+				return NanEscapeScope(NanNew<Number>(v.toUInt()));
 
 			case QMetaType::Float:
-				return scope.Close(Number::New(v.toFloat()));
+				return NanEscapeScope(NanNew<Number>(v.toFloat()));
 
 			case QMetaType::Double:
-				return scope.Close(Number::New(v.toDouble()));
+				return NanEscapeScope(NanNew<Number>(v.toDouble()));
 
 			case QMetaType::LongLong:
 
-				return scope.Close(Number::New(v.toLongLong()));
+				return NanEscapeScope(NanNew<Number>(v.toLongLong()));
 
 			case QMetaType::ULongLong:
-				return scope.Close(Number::New(v.toULongLong()));
+				return NanEscapeScope(NanNew<Number>(v.toULongLong()));
 
 			case QMetaType::QString:
-				return scope.Close(String::New(v.toString().toUtf8().constData()));
+				return NanEscapeScope(NanNew<String>(v.toString().toUtf8().constData()));
 
 			default:
 
 				if (type == qMetaTypeId<QQmlComponent::Status>()) {
-					return scope.Close(Number::New(v.toInt()));
+					return NanEscapeScope(NanNew<Number>(v.toInt()));
 				} else if (type == qMetaTypeId<qreal>()) {
-					return scope.Close(Number::New(v.toDouble()));
+					return NanEscapeScope(NanNew<Number>(v.toDouble()));
 				}
 
 //			case QMetaType::QVariant:
 			}
 
-			return scope.Close(Undefined());
+			return NanEscapeScope(NanUndefined());
 		}
 
 		QVariant V8ToQVariant(Handle<Value> value)

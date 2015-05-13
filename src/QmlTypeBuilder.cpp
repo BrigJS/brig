@@ -23,12 +23,12 @@ namespace Brig {
 
 	void QmlTypeBuilder::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlTypeBuilder");
+		Local<String> name = NanNew("QmlTypeBuilder");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlTypeBuilder::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlTypeBuilder::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -36,26 +36,28 @@ namespace Brig {
 		NODE_SET_PROTOTYPE_METHOD(tpl, "addSignal", QmlTypeBuilder::addSignal);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "build", QmlTypeBuilder::build);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
-	Handle<Value> QmlTypeBuilder::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlTypeBuilder::New) {
+		NanScope();
 
 		String::Utf8Value typeName(args[0]->ToString());
 
 		QmlTypeBuilder *obj_wrap = new QmlTypeBuilder(*typeName);
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
-	Handle<Value> QmlTypeBuilder::build(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlTypeBuilder::build) {
+		NanScope();
+
+		String::Utf8Value uriStr(args[0]->ToString());
+		int major = static_cast<int>(args[1]->Int32Value());
+		int minor = static_cast<int>(args[2]->Int32Value());
 
 		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
 
@@ -65,12 +67,14 @@ namespace Brig {
 		// Create a new QObject
 		qmltype_builder->obj = new DynamicQObject(metaobject);
 
-		return Undefined();
+		qmlRegisterType<QObject>(*uriStr, major, minor, qmltype_builder->metaobject_builder->getTypeName());
+
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QmlTypeBuilder::addSignal(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlTypeBuilder::addSignal) {
+		NanScope();
 
 		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
 
@@ -80,6 +84,6 @@ namespace Brig {
 
 		qmltype_builder->metaobject_builder->addSignal(*signature, parameterNames, args[2]);
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 }

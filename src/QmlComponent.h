@@ -24,15 +24,16 @@ namespace Brig {
 
 		private:
 
-			static Handle<Value> New(const Arguments& args);
+			static NAN_METHOD(New);
 
 			/* Methods */
-			static Handle<Value> setEngine(const Arguments& args);
-			static Handle<Value> loadUrl(const Arguments& args);
-			static Handle<Value> setData(const Arguments& args);
-			static Handle<Value> on(const Arguments& args);
-			static Handle<Value> progress(const Arguments& args);
-			static Handle<Value> status(const Arguments& args);
+			static NAN_METHOD(setEngine);
+			static NAN_METHOD(loadUrl);
+			static NAN_METHOD(setData);
+			static NAN_METHOD(on);
+			static NAN_METHOD(progress);
+			static NAN_METHOD(status);
+			static NAN_METHOD(errors);
 
 			QmlEngineWrap *engine;
 			QQmlComponent *obj;

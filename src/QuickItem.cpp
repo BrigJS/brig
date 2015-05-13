@@ -26,12 +26,12 @@ printf("RELEASE QuickItem\n");
 
 	void QuickItem::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QuickItem");
+		Local<String> name = NanNew("QuickItem");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QuickItem::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QuickItem::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -45,26 +45,24 @@ printf("RELEASE QuickItem\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "emitEvent", QuickItem::emitEvent);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QuickItem::on);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor
-	Handle<Value> QuickItem::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::New) {
+		NanScope();
 
 		QuickItem *obj_wrap = new QuickItem();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
 	// Method
-	Handle<Value> QuickItem::create(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::create) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
@@ -75,34 +73,32 @@ printf("RELEASE QuickItem\n");
 		obj_wrap->signal = new SignalHandler(qobject_cast<QObject *>(obj_wrap->GetObject()));
 //		obj_wrap->signal->setObject(qobject_cast<QObject *>(obj_wrap->GetObject()));
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QuickItem::getPropertyNames(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::getPropertyNames) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
-		Handle<Array> keys = Array::New();
+		Handle<Array> keys = NanNew<Array>();
 
 		// Getting property names
 		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
 		for (int i = 0; i < meta->propertyCount(); i++) {
-			keys->Set(i, String::New(QString(meta->property(i).name()).toUtf8().constData()));
+			keys->Set(i, NanNew(QString(meta->property(i).name()).toUtf8().constData()));
 		}
 
-		return scope.Close(keys);
+		NanReturnValue(keys);
 	}
 
-	Handle<Value> QuickItem::getProperty(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::getProperty) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		String::Utf8Value name(args[0]->ToString());
 
@@ -111,19 +107,18 @@ printf("RELEASE QuickItem\n");
 
 		// Convert Qvariant to V8 data type
 		if (v.isNull())
-			return scope.Close(Null());
+			NanReturnNull();
 
-		return scope.Close(Utils::QVariantToV8(v.userType(), v));
+		NanReturnValue(Utils::QVariantToV8(v.userType(), v));
 	}
 
-	Handle<Value> QuickItem::setProperty(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::setProperty) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		String::Utf8Value name(args[0]->ToString());
 		Handle<Value> value(args[1]);
@@ -144,19 +139,18 @@ printf("RELEASE QuickItem\n");
 		// Set property
 		obj_wrap->GetObject()->setProperty(*name, v);
 
-		return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QuickItem::setParent(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::setParent) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
 		QuickItem *item = ObjectWrap::Unwrap<QuickItem>(args[0]->ToObject());
 
 		if (!item->GetObject())
-			return Undefined();
+			NanReturnUndefined();
 
 		QQuickItem *parentObj = NULL;
 		if (item->GetObject()->isWindowType()) {
@@ -165,20 +159,20 @@ printf("RELEASE QuickItem\n");
 		} else {
 			parentObj = item->GetObject();
 		}
+
 		obj_wrap->GetObject()->setParentItem(parentObj);
 
-		return Undefined();
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QuickItem::invokeMethod(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::invokeMethod) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		// Method name
 		String::Utf8Value methodSig(args[0]->ToString());
@@ -203,41 +197,40 @@ printf("RELEASE QuickItem\n");
 
 		// Convert Qvariant to V8 data type
 		if (returnedValue.isNull())
-			return scope.Close(Null());
+			NanReturnNull();
 
 		switch(returnedValue.userType()) {
 		case QMetaType::Bool:
-			return scope.Close(Boolean::New(returnedValue.toBool()));
+			NanReturnValue(NanNew<Boolean>(returnedValue.toBool()));
 		case QMetaType::Int:
-			return scope.Close(Number::New(returnedValue.toInt()));
+			NanReturnValue(NanNew<Number>(returnedValue.toInt()));
 		case QMetaType::UInt:
-			return scope.Close(Number::New(returnedValue.toUInt()));
+			NanReturnValue(NanNew<Number>(returnedValue.toUInt()));
 		case QMetaType::Float:
-			return scope.Close(Number::New(returnedValue.toFloat()));
+			NanReturnValue(NanNew<Number>(returnedValue.toFloat()));
 		case QMetaType::Double:
-			return scope.Close(Number::New(returnedValue.toDouble()));
+			NanReturnValue(NanNew<Number>(returnedValue.toDouble()));
 		case QMetaType::LongLong:
-			return scope.Close(Number::New(returnedValue.toLongLong()));
+			NanReturnValue(NanNew<Number>(returnedValue.toLongLong()));
 		case QMetaType::ULongLong:
-			return scope.Close(Number::New(returnedValue.toULongLong()));
+			NanReturnValue(NanNew<Number>(returnedValue.toULongLong()));
 		case QMetaType::QString:
-			return scope.Close(String::New(returnedValue.toString().toUtf8().constData()));
+			NanReturnValue(NanNew(returnedValue.toString().toUtf8().constData()));
 		case QMetaType::QColor:
-			return scope.Close(String::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
+			NanReturnValue(NanNew(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
 		}
 
-		return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QuickItem::emitEvent(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::emitEvent) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		// Method name
 		String::Utf8Value methodSig(args[0]->ToString());
@@ -319,16 +312,15 @@ printf("RELEASE QuickItem\n");
 			dataList.clear();
 			parameters.clear();
 
-			//return scope.Close(Boolean::New(True));
-			return scope.Close(True());
+			//NanReturnValue(NanNew<Boolean>(True));
+			NanReturnValue(NanTrue());
 		}
 
-		return scope.Close(False());
+		NanReturnValue(NanFalse());
 	}
 
-	Handle<Value> QuickItem::on(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QuickItem::on) {
+		NanScope();
 
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
 
@@ -336,6 +328,6 @@ printf("RELEASE QuickItem\n");
 		String::Utf8Value url(args[0]->ToString());
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		return args.This();
+		NanReturnThis();
 	}
 }

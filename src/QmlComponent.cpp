@@ -27,12 +27,12 @@ printf("RELEASE Component\n");
 
 	void QmlComponent::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlComponent");
+		Local<String> name = NanNew("QmlComponent");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlComponent::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlComponent::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -43,27 +43,26 @@ printf("RELEASE Component\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlComponent::on);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "progress", QmlComponent::progress);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "status", QmlComponent::status);
+		NODE_SET_PROTOTYPE_METHOD(tpl, "errors", QmlComponent::errors);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor
-	Handle<Value> QmlComponent::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::New) {
+		NanScope();
 
 		QmlComponent *obj_wrap = new QmlComponent();
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
 	// Method
-	Handle<Value> QmlComponent::setEngine(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::setEngine) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -71,32 +70,35 @@ printf("RELEASE Component\n");
 
 		obj_wrap->engine = engine_wrap;
 
-		return args.This();
+		NanReturnThis();
 	}
 
-	Handle<Value> QmlComponent::loadUrl(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::loadUrl) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
 		String::Utf8Value url(args[0]->ToString());
 
+		// Create component
 		obj_wrap->obj = new QQmlComponent(obj_wrap->engine->GetObject());
+
+		// Setup signal handler
 		obj_wrap->signal->setObject(obj_wrap->obj);
+
+		// Loading specific file
 		obj_wrap->obj->loadUrl(QUrl(QString(*url)), QQmlComponent::Asynchronous);
 
-		return args.This();
+		NanReturnThis();
 	}
 
-	Handle<Value> QmlComponent::setData(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::setData) {
+		NanScope();
 
 		QUrl url;
 
 		if (!args[0]->IsString())
-			return ThrowException(Exception::Error(String::New("First argument must be a string")));
+			NanThrowTypeError("First argument must be a string");
 
 		if (args[1]->IsString()) {
 			String::Utf8Value url_str(args[1]->ToString());
@@ -115,12 +117,12 @@ printf("RELEASE Component\n");
 		String::Utf8Value data_str(args[0]->ToString());
 		obj_wrap->GetObject()->setData(*data_str, url); 
 
-		return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QmlComponent::on(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlComponent::on) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
@@ -129,24 +131,41 @@ printf("RELEASE Component\n");
 
 		int id = obj_wrap->signal->addCallback(*url, args[1]);
 
-		return args.This();
+		NanReturnThis();
 	}
 
-	Handle<Value> QmlComponent::progress(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::progress) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		return scope.Close(Number::New(obj_wrap->obj->progress()));
+		NanReturnValue(NanNew<Number>(obj_wrap->obj->progress()));
 	}
 
-	Handle<Value> QmlComponent::status(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QmlComponent::status) {
+		NanScope();
 
 		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
 
-		return scope.Close(Number::New(obj_wrap->obj->status()));
+		NanReturnValue(NanNew<Number>(obj_wrap->obj->status()));
+	}
+
+	NAN_METHOD(QmlComponent::errors) {
+		NanScope();
+
+		QmlComponent *obj_wrap = ObjectWrap::Unwrap<QmlComponent>(args.This());
+
+		// Getting errors
+		QList<QQmlError> errs = obj_wrap->GetObject()->errors();
+
+		// Create an array
+		//Handle<Array> errArr = Array::New();
+		Handle<Array> errArr = NanNew<Array>();
+
+		for (int i = 0; i < errs.length(); i++) {
+			errArr->Set(i, NanNew(errs[i].toString().toUtf8().constData()));
+		}
+
+		NanReturnValue(errArr);
 	}
 }

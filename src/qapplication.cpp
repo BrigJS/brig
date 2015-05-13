@@ -1,4 +1,5 @@
 #include <node.h>
+#include <nan.h>
 #include <QtGui>
 #include <QObject>
 #include <QTextCodec>
@@ -40,12 +41,13 @@ printf("RELEASE QApplication\n");
 
 	void QApplicationWrap::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QApplication");
+		Local<String> name = NanNew("QApplication");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QApplicationWrap::New);
+//		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
@@ -53,24 +55,27 @@ printf("RELEASE QApplication\n");
 		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
 		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
+//		constructor = Persistent<Function>::New(tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
-	Handle<Value> QApplicationWrap::New(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::New) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = new QApplicationWrap();
 		app_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnValue(args.This());
 	}
-
+/*
 	Handle<Value> QApplicationWrap::Exec(const Arguments& args)
 	{
-		HandleScope scope;
+*/
+	NAN_METHOD(QApplicationWrap::Exec) {
+		NanScope();
+//		HandleScope scope;
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
 		app_wrap->quickview->show();
@@ -84,12 +89,12 @@ printf("RELEASE QApplication\n");
 
 printf("EXEC\n");
 
-		return scope.Close(Undefined());
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 
-	Handle<Value> QApplicationWrap::Test(const Arguments& args)
-	{
-		HandleScope scope;
+	NAN_METHOD(QApplicationWrap::Test) {
+		NanScope();
 
 		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
 		app_wrap->dispatcher->wakeUp();
@@ -107,6 +112,7 @@ printf("5\n");
 //		app_wrap->app->exec();
 #endif
 #endif
-		return scope.Close(Undefined());
+		//return scope.Close(Undefined());
+		NanReturnUndefined();
 	}
 }

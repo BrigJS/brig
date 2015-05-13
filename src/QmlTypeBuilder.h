@@ -20,12 +20,12 @@ namespace Brig {
 
 		private:
 
-			static Handle<Value> New(const Arguments& args);
+			static NAN_METHOD(New);
 
 			/* Methods */
-			static Handle<Value> build(const Arguments& args);
-			static Handle<Value> addMethod(const Arguments& args);
-			static Handle<Value> addSignal(const Arguments& args);
+			static NAN_METHOD(build);
+			static NAN_METHOD(addMethod);
+			static NAN_METHOD(addSignal);
 
 			QObject *obj;
 			unsigned long counter;

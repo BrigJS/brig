@@ -39,7 +39,7 @@ namespace Brig {
 		int methodId = findSignalId(callback->signal);
 
 		// Convert parameters
-		HandleScope scope;
+		NanScope();
 
 		const QMetaObject *meta = obj->metaObject();
 		QMetaMethod method = meta->method(methodId);
@@ -54,7 +54,8 @@ namespace Brig {
 		}
 
 		// Invoke
-		MakeCallback(callback->handler, callback->handler, argc, argv);
+//		MakeCallback(callback->handler, callback->handler, argc, argv);
+		callback->handler->Call(argc, argv);
 
 		// Release
 		delete [] argv;
@@ -100,14 +101,15 @@ namespace Brig {
 
 	int SignalHandler::addCallback(const char *signal, Handle<Value> cb)
 	{
-		HandleScope scope;
+		NanScope();
 
 		int slotId = callbacks.count();
 
 		// Create a new callback
 		Callback *callback = new Callback();
 		callback->signal = strdup(signal);
-		callback->handler = Persistent<Function>::New(Handle<Function>::Cast(cb));
+		callback->handler = new NanCallback(cb.As<Function>());
+//		Persistent<Function>::New(Handle<Function>::Cast(cb));
 		callbacks.append(callback);
 
 		// No object can be hooked yet

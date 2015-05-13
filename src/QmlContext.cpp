@@ -23,30 +23,30 @@ namespace Brig {
 
 	void QmlContext::Initialize(Handle<Object> target)
 	{
-		HandleScope scope;
+		NanScope();
 
-		Local<String> name = String::NewSymbol("QmlContext");
+		Local<String> name = NanNew("QmlContext");
 
 		/* Constructor template */
-		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QmlContext::New));
+		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlContext::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
 		//NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlContext::setEngine);
 
-		constructor = Persistent<Function>::New(tpl->GetFunction());
+		NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, constructor);
+		target->Set(name, NanNew(constructor));
 	}
 
 	// Prototype Constructor
-	Handle<Value> QmlContext::New(const Arguments& args)
-	{
-		HandleScope scope;
+
+	NAN_METHOD(QmlContext::New) {
+		NanScope();
 
 		if (args.Length() == 0)
-			return Undefined();
+			NanReturnUndefined();
 
 		// Using Engine to initialize QQmlContext
 		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args[0]->ToObject());
@@ -55,7 +55,7 @@ namespace Brig {
 		obj_wrap->obj = new QQmlContext(engine_wrap->GetObject()->rootContext());
 		obj_wrap->Wrap(args.This());
 
-		return args.This();
+		NanReturnThis();
 	}
 
 	// Method

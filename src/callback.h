@@ -12,11 +12,10 @@ namespace Brig {
 
 	struct Callback {
 		char *signal;
-		Persistent<Function> handler;
+		NanCallback *handler;
 
 		~Callback() {
-			handler.Dispose();
-			handler.Clear();
+			delete handler;
 			delete signal;
 		}
 	};

@@ -2,6 +2,7 @@
 #define BRIG_EVENTLOOP_H
 
 #include <node.h>
+#include <uv.h>
 #include <QObject>
 #include <QGuiApplication>
 #include <QAbstractEventDispatcher>
@@ -19,7 +20,7 @@ namespace Brig {
 			~EventLoop(void);
 
 			QGuiApplication *GetApp() const { return app; };
-			uv_async_t *GetMainLoop() const { return mainloop; };
+			//uv_async_t *GetMainLoop() const { return mainloop; };
 			QAbstractEventDispatcher *eventDispatcher;
 			void Main();
 
@@ -29,7 +30,7 @@ namespace Brig {
 
 			QGuiApplication *app;
 			QEventLoop *eventloop;
-			uv_async_t *mainloop;
+			//uv_async_t *mainloop;
 	};
 
 }
