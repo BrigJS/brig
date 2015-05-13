@@ -19,7 +19,7 @@ npm install brig
 Demonstration
 ---
 
-Here is a great countdown timer for hackathon event to show off, you can clicks to play YouTube video:
+Here is a great countdown timer for hackathon event to show off, you can click image to play YouTube video:
 
 [![Countdown Timer](https://cloud.githubusercontent.com/assets/252072/7604018/44697ee8-f96f-11e4-9690-db826fccbc22.png)](http://www.youtube.com/watch?v=D6CnZfK723M)
 (clicks to play video)
