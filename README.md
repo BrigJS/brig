@@ -1,4 +1,4 @@
-brig
+Brig
 ====
 
 A user interface engine for Node.js and io.js, which is based on Qt. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js.
