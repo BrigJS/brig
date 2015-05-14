@@ -23,7 +23,6 @@
   "devDependencies": {},
   "optionalDependencies": {},
   "dependencies": {
-    "nan": "^1.7.0",
-    "compare-version": "~0.1.2"
+    "nan": "^1.7.0"
   }
 }
