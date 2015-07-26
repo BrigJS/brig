@@ -29,6 +29,7 @@
 				],
 				'cflags': [
 					'-std=c++11',
+					'-fPIC',
 					'-I./src',
 					'<!@(pkg-config --cflags Qt5Core Qt5Quick Qt5Qml Qt5Multimedia)'
 				],
