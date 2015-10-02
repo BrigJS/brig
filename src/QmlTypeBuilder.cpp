@@ -8,7 +8,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QmlTypeBuilder::constructor;
+	Nan::Persistent<Function> QmlTypeBuilder::constructor;
 
 	QmlTypeBuilder::QmlTypeBuilder(const char *typeName) : ObjectWrap()
 	{
@@ -21,45 +21,41 @@ namespace Brig {
 		delete metaobject_builder;
 	}
 
-	void QmlTypeBuilder::Initialize(Handle<Object> target)
-	{
-		NanScope();
+	NAN_MODULE_INIT(QmlTypeBuilder::Initialize) {
 
-		Local<String> name = NanNew("QmlTypeBuilder");
+		Local<String> name = Nan::New("QmlTypeBuilder").ToLocalChecked();
 
 		/* Constructor template */
-		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlTypeBuilder::New);
+		Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(QmlTypeBuilder::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "addSignal", QmlTypeBuilder::addSignal);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "build", QmlTypeBuilder::build);
+		Nan::SetPrototypeMethod(tpl, "addSignal", QmlTypeBuilder::addSignal);
+		Nan::SetPrototypeMethod(tpl, "build", QmlTypeBuilder::build);
 
-		NanAssignPersistent(constructor, tpl->GetFunction());
+		constructor.Reset(tpl->GetFunction());
 
-		target->Set(name, NanNew(constructor));
+		target->Set(name, Nan::New(constructor));
 	}
 
 	NAN_METHOD(QmlTypeBuilder::New) {
-		NanScope();
 
-		String::Utf8Value typeName(args[0]->ToString());
+		String::Utf8Value typeName(info[0]->ToString());
 
 		QmlTypeBuilder *obj_wrap = new QmlTypeBuilder(*typeName);
-		obj_wrap->Wrap(args.This());
+		obj_wrap->Wrap(info.This());
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 
 	NAN_METHOD(QmlTypeBuilder::build) {
-		NanScope();
 
-		String::Utf8Value uriStr(args[0]->ToString());
-		int major = static_cast<int>(args[1]->Int32Value());
-		int minor = static_cast<int>(args[2]->Int32Value());
+		String::Utf8Value uriStr(info[0]->ToString());
+		int major = static_cast<int>(info[1]->Int32Value());
+		int minor = static_cast<int>(info[2]->Int32Value());
 
-		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
 
 		// Generate a new QMetaObject
 		QMetaObject *metaobject = qmltype_builder->metaobject_builder->build();
@@ -69,21 +65,20 @@ namespace Brig {
 
 		qmlRegisterType<QObject>(*uriStr, major, minor, qmltype_builder->metaobject_builder->getTypeName());
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 
 
 	NAN_METHOD(QmlTypeBuilder::addSignal) {
-		NanScope();
 
-		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(args.This());
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
 
-		String::Utf8Value signature(args[0]->ToString());
+		String::Utf8Value signature(info[0]->ToString());
 
 		QStringList parameterNames;
 
-		qmltype_builder->metaobject_builder->addSignal(*signature, parameterNames, args[2]);
+		qmltype_builder->metaobject_builder->addSignal(*signature, parameterNames, info[2]);
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 }

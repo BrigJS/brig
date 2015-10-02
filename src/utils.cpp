@@ -12,62 +12,61 @@ namespace Brig {
 
 	namespace Utils {
 
-		Handle<Value> QDataToV8(int type, void *value)
+		Local<Value> QDataToV8(int type, void *value)
 		{
-			NanEscapableScope();
+			Nan::EscapableHandleScope scope;
 
-			return NanEscapeScope(QVariantToV8(type, QVariant(type, value)));
+			return scope.Escape(QVariantToV8(type, QVariant(type, value)));
 		}
 
-		Handle<Value> QVariantToV8(int type, QVariant v)
+		Local<Value> QVariantToV8(int type, QVariant v)
 		{
-			NanEscapableScope();
-
-			Handle<Value> result = NanNull();
+			Nan::EscapableHandleScope scope;
 
 			switch(type) {
 			case QMetaType::Bool:
-				//return NanEscapeScope(Boolean::New(v.toBool()));
-				return NanEscapeScope(NanNew<Boolean>(v.toBool()));
+				//return scope.Escape(Boolean::New(v.toBool()));
+				return scope.Escape(Nan::New<Boolean>(v.toBool()));
 
 			case QMetaType::Int:
-				//return NanEscapeScope(NanNew<Number>(v.toInt()));
-				return NanEscapeScope(NanNew<Number>(v.toInt()));
+				//return scope.Escape(Nan::New<Number>(v.toInt()));
+				return scope.Escape(Nan::New<Int32>(v.toInt()));
 
 			case QMetaType::UInt:
-				return NanEscapeScope(NanNew<Number>(v.toUInt()));
+				return scope.Escape(Nan::New<Uint32>(v.toUInt()));
 
 			case QMetaType::Float:
-				return NanEscapeScope(NanNew<Number>(v.toFloat()));
+				return scope.Escape(Nan::New<Number>(v.toFloat()));
 
 			case QMetaType::Double:
-				return NanEscapeScope(NanNew<Number>(v.toDouble()));
+				return scope.Escape(Nan::New<Number>(v.toDouble()));
 
 			case QMetaType::LongLong:
 
-				return NanEscapeScope(NanNew<Number>(v.toLongLong()));
+				return scope.Escape(Nan::New<Number>(v.toLongLong()));
 
 			case QMetaType::ULongLong:
-				return NanEscapeScope(NanNew<Number>(v.toULongLong()));
+				return scope.Escape(Nan::New<Number>(v.toULongLong()));
 
 			case QMetaType::QString:
-				return NanEscapeScope(NanNew<String>(v.toString().toUtf8().constData()));
+				//return scope.Escape(Nan::New<String>(v.toString().toUtf8().constData()));
+				return scope.Escape(Nan::New<String>(v.toString().toStdString()).ToLocalChecked());
 
 			default:
 
 				if (type == qMetaTypeId<QQmlComponent::Status>()) {
-					return NanEscapeScope(NanNew<Number>(v.toInt()));
+					return scope.Escape(Nan::New<Number>(v.toInt()));
 				} else if (type == qMetaTypeId<qreal>()) {
-					return NanEscapeScope(NanNew<Number>(v.toDouble()));
+					return scope.Escape(Nan::New<Number>(v.toDouble()));
 				}
 
 //			case QMetaType::QVariant:
 			}
 
-			return NanEscapeScope(NanUndefined());
+			return scope.Escape(Nan::Undefined());
 		}
 
-		QVariant V8ToQVariant(Handle<Value> value)
+		QVariant V8ToQVariant(Local<Value> value)
 		{
 			QVariant v;
 
@@ -89,7 +88,7 @@ namespace Brig {
 			return v;
 		}
 
-		QJSValue V8ToQJSValue(QQmlEngine *engine, Handle<Value> value)
+		QJSValue V8ToQJSValue(QQmlEngine *engine, Local<Value> value)
 		{
 			// Check data type
 			if (value->IsNull()) {
@@ -109,7 +108,7 @@ namespace Brig {
 			return engine->evaluate("undefined");
 		}
 
-		ParamData *MakeParameter(int type, Handle<Value> value)
+		ParamData *MakeParameter(int type, Local<Value> value)
 		{
 			// Null
 			if (value->IsNull()) {

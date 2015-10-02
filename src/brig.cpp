@@ -8,9 +8,7 @@ namespace Brig {
 	using namespace v8;
 
 	NAN_METHOD(Cast) {
-		NanScope();
-
-		NanReturnUndefined();
+		info.GetReturnValue().Set(Nan::Undefined());
 	}
 
 	extern "C" {

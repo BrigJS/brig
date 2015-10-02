@@ -39,13 +39,13 @@ namespace Brig {
 		int methodId = findSignalId(callback->signal);
 
 		// Convert parameters
-		NanScope();
+		Nan::HandleScope scope;
 
 		const QMetaObject *meta = obj->metaObject();
 		QMetaMethod method = meta->method(methodId);
 		int argc = method.parameterCount();
 
-		Handle<Value> *argv = new Handle<Value>[argc];
+		Local<Value> *argv = new Local<Value>[argc];
 		for (int i = 0; i < method.parameterCount(); ++i) {
 			int type = method.parameterType(i);
 
@@ -99,16 +99,16 @@ namespace Brig {
 		return true;
 	}
 
-	int SignalHandler::addCallback(const char *signal, Handle<Value> cb)
+	int SignalHandler::addCallback(const char *signal, Local<Value> cb)
 	{
-		NanScope();
+		Nan::HandleScope scope;
 
 		int slotId = callbacks.count();
 
 		// Create a new callback
 		Callback *callback = new Callback();
 		callback->signal = strdup(signal);
-		callback->handler = new NanCallback(cb.As<Function>());
+		callback->handler = new Nan::Callback(cb.As<Function>());
 //		Persistent<Function>::New(Handle<Function>::Cast(cb));
 		callbacks.append(callback);
 

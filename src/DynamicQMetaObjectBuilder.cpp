@@ -35,7 +35,7 @@ namespace Brig {
 		// Create a new callback
 		Callback *callback = new Callback();
 		callback->signal = strdup(signature);
-		callback->handler = new NanCallback(cb.As<Function>());
+		callback->handler = new Nan::Callback(cb.As<Function>());
 		//callback->handler = Persistent<Function>::New(Handle<Function>::Cast(cb));
 		_signals.append(callback);
 

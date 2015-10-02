@@ -16,8 +16,7 @@ namespace Brig {
 			QmlContext();
 			~QmlContext();
 
-			static Persistent<Function> constructor;
-			static void Initialize(Handle<Object> target);
+			static NAN_MODULE_INIT(Initialize);
 
 			QQmlContext *GetObject() const { return obj; };
 
@@ -29,6 +28,8 @@ namespace Brig {
 			static NAN_METHOD(setEngine);
 
 			QQmlContext *obj;
+
+			static Nan::Persistent<Function> constructor;
 	};
 
 }

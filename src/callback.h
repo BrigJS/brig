@@ -12,7 +12,7 @@ namespace Brig {
 
 	struct Callback {
 		char *signal;
-		NanCallback *handler;
+		Nan::Callback *handler;
 
 		~Callback() {
 			delete handler;

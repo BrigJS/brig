@@ -16,8 +16,7 @@ namespace Brig {
 			QuickItem();
 			~QuickItem();
 
-			static Persistent<Function> constructor;
-			static void Initialize(Handle<Object> target);
+			static NAN_MODULE_INIT(Initialize);
 
 			QQuickItem *GetObject() const { return obj; };
 
@@ -37,6 +36,8 @@ namespace Brig {
 
 			QQuickItem *obj;
 			SignalHandler *signal;
+
+			static Nan::Persistent<Function> constructor;
 	};
 
 }

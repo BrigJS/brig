@@ -88,12 +88,12 @@ namespace Brig {
 			};
 		};
 
-		Handle<Value> QDataToV8(int type, void *value);
-		Handle<Value> QVariantToV8(int type, QVariant v);
-		QVariant V8ToQVariant(Handle<Value> value);
-		QJSValue V8ToQJSValue(QQmlEngine *engine, Handle<Value> value);
-		ParamData *MakeParameter(int type, Handle<Value> value);
-		QGenericArgument MakeArgument(int type, Handle<Value> value);
+		Local<Value> QDataToV8(int type, void *value);
+		Local<Value> QVariantToV8(int type, QVariant v);
+		QVariant V8ToQVariant(Local<Value> value);
+		QJSValue V8ToQJSValue(QQmlEngine *engine, Local<Value> value);
+		ParamData *MakeParameter(int type, Local<Value> value);
+		QGenericArgument MakeArgument(int type, Local<Value> value);
 	}
 }
 

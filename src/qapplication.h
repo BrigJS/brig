@@ -15,8 +15,7 @@ namespace Brig {
 	class QApplicationWrap : public ObjectWrap {
 
 		public:
-			static Persistent<Function> constructor;
-			static void Initialize(Handle<Object> target);
+			static NAN_MODULE_INIT(Initialize);
 
 			QGuiApplication *GetApp() const { return app; };
 			EventLoop *GetEventLoop() const { return eventloop; };
@@ -38,6 +37,8 @@ namespace Brig {
 			BrigEventDispatcher *dispatcher;
 
 			QQuickView *quickview;
+
+			static Nan::Persistent<Function> constructor;
 	};
 
 }

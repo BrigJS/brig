@@ -15,8 +15,7 @@ namespace Brig {
 			QmlTypeBuilder(const char *typeName);
 			~QmlTypeBuilder();
 
-			static Persistent<Function> constructor;
-			static void Initialize(Handle<Object> target);
+			static NAN_MODULE_INIT(Initialize);
 
 		private:
 
@@ -31,6 +30,8 @@ namespace Brig {
 			unsigned long counter;
 			DynamicQMetaObjectBuilder *metaobject_builder;
 			QMap<unsigned long, QObject *> qml_types;
+
+			static Nan::Persistent<Function> constructor;
 	};
 
 }

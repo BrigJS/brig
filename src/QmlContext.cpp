@@ -9,7 +9,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QmlContext::constructor;
+	Nan::Persistent<Function> QmlContext::constructor;
 
 	QmlContext::QmlContext() : ObjectWrap()
 	{
@@ -21,41 +21,38 @@ namespace Brig {
 		delete obj;
 	}
 
-	void QmlContext::Initialize(Handle<Object> target)
-	{
-		NanScope();
+	NAN_MODULE_INIT(QmlContext::Initialize) {
 
-		Local<String> name = NanNew("QmlContext");
+		Local<String> name = Nan::New("QmlContext").ToLocalChecked();
 
 		/* Constructor template */
-		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlContext::New);
+		Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(QmlContext::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		//NODE_SET_PROTOTYPE_METHOD(tpl, "setEngine", QmlContext::setEngine);
+		//Nan::SetPrototypeMethod(tpl, "setEngine", QmlContext::setEngine);
 
-		NanAssignPersistent(constructor, tpl->GetFunction());
+		constructor.Reset(tpl->GetFunction());
 
-		target->Set(name, NanNew(constructor));
+		target->Set(name, Nan::New(constructor));
 	}
 
 	// Prototype Constructor
 
 	NAN_METHOD(QmlContext::New) {
-		NanScope();
 
-		if (args.Length() == 0)
-			NanReturnUndefined();
+		if (info.Length() == 0)
+			info.GetReturnValue().SetUndefined();
 
 		// Using Engine to initialize QQmlContext
-		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args[0]->ToObject());
+		QmlEngineWrap *engine_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info[0]->ToObject());
 
 		QmlContext *obj_wrap = new QmlContext();
 		obj_wrap->obj = new QQmlContext(engine_wrap->GetObject()->rootContext());
-		obj_wrap->Wrap(args.This());
+		obj_wrap->Wrap(info.This());
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 
 	// Method

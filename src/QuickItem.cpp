@@ -9,7 +9,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QuickItem::constructor;
+	Nan::Persistent<Function> QuickItem::constructor;
 
 	QuickItem::QuickItem() : ObjectWrap()
 	{
@@ -24,104 +24,97 @@ printf("RELEASE QuickItem\n");
 		delete obj;
 	}
 
-	void QuickItem::Initialize(Handle<Object> target)
-	{
-		NanScope();
+	NAN_MODULE_INIT(QuickItem::Initialize) {
 
-		Local<String> name = NanNew("QuickItem");
+		Local<String> name = Nan::New("QuickItem").ToLocalChecked();
 
 		/* Constructor template */
-		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QuickItem::New);
+		Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(QuickItem::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "create", QuickItem::create);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "getPropertyNames", QuickItem::getPropertyNames);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "getProperty", QuickItem::getProperty);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "setProperty", QuickItem::setProperty);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "setParent", QuickItem::setParent);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "invokeMethod", QuickItem::invokeMethod);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "emitEvent", QuickItem::emitEvent);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QuickItem::on);
+		Nan::SetPrototypeMethod(tpl, "create", QuickItem::create);
+		Nan::SetPrototypeMethod(tpl, "getPropertyNames", QuickItem::getPropertyNames);
+		Nan::SetPrototypeMethod(tpl, "getProperty", QuickItem::getProperty);
+		Nan::SetPrototypeMethod(tpl, "setProperty", QuickItem::setProperty);
+		Nan::SetPrototypeMethod(tpl, "setParent", QuickItem::setParent);
+		Nan::SetPrototypeMethod(tpl, "invokeMethod", QuickItem::invokeMethod);
+		Nan::SetPrototypeMethod(tpl, "emitEvent", QuickItem::emitEvent);
+		Nan::SetPrototypeMethod(tpl, "on", QuickItem::on);
 
-		NanAssignPersistent(constructor, tpl->GetFunction());
+		constructor.Reset(tpl->GetFunction());
 
-		target->Set(name, NanNew(constructor));
+		target->Set(name, Nan::New(constructor));
 	}
 
 	// Prototype Constructor
 	NAN_METHOD(QuickItem::New) {
-		NanScope();
 
 		QuickItem *obj_wrap = new QuickItem();
-		obj_wrap->Wrap(args.This());
+		obj_wrap->Wrap(info.This());
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 
 	// Method
 	NAN_METHOD(QuickItem::create) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
-		QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(args[0]->ToObject());
+		QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(info[0]->ToObject());
 
 		// Create QuickItem with component
 		obj_wrap->obj = static_cast<QQuickItem *>(component->GetObject()->create());
 		obj_wrap->signal = new SignalHandler(qobject_cast<QObject *>(obj_wrap->GetObject()));
 //		obj_wrap->signal->setObject(qobject_cast<QObject *>(obj_wrap->GetObject()));
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 
 	NAN_METHOD(QuickItem::getPropertyNames) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
-		Handle<Array> keys = NanNew<Array>();
+		Handle<Array> keys = Nan::New<Array>();
 
 		// Getting property names
 		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
 		for (int i = 0; i < meta->propertyCount(); i++) {
-			keys->Set(i, NanNew(QString(meta->property(i).name()).toUtf8().constData()));
+			keys->Set(i, Nan::New(QString(meta->property(i).name()).toUtf8().constData()).ToLocalChecked());
 		}
 
-		NanReturnValue(keys);
+		info.GetReturnValue().Set(keys);
 	}
 
 	NAN_METHOD(QuickItem::getProperty) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
-		if (!args[0]->IsString())
-			NanThrowTypeError("First argument must be a string");
+		if (!info[0]->IsString())
+			Nan::ThrowTypeError("First argument must be a string");
 
-		String::Utf8Value name(args[0]->ToString());
+		String::Utf8Value name(info[0]->ToString());
 
 		// Get property
 		QVariant v = obj_wrap->GetObject()->property(*name);
 
 		// Convert Qvariant to V8 data type
 		if (v.isNull())
-			NanReturnNull();
+			info.GetReturnValue().SetNull();
 
-		NanReturnValue(Utils::QVariantToV8(v.userType(), v));
+		info.GetReturnValue().Set(Utils::QVariantToV8(v.userType(), v));
 	}
 
 	NAN_METHOD(QuickItem::setProperty) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
-		if (!args[0]->IsString())
-			NanThrowTypeError("First argument must be a string");
+		if (!info[0]->IsString())
+			Nan::ThrowTypeError("First argument must be a string");
 
-		String::Utf8Value name(args[0]->ToString());
-		Handle<Value> value(args[1]);
+		String::Utf8Value name(info[0]->ToString());
+		Local<Value> value(info[1]);
 		QVariant v;
 
 		// Check data type
@@ -139,18 +132,17 @@ printf("RELEASE QuickItem\n");
 		// Set property
 		obj_wrap->GetObject()->setProperty(*name, v);
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 
 	NAN_METHOD(QuickItem::setParent) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
-		QuickItem *item = ObjectWrap::Unwrap<QuickItem>(args[0]->ToObject());
+		QuickItem *item = ObjectWrap::Unwrap<QuickItem>(info[0]->ToObject());
 
 		if (!item->GetObject())
-			NanReturnUndefined();
+			info.GetReturnValue().SetUndefined();
 
 		QQuickItem *parentObj = NULL;
 		if (item->GetObject()->isWindowType()) {
@@ -162,81 +154,79 @@ printf("RELEASE QuickItem\n");
 
 		obj_wrap->GetObject()->setParentItem(parentObj);
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 
 	NAN_METHOD(QuickItem::invokeMethod) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
-		if (!args[0]->IsString())
-			NanThrowTypeError("First argument must be a string");
+		if (!info[0]->IsString())
+			Nan::ThrowTypeError("First argument must be a string");
 
 		// Method name
-		String::Utf8Value methodSig(args[0]->ToString());
+		String::Utf8Value methodSig(info[0]->ToString());
 
 		QVariant returnedValue;
-		int argsLen = args.Length() - 1;
+		int infoLen = info.Length() - 1;
 
 		// It supports only 10 arguments with limitation of Qt
 		QMetaObject::invokeMethod(qobj, *methodSig,
 			Qt::AutoConnection,
 			Q_RETURN_ARG(QVariant, returnedValue),
-			(argsLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[1])) : QGenericArgument(),
-			(argsLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[2])) : QGenericArgument(),
-			(argsLen > 2) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[3])) : QGenericArgument(),
-			(argsLen > 3) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[4])) : QGenericArgument(),
-			(argsLen > 4) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[5])) : QGenericArgument(),
-			(argsLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[6])) : QGenericArgument(),
-			(argsLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[7])) : QGenericArgument(),
-			(argsLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[8])) : QGenericArgument(),
-			(argsLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[8])) : QGenericArgument(),
-			(argsLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(args[9])) : QGenericArgument());
+			(infoLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[1])) : QGenericArgument(),
+			(infoLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[2])) : QGenericArgument(),
+			(infoLen > 2) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[3])) : QGenericArgument(),
+			(infoLen > 3) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[4])) : QGenericArgument(),
+			(infoLen > 4) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[5])) : QGenericArgument(),
+			(infoLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[6])) : QGenericArgument(),
+			(infoLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[7])) : QGenericArgument(),
+			(infoLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
+			(infoLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
+			(infoLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[9])) : QGenericArgument());
 
 		// Convert Qvariant to V8 data type
 		if (returnedValue.isNull())
-			NanReturnNull();
+			info.GetReturnValue().SetNull();
 
 		switch(returnedValue.userType()) {
 		case QMetaType::Bool:
-			NanReturnValue(NanNew<Boolean>(returnedValue.toBool()));
+			info.GetReturnValue().Set(Nan::New<Boolean>(returnedValue.toBool()));
 		case QMetaType::Int:
-			NanReturnValue(NanNew<Number>(returnedValue.toInt()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toInt()));
 		case QMetaType::UInt:
-			NanReturnValue(NanNew<Number>(returnedValue.toUInt()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toUInt()));
 		case QMetaType::Float:
-			NanReturnValue(NanNew<Number>(returnedValue.toFloat()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toFloat()));
 		case QMetaType::Double:
-			NanReturnValue(NanNew<Number>(returnedValue.toDouble()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toDouble()));
 		case QMetaType::LongLong:
-			NanReturnValue(NanNew<Number>(returnedValue.toLongLong()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toLongLong()));
 		case QMetaType::ULongLong:
-			NanReturnValue(NanNew<Number>(returnedValue.toULongLong()));
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toULongLong()));
 		case QMetaType::QString:
-			NanReturnValue(NanNew(returnedValue.toString().toUtf8().constData()));
+			info.GetReturnValue().Set(Nan::New(returnedValue.toString().toUtf8().constData()).ToLocalChecked());
 		case QMetaType::QColor:
-			NanReturnValue(NanNew(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()));
+			info.GetReturnValue().Set(Nan::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()).ToLocalChecked());
 		}
 
-		NanReturnUndefined();
+		info.GetReturnValue().SetUndefined();
 	}
 
 	NAN_METHOD(QuickItem::emitEvent) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 		QObject *qobj = qobject_cast<QObject *>(obj_wrap->GetObject());
 
-		if (!args[0]->IsString())
-			NanThrowTypeError("First argument must be a string");
+		if (!info[0]->IsString())
+			Nan::ThrowTypeError("First argument must be a string");
 
 		// Method name
-		String::Utf8Value methodSig(args[0]->ToString());
+		String::Utf8Value methodSig(info[0]->ToString());
 
 		QVariant returnedValue;
-		int argsLen = args.Length() - 1;
+		int infoLen = info.Length() - 1;
 
 		static const QMetaObject *meta = qobj->metaObject();
 //		int methodIndex = meta->indexOfMethod(*methodSig);
@@ -246,7 +236,7 @@ printf("RELEASE QuickItem\n");
 		QQmlContext *thisContext = QQmlEngine::contextForObject(qobj);
 
 		// Preparing parameter and ensure QJSValue have individual memory
-//		QJSValue val[argsLen];
+//		QJSValue val[infoLen];
 		QMap<int, QJSValue> vals;
 		QList<QGenericArgument> parameters;
 		QList<Utils::ParamData> dataList;
@@ -265,10 +255,10 @@ printf("RELEASE QuickItem\n");
 			for (int j = 0; j < method.parameterCount(); j++) {
 				int type = method.parameterType(j);
 
-				if (j >= args.Length())
+				if (j >= info.Length())
 					break;
 
-				Handle<Value> value = args[j + 1];
+				Local<Value> value = info[j + 1];
 
 				// Type is "var" in QML, which is different from QVariant
 				if (type == qMetaTypeId<QJSValue>()) {
@@ -296,38 +286,37 @@ printf("RELEASE QuickItem\n");
 			// Invoke
 			method.invoke(qobj,
 				Qt::QueuedConnection,
-				(argsLen > 0) ? parameters[0] : QGenericArgument(),
-				(argsLen > 1) ? parameters[1] : QGenericArgument(),
-				(argsLen > 2) ? parameters[2] : QGenericArgument(),
-				(argsLen > 3) ? parameters[3] : QGenericArgument(),
-				(argsLen > 4) ? parameters[4] : QGenericArgument(),
-				(argsLen > 5) ? parameters[5] : QGenericArgument(),
-				(argsLen > 6) ? parameters[6] : QGenericArgument(),
-				(argsLen > 7) ? parameters[7] : QGenericArgument(),
-				(argsLen > 8) ? parameters[8] : QGenericArgument(),
-				(argsLen > 9) ? parameters[9] : QGenericArgument());
+				(infoLen > 0) ? parameters[0] : QGenericArgument(),
+				(infoLen > 1) ? parameters[1] : QGenericArgument(),
+				(infoLen > 2) ? parameters[2] : QGenericArgument(),
+				(infoLen > 3) ? parameters[3] : QGenericArgument(),
+				(infoLen > 4) ? parameters[4] : QGenericArgument(),
+				(infoLen > 5) ? parameters[5] : QGenericArgument(),
+				(infoLen > 6) ? parameters[6] : QGenericArgument(),
+				(infoLen > 7) ? parameters[7] : QGenericArgument(),
+				(infoLen > 8) ? parameters[8] : QGenericArgument(),
+				(infoLen > 9) ? parameters[9] : QGenericArgument());
 
 			// Release
 			vals.clear();
 			dataList.clear();
 			parameters.clear();
 
-			//NanReturnValue(NanNew<Boolean>(True));
-			NanReturnValue(NanTrue());
+			//info.GetReturnValue().Set(Nan::New<Boolean>(True));
+			info.GetReturnValue().Set(Nan::True());
 		}
 
-		NanReturnValue(NanFalse());
+		info.GetReturnValue().Set(Nan::False());
 	}
 
 	NAN_METHOD(QuickItem::on) {
-		NanScope();
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(args.This());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
 		// Signal name
-		String::Utf8Value url(args[0]->ToString());
-		int id = obj_wrap->signal->addCallback(*url, args[1]);
+		String::Utf8Value url(info[0]->ToString());
+		int id = obj_wrap->signal->addCallback(*url, info[1]);
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 }

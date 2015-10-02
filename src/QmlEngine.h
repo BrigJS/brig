@@ -16,8 +16,7 @@ namespace Brig {
 			QmlEngineWrap();
 			~QmlEngineWrap();
 
-			static Persistent<Function> constructor;
-			static void Initialize(Handle<Object> target);
+			static NAN_MODULE_INIT(Initialize);
 
 			QQmlEngine *GetObject() const { return obj; };
 
@@ -31,6 +30,8 @@ namespace Brig {
 
 			QQmlEngine *obj;
 			SignalHandler *signal;
+
+			static Nan::Persistent<Function> constructor;
 	};
 
 }

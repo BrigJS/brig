@@ -12,7 +12,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QApplicationWrap::constructor;
+	Nan::Persistent<Function> QApplicationWrap::constructor;
 
 	QApplicationWrap::QApplicationWrap() : ObjectWrap()
 	{
@@ -39,45 +39,44 @@ printf("RELEASE QApplication\n");
 		delete dispatcher;
 	}
 
-	void QApplicationWrap::Initialize(Handle<Object> target)
-	{
-		NanScope();
+	NAN_MODULE_INIT(QApplicationWrap::Initialize) { 
 
-		Local<String> name = NanNew("QApplication");
+		Local<String> name = Nan::New("QApplication").ToLocalChecked();
 
 		/* Constructor template */
-		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QApplicationWrap::New);
+		Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(QApplicationWrap::New);
 //		Persistent<FunctionTemplate> tpl = Persistent<FunctionTemplate>::New(FunctionTemplate::New(QApplicationWrap::New));
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
-		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
+		Nan::SetPrototypeMethod(tpl, "exec", QApplicationWrap::Exec);
+		Nan::SetPrototypeMethod(tpl, "test", QApplicationWrap::Test);
+//		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
+//		NODE_SET_PROTOTYPE_METHOD(tpl, "test", QApplicationWrap::Test);
 
-		NanAssignPersistent(constructor, tpl->GetFunction());
+		constructor.Reset(tpl->GetFunction());
+
+//		NanAssignPersistent(constructor, tpl->GetFunction());
 //		constructor = Persistent<Function>::New(tpl->GetFunction());
 
-		target->Set(name, NanNew(constructor));
+		Nan::Set(target, name, Nan::New(constructor));
 	}
 
 	NAN_METHOD(QApplicationWrap::New) {
-		NanScope();
 
 		QApplicationWrap *app_wrap = new QApplicationWrap();
-		app_wrap->Wrap(args.This());
+		app_wrap->Wrap(info.This());
 
-		NanReturnValue(args.This());
+		info.GetReturnValue().Set(info.This());
 	}
 /*
 	Handle<Value> QApplicationWrap::Exec(const Arguments& args)
 	{
 */
 	NAN_METHOD(QApplicationWrap::Exec) {
-		NanScope();
-//		HandleScope scope;
 
-		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
+		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(info.This());
 		app_wrap->quickview->show();
 //		app_wrap->GetEventLoop()->Main();
 //		app_wrap->app->processEvents();
@@ -90,13 +89,12 @@ printf("RELEASE QApplication\n");
 printf("EXEC\n");
 
 		//return scope.Close(Undefined());
-		NanReturnUndefined();
+		info.GetReturnValue().Set(Nan::Undefined());
 	}
 
 	NAN_METHOD(QApplicationWrap::Test) {
-		NanScope();
 
-		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(args.This());
+		QApplicationWrap *app_wrap = ObjectWrap::Unwrap<QApplicationWrap>(info.This());
 		app_wrap->dispatcher->wakeUp();
 #if 0
 printf("4\n");
@@ -113,6 +111,6 @@ printf("5\n");
 #endif
 #endif
 		//return scope.Close(Undefined());
-		NanReturnUndefined();
+		info.GetReturnValue().Set(Nan::Undefined());
 	}
 }

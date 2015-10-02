@@ -9,7 +9,7 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
-	Persistent<Function> QmlEngineWrap::constructor;
+	Nan::Persistent<Function> QmlEngineWrap::constructor;
 
 	QmlEngineWrap::QmlEngineWrap() : ObjectWrap()
 	{
@@ -25,59 +25,56 @@ printf("RELEASE ENGINE\n");
 		delete obj;
 	}
 
-	void QmlEngineWrap::Initialize(Handle<Object> target)
-	{
-		NanScope();
+	NAN_MODULE_INIT(QmlEngineWrap::Initialize) {
 
-		Local<String> name = NanNew("QmlEngine");
+		Local<String> name = Nan::New("QmlEngine").ToLocalChecked();
 
 		/* Constructor template */
-		Local<FunctionTemplate> tpl = NanNew<FunctionTemplate>(QmlEngineWrap::New);
+		Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(QmlEngineWrap::New);
 		tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 		tpl->SetClassName(name);
 
 		/* Prototype */
-		NODE_SET_PROTOTYPE_METHOD(tpl, "on", QmlEngineWrap::on);
-//		NODE_SET_PROTOTYPE_METHOD(tpl, "rootContext", QmlEngineWrap::rootContext);
+		Nan::SetPrototypeMethod(tpl, "on", QmlEngineWrap::on);
+//		Nan::SetPrototypeMethod(tpl, "rootContext", QmlEngineWrap::rootContext);
 
-		//constructor = Persistent<Function>::New(tpl->GetFunction());
-		NanAssignPersistent(constructor, tpl->GetFunction());
+		//constructor = Nan::Persistent<Function>::New(tpl->GetFunction());
+		constructor.Reset(tpl->GetFunction());
+		//NanAssignPersistent(constructor, tpl->GetFunction());
 
-		target->Set(name, NanNew(constructor));
+		target->Set(name, Nan::New(constructor));
 	}
 
 	NAN_METHOD(QmlEngineWrap::New) {
-		NanScope();
 
 		QmlEngineWrap *obj_wrap = new QmlEngineWrap();
-		obj_wrap->Wrap(args.This());
+		obj_wrap->Wrap(info.This());
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 
 	NAN_METHOD(QmlEngineWrap::on) {
-		NanScope();
 
-		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info.This());
 
 		// Signal name
-		String::Utf8Value url(args[0]->ToString());
+		String::Utf8Value url(info[0]->ToString());
 
-		int id = obj_wrap->signal->addCallback(*url, args[1]);
+		int id = obj_wrap->signal->addCallback(*url, info[1]);
 
-		NanReturnThis();
+		info.GetReturnValue().Set(info.This());
 	}
 /*
-	Handle<Value> QmlEngineWrap::rootContext(const Arguments& args)
+	Local<Value> QmlEngineWrap::rootContext(const Arguments& args)
 	{
 		HandleScope scope;
 
-		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(args.This());
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info.This());
 
 		QQmlEngine *engine = obj_wrap->GetObject();
 		QQmlContext *context = engine->rootContext();
 
-		Handle<Value> instance = QmlContextWrap::NewInstance(context);
+		Local<Value> instance = QmlContextWrap::NewInstance(context);
 
 		return scope.Close(instance);
 	}
