@@ -46,10 +46,13 @@
 					'src/eventdispatcher/platform/mac.mm'
 				],
 				'xcode_settings': {
+					'DYLIB_INSTALL_NAME_BASE': '@loader_path/../../node_modules/qt-darwin/Frameworks',
+					'LD_RUNPATH_SEARCH_PATHS': [ '@loader_path/../../node_modules/qt-darwin/Frameworks', ],
 					'OTHER_CPLUSPLUSFLAGS': [
 						'-stdlib=libc++',
 						'-std=c++11',
 						'-mmacosx-version-min=10.7',
+						'-Wno-inconsistent-missing-override',
 						'<!@(tools/mac-config.sh --cflags)'
 					],
 					'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
@@ -59,10 +62,11 @@
 				],
 				'include_dirs': [
 					'build/src',
-					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia)'
+					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets)'
 				],
 				'libraries': [
-					'<!@(tools/mac-config.sh --libs QtGui QtCore QtQuick QtQml QtMultimedia)'
+					'-undefined dynamic_lookup',
+					'<!@(tools/mac-config.sh --libs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets)'
 				]
 			}]
 		]

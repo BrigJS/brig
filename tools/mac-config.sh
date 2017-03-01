@@ -1,6 +1,12 @@
 #!/bin/bash
 
-QT_LIBS_PATH=`qmake -query QT_INSTALL_LIBS`
+NODE_QT_MOD=../node_modules/qt-darwin/Frameworks
+QMAKE=`which qmake`
+if [ "$QMAKE" == "" ]; then
+	QT_LIBS_PATH=$NODE_QT_MOD
+else
+	QT_LIBS_PATH=`qmake -query QT_INSTALL_LIBS`
+fi
 
 if [ "$1" == "--include-dirs" ]; then
 	shift 1
@@ -15,10 +21,18 @@ if [ "$1" == "--include-dirs" ]; then
 
 elif [ "$1" == "--cflags" ]; then
 
+	if [ -d "$NODE_QT_MOD" ]; then
+		QT_LIBS_PATH=$NODE_QT_MOD
+	fi
+
 	echo -F$QT_LIBS_PATH
 
 elif [ "$1" == "--libs" ]; then
 	shift 1
+
+	if [ -d "$NODE_QT_MOD" ]; then
+		QT_LIBS_PATH=$NODE_QT_MOD
+	fi
 
 	echo -F$QT_LIBS_PATH
 
