@@ -74,11 +74,11 @@ namespace Brig {
 			if (value->IsNull()) {
 				v.setValue(QVariant(QMetaType::VoidStar, 0));
 			} else if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
-				v.setValue(QVariant(value->ToBoolean()->Value()));
+				v.setValue(QVariant(value->BooleanValue()));
 			} else if (value->IsNumber()) {
 				v.setValue(QVariant(value->NumberValue()));
 			} else if (value->IsInt32()) {
-				v.setValue(QVariant(value->ToInt32()->Value()));
+				v.setValue(QVariant(value->Int32Value()));
 			} else if (value->IsString()) {
 				String::Utf8Value _v(value->ToString());
 				v.setValue(QVariant(static_cast<char *>(*_v)));
@@ -94,11 +94,11 @@ namespace Brig {
 			if (value->IsNull()) {
 				return engine->evaluate("null");
 			} else if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
-				return engine->toScriptValue(value->ToBoolean()->Value());
+				return engine->toScriptValue(value->BooleanValue());
 			} else if (value->IsNumber()) {
 				return engine->toScriptValue(value->NumberValue());
 			} else if (value->IsInt32()) {
-				return engine->toScriptValue(value->ToInt32()->Value());
+				return engine->toScriptValue(value->Int32Value());
 			} else if (value->IsString()) {
 				String::Utf8Value _v(value->ToString());
 				return engine->toScriptValue(QString(*_v));
@@ -117,7 +117,7 @@ namespace Brig {
 
 			switch(type) {
 			case QMetaType::Bool:
-				return new ParamData(static_cast<bool>(value->ToBoolean()->Value()));
+				return new ParamData(static_cast<bool>(value->BooleanValue()));
 			case QMetaType::Int:
 				return new ParamData(static_cast<qint32>(value->Int32Value()));
 			case QMetaType::UInt:
