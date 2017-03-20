@@ -11,6 +11,38 @@ namespace Brig {
 	using namespace v8;
 	using namespace node;
 
+	struct BrigMetaMethod {
+		char *name;
+		char *signature;
+		QList<QByteArray> arguments;
+		Nan::Callback *handler;
+
+		~BrigMetaMethod() {
+
+			arguments.clear();
+
+			delete name;
+			delete handler;
+			delete signature;
+		}
+	};
+
+	struct BrigMetaSignal {
+		char *name;
+		char *signature;
+		QList<QByteArray> arguments;
+		Nan::Callback *handler;
+
+		~BrigMetaSignal() {
+
+			arguments.clear();
+
+			delete name;
+			delete handler;
+			delete signature;
+		}
+	};
+
 	class DynamicQMetaObjectBuilder {
 
 		public:
@@ -18,20 +50,20 @@ namespace Brig {
 			~DynamicQMetaObjectBuilder(void);
 
 			QMetaObject *build();
-			void addSignal(const char *signature, QStringList argumentNames, Handle<Value> cb);
 			char *getTypeName() { return _typeName; };
+			QVector<BrigMetaSignal *> getSignals() { return _signals; };
+			QVector<BrigMetaMethod *> getMethods() { return _methods; };
+
+			void addSignal(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
+			void addMethod(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
 
 		private:
 
-			QMetaObjectBuilder *builder;
-			QMetaPropertyBuilder *property_builder;
-			QMetaMethodBuilder *method_builder;
-
-		protected:
-
 			char *_typeName;
-			QVector<Callback *> _signals;
-			QVector<Callback *> _methods;
+			QMetaObjectBuilder builder;
+			QVector<BrigMetaMethod *> _methods;
+			QVector<BrigMetaSignal *> _signals;
+
 	};
 
 }

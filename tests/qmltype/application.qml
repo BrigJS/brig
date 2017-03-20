@@ -10,8 +10,33 @@ ApplicationWindow {
 	height: 480;
 
 	MyItem {
+		onTest: {
+			console.log('Got SIGNAL!');
+		}
+
+		onTest2: {
+			console.log('Got SIGNAL 2222!');
+		}
+
+		function xxx(X) {
+			console.log('xxx', X);
+		}
+
 		Component.onCompleted: {
-			this.test();
+			console.log('============ MyItem');
+			console.log('=================> test()');
+			this.test(123);
+			console.log('=================> test2()');
+			this.test2();
+			console.log('=================> methodTest()');
+			//var x = this.methodTest(123, 222, 333, 444, 555, 666, 777, 888);
+			var x = this.methodTest(123, 222, 333, 444, 555, 666);
+			console.log('QQ', x);
+			this.xxx(999);
+//			console.log('=================> readFile()');
+			var content = this.readFile('./sample.txt');
+			console.log(content);
+			console.log('============ MyItem COMPLETE');
 		}
 	}
 

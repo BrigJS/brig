@@ -36,7 +36,7 @@ namespace Brig {
 		Q_ASSERT(id < callbacks.count());
 		Callback *callback = callbacks[id];
 
-		int methodId = findSignalId(callback->signal);
+		int methodId = findSignalId(callback->signature);
 
 		// Convert parameters
 		Nan::HandleScope scope;
@@ -54,7 +54,6 @@ namespace Brig {
 		}
 
 		// Invoke
-//		MakeCallback(callback->handler, callback->handler, argc, argv);
 		callback->handler->Call(argc, argv);
 
 		// Release
@@ -89,7 +88,7 @@ namespace Brig {
 
 		// Apply all callbacks if callbacks were already set up
 		for (int i = 0; i < callbacks.count(); ++i) {
-			int id = findSignalId(callbacks[i]->signal);
+			int id = findSignalId(callbacks[i]->signature);
 			if (id == -1)
 				continue;
 
@@ -107,7 +106,7 @@ namespace Brig {
 
 		// Create a new callback
 		Callback *callback = new Callback();
-		callback->signal = strdup(signal);
+		callback->signature = strdup(signal);
 		callback->handler = new Nan::Callback(cb.As<Function>());
 //		Persistent<Function>::New(Handle<Function>::Cast(cb));
 		callbacks.append(callback);
@@ -117,7 +116,7 @@ namespace Brig {
 			return slotId;
 
 		// Connect to signal
-		int signalId = findSignalId(callback->signal);
+		int signalId = findSignalId(callback->signature);
 		if (signalId == -1)
 			return -1;
 

@@ -2,6 +2,7 @@
 #define BRIG_QMLTYPEBUILDER_H
 
 #include <node.h>
+#include <qqmlprivate.h>
 #include "brig.h"
 
 namespace Brig {
@@ -30,6 +31,7 @@ namespace Brig {
 			unsigned long counter;
 			DynamicQMetaObjectBuilder *metaobject_builder;
 			QMap<unsigned long, QObject *> qml_types;
+			static QQmlPrivate::RegisterType types[2];
 
 			static Nan::Persistent<Function> constructor;
 	};

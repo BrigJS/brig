@@ -14,11 +14,13 @@ namespace Brig {
 	class DynamicQObject : public QObject {
 
 		public:
-			DynamicQObject(QMetaObject *metaobject);
+			DynamicQObject(DynamicQMetaObjectBuilder *dynamicMetaObjectBuilder, QMetaObject *metaObject, QObject *parent);
 			~DynamicQObject(void);
 
 			QObject *GetObject() const { return obj; };
 
+			const QMetaObject *metaObject() const { return _metaObject; };
+			virtual int printAllMeta(const QMetaObject *meta);
 			virtual int qt_metacall(QMetaObject::Call call, int id, void **arguments);
 			virtual int findSignalId(const char *signal);
 			virtual bool setObject(QObject *_obj);
@@ -28,7 +30,7 @@ namespace Brig {
 
 			QObject *obj;
 			QMetaObject *_metaObject;
-			QMetaObjectBuilder *_builder;
+			DynamicQMetaObjectBuilder *_builder;
 
 		protected:
 

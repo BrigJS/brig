@@ -53,6 +53,7 @@
 						'-std=c++11',
 						'-mmacosx-version-min=10.7',
 						'-Wno-inconsistent-missing-override',
+						'-Woverloaded-virtual',
 						'<!@(tools/mac-config.sh --cflags)'
 					],
 					'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'

@@ -14,13 +14,12 @@ namespace Brig {
 	QmlEngineWrap::QmlEngineWrap() : ObjectWrap()
 	{
 		obj = new QQmlEngine();
-		obj->setOutputWarningsToStandardError(false);
+		obj->setOutputWarningsToStandardError(true);
 		signal = new SignalHandler(obj);
 	}
 
 	QmlEngineWrap::~QmlEngineWrap()
 	{
-printf("RELEASE ENGINE\n");
 		delete signal;
 		delete obj;
 	}
@@ -58,9 +57,9 @@ printf("RELEASE ENGINE\n");
 		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info.This());
 
 		// Signal name
-		String::Utf8Value url(info[0]->ToString());
+		String::Utf8Value name(info[0]->ToString());
 
-		int id = obj_wrap->signal->addCallback(*url, info[1]);
+		obj_wrap->signal->addCallback(*name, info[1]);
 
 		info.GetReturnValue().Set(info.This());
 	}

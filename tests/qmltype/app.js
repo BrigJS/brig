@@ -9,13 +9,21 @@ brig.on('ready', function(brig) {
 
 	brig.createType('MyItem', {
 		methods: {
-			readFile: function(filename) {
-				return fs.readFileSync(filename);
+			'methodTest(a,b,c,d,e)':  function(a, b, c, d, e) {
+				console.log('Method Test', a, b, c, d, e);
+
+				return 123;
+			},
+			'readFile(a)': function(filename) {
+				return fs.readFileSync(filename).toString();
 			}
 		},
 		signals: {
-			'test()': function() {
-				console.log('Signal TEST');
+			'test(a)': function(a) {
+				console.log('Signal TEST', a);
+			},
+			'test2()': function() {
+				console.log('Signal TEST 2');
 			}
 		}
 	});

@@ -119,11 +119,11 @@ printf("RELEASE QuickItem\n");
 
 		// Check data type
 		if (value->IsTrue() || value->IsFalse() || value->IsBoolean() ) {
-			v.setValue(QVariant(value->ToBoolean()->Value()));
+			v.setValue(QVariant(value->BooleanValue()));
 		} else if (value->IsNumber()) {
 			v.setValue(QVariant(value->NumberValue()));
 		} else if (value->IsInt32()) {
-			v.setValue(QVariant(value->ToInt32()->Value()));
+			v.setValue(QVariant(value->Int32Value()));
 		} else if (value->IsString()) {
 			String::Utf8Value _v(value->ToString());
 			v.setValue(QVariant(static_cast<char *>(*_v)));

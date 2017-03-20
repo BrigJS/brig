@@ -11,12 +11,12 @@ namespace Brig {
 	using namespace node;
 
 	struct Callback {
-		char *signal;
+		char *signature;
 		Nan::Callback *handler;
 
 		~Callback() {
 			delete handler;
-			delete signal;
+			delete signature;
 		}
 	};
 
