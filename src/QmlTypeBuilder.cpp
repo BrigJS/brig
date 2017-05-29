@@ -234,7 +234,7 @@ namespace Brig {
 
 		String::Utf8Value name(info[0]->ToString());
 
-		qmltype_builder->metaobject_builder->addProperty(*name);
+		qmltype_builder->metaobject_builder->addProperty(*name, info[1], info[2]);
 
 		info.GetReturnValue().SetUndefined();
 	}

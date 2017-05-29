@@ -33,7 +33,7 @@ brig.on('ready', function(brig) {
 
 	var qmlTypeSecond = brig.createType('Second', {
 		property: {
-			prop1: 'Sum'
+			prop1: 123
 		},
 		method: {
 			'sum(a,b)': function(a, b) {

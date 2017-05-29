@@ -46,11 +46,15 @@ namespace Brig {
 	struct BrigMetaProperty {
 		char *name;
 		char *signature;
+		Nan::Callback *readHandler;
+		Nan::Callback *writeHandler;
 
 		~BrigMetaProperty() {
 
 			delete name;
 			delete signature;
+			delete readHandler;
+			delete writeHandler;
 		}
 	};
 
@@ -64,10 +68,11 @@ namespace Brig {
 			char *getTypeName() { return _typeName; };
 			QVector<BrigMetaSignal *> getSignals() { return _signals; };
 			QVector<BrigMetaMethod *> getMethods() { return _methods; };
+			QVector<BrigMetaProperty *> getProperties() { return _properties; };
 
 			void addSignal(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
 			void addMethod(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
-			void addProperty(const char *name);
+			void addProperty(const char *name, Local<Value> readCallback, Local<Value> writeCallback);
 
 		private:
 

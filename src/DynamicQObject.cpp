@@ -92,13 +92,50 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 		const QMetaObject *meta = DynamicQObject::metaObject();
 
 		switch(call) {
-			/*
 			case QMetaObject::ReadProperty:
 			{
-				printf("READ property\n");
+				printf("READ property %d\n", idx);
+				QVector<BrigMetaProperty *> _properties = _builder->getProperties();
+				Q_ASSERT(idx < _properties.count());
+				BrigMetaProperty *property = _properties[idx];
+				Nan::Callback *handler = property->readHandler;
+
+				// Prepare arguments
+				Nan::HandleScope scope;
+				int argc = 1;
+				Local<Value> argv[] = {
+					Nan::New<String>(property->name).ToLocalChecked()
+				};
+
+				// Invoke
+				Handle<Value> ret = handler->Call(argc, argv);
+
+				QVariant value;
+				value.setValue(Utils::V8ToQVariant(ret));
+				*reinterpret_cast<QVariant *>(arguments[0]) = value;
+
 				break;
 			}
-*/
+			case QMetaObject::WriteProperty:
+			{
+				printf("Write property %d\n", idx);
+				QVector<BrigMetaProperty *> _properties = _builder->getProperties();
+				Q_ASSERT(idx < _properties.count());
+				BrigMetaProperty *property = _properties[idx];
+				Nan::Callback *handler = property->readHandler;
+
+				// Prepare arguments
+				Nan::HandleScope scope;
+				int argc = 1;
+				Local<Value> argv[] = {
+					Nan::New<String>(property->name).ToLocalChecked()
+				};
+
+				// Invoke
+				//Handle<Value> ret = handler->Call(argc, argv);
+
+				break;
+			}
 			case QMetaObject::InvokeMetaMethod:
 			{
 #if 0

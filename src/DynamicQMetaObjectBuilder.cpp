@@ -31,6 +31,8 @@ namespace Brig {
 		}
 
 		_properties.clear();
+
+		delete _typeName;
 	}
 
 	QMetaObject *DynamicQMetaObjectBuilder::build()
@@ -122,13 +124,15 @@ namespace Brig {
 #endif
 	}
 
-	void DynamicQMetaObjectBuilder::addProperty(const char *name)
+	void DynamicQMetaObjectBuilder::addProperty(const char *name, Local<Value> readCallback, Local<Value> writeCallback)
 	{
 		Nan::HandleScope scope;
 
 		BrigMetaProperty *property = new BrigMetaProperty();
 		property->name = strdup(name);
 		property->signature = strdup(name);
+		property->readHandler = new Nan::Callback(readCallback.As<Function>());
+		property->writeHandler = new Nan::Callback(writeCallback.As<Function>());
 		_properties.append(property);
 	}
 }
