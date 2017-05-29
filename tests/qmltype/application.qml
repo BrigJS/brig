@@ -11,7 +11,6 @@ ApplicationWindow {
 	height: 480;
 
 	Second {
-		prop1: 'XXX';
 		onTest: {
 			console.log('Second: Got SIGNAL!');
 		}

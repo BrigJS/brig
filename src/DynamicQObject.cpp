@@ -19,8 +19,6 @@ namespace Brig {
 		obj = NULL;
 		_builder = dynamicMetaObjectBuilder;
 		_metaObject = metaObject;
-//		_builder = new QMetaObjectBuilder();
-printf("======================================= cooool\n");
 	}
 
 	DynamicQObject::~DynamicQObject()
@@ -94,7 +92,6 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 		switch(call) {
 			case QMetaObject::ReadProperty:
 			{
-				printf("READ property %d\n", idx);
 				QVector<BrigMetaProperty *> _properties = _builder->getProperties();
 				Q_ASSERT(idx < _properties.count());
 				BrigMetaProperty *property = _properties[idx];
@@ -118,21 +115,22 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 			}
 			case QMetaObject::WriteProperty:
 			{
-				printf("Write property %d\n", idx);
 				QVector<BrigMetaProperty *> _properties = _builder->getProperties();
 				Q_ASSERT(idx < _properties.count());
 				BrigMetaProperty *property = _properties[idx];
-				Nan::Callback *handler = property->readHandler;
+				Nan::Callback *handler = property->writeHandler;
 
 				// Prepare arguments
 				Nan::HandleScope scope;
-				int argc = 1;
+				int argc = 2;
+				QVariant *qvar = reinterpret_cast<QVariant *>(arguments[0]);
 				Local<Value> argv[] = {
-					Nan::New<String>(property->name).ToLocalChecked()
+					Nan::New<String>(property->name).ToLocalChecked(),
+					Utils::QDataToV8((int)qvar->type(), arguments[0])
 				};
 
 				// Invoke
-				//Handle<Value> ret = handler->Call(argc, argv);
+				Handle<Value> ret = handler->Call(argc, argv);
 
 				break;
 			}
