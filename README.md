@@ -1,6 +1,8 @@
 Brig
 ====
 
+![Brig](https://cloud.githubusercontent.com/assets/252072/26544332/0329d67c-4494-11e7-9dc3-7dbaccfc5bd8.png)
+
 A user interface engine for Node.js and io.js, which is based on Qt. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js.
 
 Requirements
