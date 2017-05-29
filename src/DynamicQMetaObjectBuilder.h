@@ -56,6 +56,7 @@ namespace Brig {
 
 			void addSignal(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
 			void addMethod(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
+			void addProperty(const char *name);
 
 		private:
 

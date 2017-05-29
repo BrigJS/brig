@@ -20,7 +20,7 @@ namespace Brig {
 		_builder = dynamicMetaObjectBuilder;
 		_metaObject = metaObject;
 //		_builder = new QMetaObjectBuilder();
-printf("cooool\n");
+printf("======================================= cooool\n");
 	}
 
 	DynamicQObject::~DynamicQObject()

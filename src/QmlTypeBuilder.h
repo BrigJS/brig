@@ -28,7 +28,6 @@ namespace Brig {
 			static NAN_METHOD(addSignal);
 
 			QObject *obj;
-			unsigned long counter;
 			DynamicQMetaObjectBuilder *metaobject_builder;
 			QMap<unsigned long, QObject *> qml_types;
 			static QQmlPrivate::RegisterType types[2];

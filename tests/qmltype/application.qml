@@ -1,6 +1,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.0
-import brig.myitem 1.0
+import Brig.MyItem 1.0
+import Brig.Second 1.0
 
 ApplicationWindow {
 	visible: true;
@@ -8,6 +9,18 @@ ApplicationWindow {
 	title: 'Brig Demo';
 	width: 640;
 	height: 480;
+
+	Second {
+		onTest: {
+			console.log('Second: Got SIGNAL!');
+		}
+
+		Component.onCompleted: {
+			console.log('Second: Ready');
+			var ret = this.sum(3, 5);
+			console.log(ret);
+		}
+	}
 
 	MyItem {
 		onTest: {
@@ -35,7 +48,7 @@ ApplicationWindow {
 			this.xxx(999);
 //			console.log('=================> readFile()');
 			var content = this.readFile('./sample.txt');
-			console.log(content);
+			console.log('MyItem:' + content);
 			console.log('============ MyItem COMPLETE');
 		}
 	}

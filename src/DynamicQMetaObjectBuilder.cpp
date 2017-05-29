@@ -105,4 +105,9 @@ namespace Brig {
 		printf("Added method handler: %s\n", callback->signature);
 #endif
 	}
+
+	void DynamicQMetaObjectBuilder::addProperty(const char *name)
+	{
+		Nan::HandleScope scope;
+	}
 }

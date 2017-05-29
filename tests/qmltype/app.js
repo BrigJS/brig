@@ -7,8 +7,11 @@ var brig = new Brig();
 
 brig.on('ready', function(brig) {
 
-	brig.createType('MyItem', {
-		methods: {
+	var qmlType = brig.createType('MyItem', {
+		property: {
+			prop1: 123
+		},
+		method: {
 			'methodTest(a,b,c,d,e)':  function(a, b, c, d, e) {
 				console.log('Method Test', a, b, c, d, e);
 
@@ -18,12 +21,28 @@ brig.on('ready', function(brig) {
 				return fs.readFileSync(filename).toString();
 			}
 		},
-		signals: {
+		signal: {
 			'test(a)': function(a) {
 				console.log('Signal TEST', a);
 			},
 			'test2()': function() {
 				console.log('Signal TEST 2');
+			}
+		}
+	});
+
+	var qmlTypeSecond = brig.createType('Second', {
+		property: {
+			asd: 'Sum'
+		},
+		method: {
+			'sum(a,b)': function(a, b) {
+				return a + b;
+			}
+		},
+		signal: {
+			'test(a)': function(a) {
+				console.log('Signal TEST', a);
 			}
 		}
 	});
