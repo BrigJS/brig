@@ -26,6 +26,7 @@ namespace Brig {
 			static NAN_METHOD(build);
 			static NAN_METHOD(addMethod);
 			static NAN_METHOD(addSignal);
+			static NAN_METHOD(addProperty);
 
 			QObject *obj;
 			DynamicQMetaObjectBuilder *metaobject_builder;

@@ -43,6 +43,17 @@ namespace Brig {
 		}
 	};
 
+	struct BrigMetaProperty {
+		char *name;
+		char *signature;
+
+		~BrigMetaProperty() {
+
+			delete name;
+			delete signature;
+		}
+	};
+
 	class DynamicQMetaObjectBuilder {
 
 		public:
@@ -64,7 +75,7 @@ namespace Brig {
 			QMetaObjectBuilder builder;
 			QVector<BrigMetaMethod *> _methods;
 			QVector<BrigMetaSignal *> _signals;
-
+			QVector<BrigMetaProperty *> _properties;
 	};
 
 }

@@ -11,12 +11,14 @@ ApplicationWindow {
 	height: 480;
 
 	Second {
+		prop1: 'XXX';
 		onTest: {
 			console.log('Second: Got SIGNAL!');
 		}
 
 		Component.onCompleted: {
 			console.log('Second: Ready');
+			console.log('Second:' + this.prop1);
 			var ret = this.sum(3, 5);
 			console.log(ret);
 		}

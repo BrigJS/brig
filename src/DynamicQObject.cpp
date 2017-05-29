@@ -92,6 +92,13 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 		const QMetaObject *meta = DynamicQObject::metaObject();
 
 		switch(call) {
+			/*
+			case QMetaObject::ReadProperty:
+			{
+				printf("READ property\n");
+				break;
+			}
+*/
 			case QMetaObject::InvokeMetaMethod:
 			{
 #if 0

@@ -24,6 +24,13 @@ namespace Brig {
 		}
 
 		_methods.clear();
+
+		// Release all properties 
+		for (BrigMetaProperty *property: _properties) {
+			delete property;
+		}
+
+		_properties.clear();
 	}
 
 	QMetaObject *DynamicQMetaObjectBuilder::build()
@@ -32,6 +39,15 @@ namespace Brig {
 		builder.setClassName(_typeName);
 		builder.setSuperClass(&QObject::staticMetaObject);
 		builder.setFlags(QMetaObjectBuilder::DynamicMetaObject);
+
+		// Initializing properties
+		int relativePropIndex = builder.propertyCount();
+		for (int i = 0; i < _properties.count(); ++i) {
+			BrigMetaProperty *property = _properties[i];
+			QMetaPropertyBuilder propb = builder.addProperty(QMetaObject::normalizedSignature(property->signature), "QVariant", relativePropIndex);
+			propb.setWritable(true);
+			relativePropIndex++;
+		}
 
 		// Initializing signal hanglers
 		for (int i = 0; i < _signals.count(); ++i) {
@@ -109,5 +125,10 @@ namespace Brig {
 	void DynamicQMetaObjectBuilder::addProperty(const char *name)
 	{
 		Nan::HandleScope scope;
+
+		BrigMetaProperty *property = new BrigMetaProperty();
+		property->name = strdup(name);
+		property->signature = strdup(name);
+		_properties.append(property);
 	}
 }

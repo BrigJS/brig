@@ -90,6 +90,7 @@ namespace Brig {
 		/* Prototype */
 		Nan::SetPrototypeMethod(tpl, "addSignal", QmlTypeBuilder::addSignal);
 		Nan::SetPrototypeMethod(tpl, "addMethod", QmlTypeBuilder::addMethod);
+		Nan::SetPrototypeMethod(tpl, "addProperty", QmlTypeBuilder::addProperty);
 		Nan::SetPrototypeMethod(tpl, "build", QmlTypeBuilder::build);
 
 		constructor.Reset(tpl->GetFunction());
@@ -223,6 +224,17 @@ namespace Brig {
 		}
 
 		qmltype_builder->metaobject_builder->addMethod(*name, *signature, arguments, info[3]);
+
+		info.GetReturnValue().SetUndefined();
+	}
+
+	NAN_METHOD(QmlTypeBuilder::addProperty) {
+
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
+
+		String::Utf8Value name(info[0]->ToString());
+
+		qmltype_builder->metaobject_builder->addProperty(*name);
 
 		info.GetReturnValue().SetUndefined();
 	}
