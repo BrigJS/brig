@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+	<meta property="og:image" content="https://cloud.githubusercontent.com/assets/252072/26544332/0329d67c-4494-11e7-9dc3-7dbaccfc5bd8.png"/>
+    <title>Brig</title>
+    <link type="text/css" rel="stylesheet" href="assets/css/github-markdown.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/pilcrow.css">
+    <link type="text/css" rel="stylesheet" href="assets/css/hljs-github.min.css"/>
+  </head>
+  <body>
+    <article class="markdown-body"><p align="center">
+<a href="https://github.com/cfsghost/brig">
+<img src="https://cloud.githubusercontent.com/assets/252072/26544332/0329d67c-4494-11e7-9dc3-7dbaccfc5bd8.png">
+</a>
+</p>
+
+<h1 id="brig"><a class="header-link" href="#brig"></a>Brig</h1>
+<p>A user interface engine for Node.js and io.js, which is based on Qt for rendering. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js. That means developer is able to write desktop application in QML with pure JavaScript.</p>
+<h2 id="requirements"><a class="header-link" href="#requirements"></a>Requirements</h2>
+<p>Ensure Qt 5+ tookits and Node.js 0.10+ are ready to go on your system.</p>
+<h2 id="installation"><a class="header-link" href="#installation"></a>Installation</h2>
+<p>Install module via NPM</p>
+<pre class="hljs"><code>npm <span class="hljs-keyword">install</span> brig</code></pre><h2 id="get-started"><a class="header-link" href="#get-started"></a>Get Started</h2>
+<p>There is a simple way to go by loading existed QML file, so you can prepare a QML content like below:</p>
+<p><strong>Application.qml</strong></p>
+<pre class="hljs"><code><span class="hljs-keyword">import</span> QtQuick <span class="hljs-number">2.3</span>
+<span class="hljs-keyword">import</span> QtQuick.Controls <span class="hljs-number">1.0</span>
+
+<span class="hljs-title">ApplicationWindow</span> {
+    <span class="hljs-attribute">visible</span>: <span class="hljs-literal">true</span>;
+    <span class="hljs-attribute">color</span>: <span class="hljs-string">'black'</span>;
+    <span class="hljs-attribute">title</span>: <span class="hljs-string">'Brig Demo'</span>;
+    <span class="hljs-attribute">width</span>: <span class="hljs-number">640</span>;
+    <span class="hljs-attribute">height</span>: <span class="hljs-number">480</span>;
+
+    <span class="hljs-title">Text</span> {
+        <span class="hljs-attribute">anchors.centerIn</span>: <span class="hljs-built_in">parent</span>;
+        <span class="hljs-attribute">text</span>: <span class="hljs-string">'Brig'</span>;
+        <span class="hljs-attribute">font.family</span>: <span class="hljs-string">'Helvetica'</span>;
+        <span class="hljs-attribute">font.bold</span>: <span class="hljs-literal">true</span>;
+        <span class="hljs-attribute">font.pointSize</span>: <span class="hljs-number">72</span>;
+        <span class="hljs-attribute">color</span>: <span class="hljs-string">'#00ffcc'</span>;
+        <span class="hljs-attribute">scale</span>: <span class="hljs-number">0</span>;
+        <span class="hljs-attribute">opacity</span>: <span class="hljs-number">0</span>;
+
+        <span class="hljs-title">Text</span> {
+            <span class="hljs-attribute">anchors.topMargin</span>: <span class="hljs-number">10</span>;
+            <span class="hljs-attribute">anchors.top</span>: <span class="hljs-built_in">parent</span>.bottom;
+            <span class="hljs-attribute">anchors.horizontalCenter</span>: <span class="hljs-built_in">parent</span>.horizontalCenter;
+            <span class="hljs-attribute">text</span>: <span class="hljs-string">'QML Application in Node.js'</span>;
+            <span class="hljs-attribute">font.family</span>: <span class="hljs-string">'Helvetica'</span>;
+            <span class="hljs-attribute">font.pointSize</span>: <span class="hljs-number">16</span>;
+            <span class="hljs-attribute">color</span>: <span class="hljs-string">'#e6fffa'</span>;
+        }
+
+        <span class="hljs-built_in">Behavior</span> <span class="hljs-keyword">on</span> <span class="hljs-title">opacity</span> {
+            <span class="hljs-title">NumberAnimation</span> {
+                <span class="hljs-attribute">duration</span>: <span class="hljs-number">800</span>;
+                <span class="hljs-attribute">easing.type</span>: Easing.OutCubic;
+            }
+        }
+
+        <span class="hljs-built_in">Behavior</span> <span class="hljs-keyword">on</span> <span class="hljs-title">scale</span> {
+            <span class="hljs-title">NumberAnimation</span> {
+                <span class="hljs-attribute">duration</span>: <span class="hljs-number">1000</span>;
+                <span class="hljs-attribute">easing.type</span>: Easing.OutBack;
+            }
+        }
+
+        <span class="hljs-attribute">Component.onCompleted</span>: {
+            opacity = <span class="hljs-number">1.0</span>;
+            scale = <span class="hljs-number">1.0</span>;
+        }
+    }
+}</code></pre><p>Then using <code>Brig</code> to load file in Node.js:</p>
+<pre class="hljs"><code><span class="hljs-keyword">var</span> Brig = <span class="hljs-built_in">require</span>(<span class="hljs-string">'brig'</span>);
+
+<span class="hljs-keyword">var</span> brig = <span class="hljs-keyword">new</span> Brig();
+
+brig.on(<span class="hljs-string">'ready'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">brig</span>) </span>{
+
+  <span class="hljs-comment">// Loading QML file to play</span>
+  brig.open(<span class="hljs-string">'Application.qml'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">err, window</span>) </span>{
+    <span class="hljs-comment">// window was opened</span>
+  });
+});</code></pre><h2 id="demonstration"><a class="header-link" href="#demonstration"></a>Demonstration</h2>
+<p>Here is a great countdown timer with <code>Brig</code> for hackathon event to show off, you can click image to play YouTube video:</p>
+<p><a href="http://www.youtube.com/watch?v=D6CnZfK723M"><img src="https://cloud.githubusercontent.com/assets/252072/7604018/44697ee8-f96f-11e4-9690-db826fccbc22.png" alt="Countdown Timer"></a>
+(clicks to play video)</p>
+<h2 id="license"><a class="header-link" href="#license"></a>License</h2>
+<p>Licensed under the MIT License</p>
+<h2 id="authors"><a class="header-link" href="#authors"></a>Authors</h2>
+<p>Copyright(c) 2015-2017 Fred Chien <a href="&#109;&#97;&#x69;&#108;&#x74;&#111;&#58;&#60;&#x63;&#102;&#115;&#x67;&#104;&#111;&#x73;&#116;&#x40;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;">&#60;&#x63;&#102;&#115;&#x67;&#104;&#111;&#x73;&#116;&#x40;&#103;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a>&gt;</p>
+    </article>
+  </body>
+</html>
