@@ -11,6 +11,10 @@ ApplicationWindow {
 	height: 480;
 
 	Second {
+		onProp1Changed: {
+			console.log('prop1 Changed');
+		}
+
 		onTest: {
 			console.log('Second: Got SIGNAL!');
 		}
@@ -19,6 +23,25 @@ ApplicationWindow {
 			console.log('Second: Ready');
 			console.log('Second:' + this.prop1);
 			var ret = this.sum(3, 5);
+			console.log(ret);
+
+			this.prop1 = 'QQQ';
+		}
+	}
+
+	Second {
+		onProp1Changed: {
+			console.log('prop1 Changed');
+		}
+
+		onTest: {
+			console.log('Second: Got SIGNAL!');
+		}
+
+		Component.onCompleted: {
+			console.log('Second: Ready');
+			console.log('Second:' + this.prop1);
+			var ret = this.sum(6, 6);
 			console.log(ret);
 		}
 	}

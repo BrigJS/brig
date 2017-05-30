@@ -15,7 +15,7 @@ namespace Brig {
 		char *name;
 		char *signature;
 		QList<QByteArray> arguments;
-		Nan::Callback *handler;
+		Nan::Callback *handler = NULL;
 
 		~BrigMetaMethod() {
 
@@ -31,7 +31,7 @@ namespace Brig {
 		char *name;
 		char *signature;
 		QList<QByteArray> arguments;
-		Nan::Callback *handler;
+		Nan::Callback *handler = NULL;
 
 		~BrigMetaSignal() {
 
@@ -46,8 +46,9 @@ namespace Brig {
 	struct BrigMetaProperty {
 		char *name;
 		char *signature;
-		Nan::Callback *readHandler;
-		Nan::Callback *writeHandler;
+		int signalId;
+		Nan::Callback *readHandler = NULL;
+		Nan::Callback *writeHandler = NULL;
 
 		~BrigMetaProperty() {
 

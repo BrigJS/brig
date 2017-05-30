@@ -19,6 +19,7 @@ namespace Brig {
 		obj = NULL;
 		_builder = dynamicMetaObjectBuilder;
 		_metaObject = metaObject;
+//		printf("====================== INIT\n");
 	}
 
 	DynamicQObject::~DynamicQObject()
@@ -132,6 +133,8 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 				// Invoke
 				Handle<Value> ret = handler->Call(argc, argv);
 
+//				QMetaObject::activate(this, _metaObject, idx, arguments);
+
 				break;
 			}
 			case QMetaObject::InvokeMetaMethod:
@@ -161,36 +164,55 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 					Q_ASSERT(idx < _signals.count());
 					handler = _signals[idx]->handler;
 					paramCount = _signals[idx]->arguments.count();
+
+					// Convert parameters
+					Nan::HandleScope scope;
+
+					int argc = paramCount + 1;
+					Handle<Value> *argv = new Handle<Value>[argc];
+					argv[0] = Nan::New<String>(_signals[idx]->name).ToLocalChecked();
+					for (int i = 1; i < argc; i++) {
+						QVariant *qvar = reinterpret_cast<QVariant *>(arguments[i]);
+						argv[i] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
+					}
+
+					// Invoke
+					Handle<Value> ret = handler->Call(argc, argv);
+
+					// Release
+					delete [] argv;
+
+					// Rely the signal to QML
+					QMetaObject::activate(this, _metaObject, idx, arguments);
+
 				} else {
 					int methodIdx = idx - _signals.count();
 					Q_ASSERT(methodIdx < _methods.count());
 					handler = _methods[methodIdx]->handler;
 					paramCount = _methods[methodIdx]->arguments.count();
-				}
 
-				// Convert parameters
-				Nan::HandleScope scope;
+					// Convert parameters
+					Nan::HandleScope scope;
 
-				int argc = paramCount;
-				Handle<Value> *argv = new Handle<Value>[argc];
-				for (int i = 0; i < argc; i++) {
-					QVariant *qvar = reinterpret_cast<QVariant *>(arguments[i + 1]);
-					argv[i] = Utils::QDataToV8((int)qvar->type(), arguments[i + 1]);
-				}
+					int argc = paramCount + 1;
+					Handle<Value> *argv = new Handle<Value>[argc];
+					argv[0] = Nan::New<String>(_methods[methodIdx]->name).ToLocalChecked();
+					for (int i = 1; i < argc; i++) {
+						QVariant *qvar = reinterpret_cast<QVariant *>(arguments[i]);
+						argv[i] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
+					}
 
-				// Invoke
-				Handle<Value> ret = handler->Call(argc, argv);
+					// Invoke
+					Handle<Value> ret = handler->Call(argc, argv);
 
-				// Release
-				delete [] argv;
-
-				if (qmethod.methodType() == QMetaMethod::Signal) {
-					// Rely the signal to QML
-					QMetaObject::activate(this, _metaObject, idx, arguments);
-				} else {
+					// Return value
 					QVariant value;
 					value.setValue(Utils::V8ToQVariant(ret));
 					*reinterpret_cast<QVariant *>(arguments[0]) = value;
+
+					// Release
+					delete [] argv;
+
 				}
 
 				break;
