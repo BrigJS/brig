@@ -60,14 +60,12 @@ printf("RELEASE QuickItem\n");
 	// Method
 	NAN_METHOD(QuickItem::create) {
 
-		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
-
 		QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(info[0]->ToObject());
+		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
 
 		// Create QuickItem with component
 		obj_wrap->obj = static_cast<QQuickItem *>(component->GetObject()->create());
 		obj_wrap->signal = new SignalHandler(qobject_cast<QObject *>(obj_wrap->GetObject()));
-//		obj_wrap->signal->setObject(qobject_cast<QObject *>(obj_wrap->GetObject()));
 
 		info.GetReturnValue().SetUndefined();
 	}
@@ -183,35 +181,46 @@ printf("RELEASE QuickItem\n");
 			(infoLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[6])) : QGenericArgument(),
 			(infoLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[7])) : QGenericArgument(),
 			(infoLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
-			(infoLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
-			(infoLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[9])) : QGenericArgument());
+			(infoLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[9])) : QGenericArgument(),
+			(infoLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[10])) : QGenericArgument());
 
 		// Convert Qvariant to V8 data type
-		if (returnedValue.isNull())
+		if (returnedValue.isNull()) {
 			info.GetReturnValue().SetNull();
+			return;
+		}
 
 		switch(returnedValue.userType()) {
 		case QMetaType::Bool:
 			info.GetReturnValue().Set(Nan::New<Boolean>(returnedValue.toBool()));
+			break;
 		case QMetaType::Int:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toInt()));
+			break;
 		case QMetaType::UInt:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toUInt()));
+			break;
 		case QMetaType::Float:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toFloat()));
+			break;
 		case QMetaType::Double:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toDouble()));
+			break;
 		case QMetaType::LongLong:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toLongLong()));
+			break;
 		case QMetaType::ULongLong:
 			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toULongLong()));
+			break;
 		case QMetaType::QString:
 			info.GetReturnValue().Set(Nan::New(returnedValue.toString().toUtf8().constData()).ToLocalChecked());
+			break;
 		case QMetaType::QColor:
 			info.GetReturnValue().Set(Nan::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()).ToLocalChecked());
+			break;
+		default:
+			info.GetReturnValue().SetUndefined();
 		}
-
-		info.GetReturnValue().SetUndefined();
 	}
 
 	NAN_METHOD(QuickItem::emitEvent) {

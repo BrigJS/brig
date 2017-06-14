@@ -138,5 +138,30 @@ namespace Brig {
 
 			return NULL;
 		}
+
+		void printAllMeta(const QMetaObject *meta)
+		{
+
+			printf("== Print Meta: %s\n", meta->className());
+
+			// Properties
+			for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i) {
+				QMetaProperty property = meta->property(i);
+				const char *propName = property.name();
+				printf("=== property [%d]: %s\n", i, propName);
+			}
+
+			// Properties
+			for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
+				QMetaMethod method = meta->method(i);
+				const char *methodName = method.name();
+
+				if (method.methodType() == QMetaMethod::Signal) {
+					printf("=== signal [%d]: %s %s %d\n", i, methodName, method.methodSignature().data(), method.returnType());
+				} else {
+					printf("=== method [%d]: %s %s %d\n", i, methodName, method.methodSignature().data(), method.returnType());
+				}
+			}
+		}
 	}
 }

@@ -1,31 +1,31 @@
-#include <QObject>
 #include "DynamicQObject.h"
 
 namespace Brig {
-/*
-	DynamicQObject::DynamicQObject(QMetaObject *metaobject) : _metaObject(NULL)
-	{
-		obj = NULL;
-		_builder = new QMetaObjectBuilder();
-		if (metaobject)
-			_metaObject = metaobject;
-	}
-*/
 
-
-	DynamicQObject::DynamicQObject(DynamicQMetaObjectBuilder *dynamicMetaObjectBuilder, QMetaObject *metaObject, QObject *parent)
+	DynamicQObject::DynamicQObject(QmlTypeBuilder *_typeBuilder, QMetaObject *metaObject, QObject *parent) : QObject(parent)
 	{
 		setParent(parent);
-		obj = NULL;
-		_builder = dynamicMetaObjectBuilder;
+//		obj = NULL;
+		typeBuilder = _typeBuilder;
+		_builder = typeBuilder->metaObjectBuilder();
 		_metaObject = metaObject;
-//		printf("====================== INIT\n");
+
+//		qDebug() << "DynamicQObject INIT";
+
+		//QDynamicMetaObjectData *dynamicMetaObjectData = new QDynamicMetaObjectData;
+		//d_ptr->metaObject = reinterpret_cast<QDynamicMetaObjectData *>(metaObject);
+#if 0
+		printf("====================== INIT\n");
+		printf("original metaObject\n");
+		printAllMeta(QObject::metaObject());
+#endif
+
 	}
 
 	DynamicQObject::~DynamicQObject()
 	{
 		// Disconnect all
-		QMetaObject::disconnect(obj, 0, 0, 0);
+		QMetaObject::disconnect(this, 0, 0, 0);
 #if 0
 		// Release all callbacks
 		for (Callback *callback : callbacks) {
@@ -34,46 +34,33 @@ namespace Brig {
 
 		callbacks.clear();
 #endif
-		delete _builder;
-		free(_metaObject);
-	}
-
-	int DynamicQObject::printAllMeta(const QMetaObject *meta)
-	{
-
-		// Properties
-		for (int i = meta->propertyOffset(); i < meta->propertyCount(); ++i) {
-			QMetaProperty property = meta->property(i);
-			const char *propName = property.name();
-printf("=== property name: %s\n", propName);
-		}
-
-		// Properties
-		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
-			QMetaMethod method = meta->method(i);
-			const char *methodName = method.name();
-printf("=== method name: %s %s %d\n", methodName, method.methodSignature().data(), method.returnType());
-/*
-			for (QByteArray x : method.parameterNames()) {
-				printf("=> %s\n", x.data());
-			}
-*/
-		}
+//		delete _builder;
+//		delete _metaObject;
 	}
 
 	int DynamicQObject::qt_metacall(QMetaObject::Call call, int id, void **arguments)
 	{
-//printf("ORIGINAL qt_metacall: call=%d, id=%d\n", call, id);
-
-		int idx = QObject::qt_metacall(call, id, arguments);
-		if (idx == -1)
-			return -1;
+		// TODO: support signals which is emitted by original meta object
 #if 0
-		printAllMeta(_metaObject);
+		printf("============================================================ qt_metacall\n");
+		printf("ORIGINAL qt_metacall: call=%d, id=%d\n", call, id);
+		printf("original metaObject\n");
 		printAllMeta(QObject::metaObject());
+		printf("customized metaObject\n");
+		//printAllMeta(DynamicQObject::metaObject());
+		printAllMeta(_metaObject);
 #endif
 
+#if 1
+		int idx = id;
+//		if (QObject::metaObject() != DynamicQObject::metaObject()) {
+			idx = QObject::qt_metacall(call, id, arguments);
+			if (idx == -1)
+				return -1;
+//		}
+#endif
 #if 0
+		printf("AFTER qt_metacall: call=%d, id=%d\n", call, idx);
 		printAllMeta(_metaObject);
 		printAllMeta(QObject::metaObject());
 
@@ -88,7 +75,8 @@ printf("qt_metacall: _mo.propertyOffset=%d, dqo.propertyOffset=%d, qo.propertyOf
 		QObject::metaObject()->propertyOffset());
 printf("after QObject::qt_metacall id=%x\n", idx);
 #endif
-		const QMetaObject *meta = DynamicQObject::metaObject();
+//		const QMetaObject *meta = DynamicQObject::metaObject();
+		const QMetaObject *meta = _metaObject;
 
 		switch(call) {
 			case QMetaObject::ReadProperty:
@@ -100,8 +88,9 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 
 				// Prepare arguments
 				Nan::HandleScope scope;
-				int argc = 1;
+				int argc = 2;
 				Local<Value> argv[] = {
+					Nan::New<Number>(getId()),
 					Nan::New<String>(property->name).ToLocalChecked()
 				};
 
@@ -123,17 +112,31 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 
 				// Prepare arguments
 				Nan::HandleScope scope;
-				int argc = 2;
+				int argc = 3;
 				QVariant *qvar = reinterpret_cast<QVariant *>(arguments[0]);
 				Local<Value> argv[] = {
+					Nan::New<Number>(getId()),
 					Nan::New<String>(property->name).ToLocalChecked(),
 					Utils::QDataToV8((int)qvar->type(), arguments[0])
 				};
 
 				// Invoke
-				Handle<Value> ret = handler->Call(argc, argv);
+				handler->Call(argc, argv);
 
-//				QMetaObject::activate(this, _metaObject, idx, arguments);
+				// Prepare for signal
+				QVector<BrigMetaSignal *> _signals = _builder->getSignals();
+				Q_ASSERT(idx < _signals.count());
+				BrigMetaSignal *signal = _signals[property->signalId];
+
+				// Prepare arguments for signal
+				Local<Value> signal_argv[] = {
+					Nan::New<Number>(getId()),
+					Nan::New<String>(signal->name).ToLocalChecked()
+				};
+
+				// Emit signal
+				_builder->getSignalListener()->Call(2, signal_argv);
+				QMetaObject::activate(this, _metaObject, property->signalId, 0);
 
 				break;
 			}
@@ -162,22 +165,22 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 
 				if (qmethod.methodType() == QMetaMethod::Signal) {
 					Q_ASSERT(idx < _signals.count());
-					handler = _signals[idx]->handler;
 					paramCount = _signals[idx]->arguments.count();
 
 					// Convert parameters
 					Nan::HandleScope scope;
 
-					int argc = paramCount + 1;
+					int argc = paramCount + 2;
 					Handle<Value> *argv = new Handle<Value>[argc];
-					argv[0] = Nan::New<String>(_signals[idx]->name).ToLocalChecked();
-					for (int i = 1; i < argc; i++) {
+					argv[0] = Nan::New<Number>(getId());
+					argv[1] = Nan::New<String>(_signals[idx]->name).ToLocalChecked();
+					for (int i = 1; i <= paramCount; i++) {
 						QVariant *qvar = reinterpret_cast<QVariant *>(arguments[i]);
-						argv[i] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
+						argv[i + 1] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
 					}
 
 					// Invoke
-					Handle<Value> ret = handler->Call(argc, argv);
+					_builder->getSignalListener()->Call(argc, argv);
 
 					// Release
 					delete [] argv;
@@ -194,12 +197,13 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 					// Convert parameters
 					Nan::HandleScope scope;
 
-					int argc = paramCount + 1;
+					int argc = paramCount + 2;
 					Handle<Value> *argv = new Handle<Value>[argc];
-					argv[0] = Nan::New<String>(_methods[methodIdx]->name).ToLocalChecked();
-					for (int i = 1; i < argc; i++) {
+					argv[0] = Nan::New<Number>(getId());
+					argv[1] = Nan::New<String>(_methods[methodIdx]->name).ToLocalChecked();
+					for (int i = 1; i <= paramCount; i++) {
 						QVariant *qvar = reinterpret_cast<QVariant *>(arguments[i]);
-						argv[i] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
+						argv[i + 1] = Utils::QDataToV8((int)qvar->type(), arguments[i]);
 					}
 
 					// Invoke
@@ -285,5 +289,97 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 
 		return signalId;
 #endif
+	}
+
+	void DynamicQObject::emitSignal()
+	{
+		printf("EMITTTTTTTTT SIGGGGGGGGGGGGGGG\n");
+	}
+
+	bool DynamicQObject::invokeMethod(const char *member,
+					Qt::ConnectionType type,
+					QGenericReturnArgument ret,
+					QGenericArgument val0,
+					QGenericArgument val1,
+					QGenericArgument val2,
+					QGenericArgument val3,
+					QGenericArgument val4,
+					QGenericArgument val5,
+					QGenericArgument val6,
+					QGenericArgument val7,
+					QGenericArgument val8,
+					QGenericArgument val9)
+	{
+		QVarLengthArray<char, 512> sig;
+
+		int len = qstrlen(member);
+		if (len <= 0)
+			return false;
+
+		sig.append(member, len);
+		sig.append('(');
+
+		const char *typeNames[] = {
+			ret.name(),
+			val0.name(),
+			val1.name(),
+			val2.name(),
+			val3.name(),
+			val4.name(),
+			val5.name(),
+			val6.name(),
+			val7.name(),
+			val8.name(),
+			val9.name()
+		};
+
+		// Preparing parameters
+		int paramCount;
+		for (paramCount = 1; paramCount < 10; ++paramCount) {
+			len = qstrlen(typeNames[paramCount]);
+			if (len <= 0)
+				break;
+
+			sig.append(typeNames[paramCount], len);
+			sig.append(',');
+		}
+
+		if (paramCount == 1) {
+			sig.append(')'); // no parameters
+		} else {
+			sig[sig.size() - 1] = ')';
+		}
+		sig.append('\0');
+
+		const QMetaObject *metaObj = DynamicQObject::metaObject();
+
+		// Finding method
+		int idx = metaObj->indexOfMethod(sig.constData());
+		if (idx < 0) {
+			QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+			idx = metaObj->indexOfMethod(norm.constData());
+		}
+
+		if (idx < 0 || idx >= metaObject()->methodCount()) {
+
+			metaObj = QObject::metaObject();
+
+			// Finding method from QML
+			idx = metaObj->indexOfMethod(sig.constData());
+			if (idx < 0) {
+				QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+				idx = metaObj->indexOfMethod(norm.constData());
+			}
+
+			if (idx < 0 || idx >= metaObj->methodCount()) {
+				return false;
+			}
+		}
+
+		// Getting method to invoke
+		QMetaMethod method = metaObj->method(idx);
+
+		return method.invoke(this, type, ret,
+		                     val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
 	}
 }

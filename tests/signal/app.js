@@ -11,6 +11,10 @@ brig.on('ready', function(brig) {
 			console.log('Listener in Node.js Scope');
 		});
 
+		window.on('closing', function() {
+			console.log('Closing');
+		});
+
 		setInterval(function() {
 			window.emit('heartBeated');
 		}, 1000);

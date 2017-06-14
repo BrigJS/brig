@@ -11,6 +11,7 @@ ApplicationWindow {
 	height: 480;
 
 	Second {
+		property var zzz: 100;
 		onProp1Changed: {
 			console.log('prop1 Changed');
 		}
@@ -26,6 +27,7 @@ ApplicationWindow {
 			console.log(ret);
 
 			this.prop1 = 'QQQ';
+			this.test(123);
 		}
 	}
 
@@ -57,6 +59,7 @@ ApplicationWindow {
 
 		function xxx(X) {
 			console.log('xxx', X);
+			return 'FRED';
 		}
 
 		Component.onCompleted: {

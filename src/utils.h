@@ -94,6 +94,7 @@ namespace Brig {
 		QJSValue V8ToQJSValue(QQmlEngine *engine, Local<Value> value);
 		ParamData *MakeParameter(int type, Local<Value> value);
 		QGenericArgument MakeArgument(int type, Local<Value> value);
+		void printAllMeta(const QMetaObject *meta);
 	}
 }
 

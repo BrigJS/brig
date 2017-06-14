@@ -33,6 +33,7 @@ namespace Brig {
 		_properties.clear();
 
 		delete _typeName;
+		delete signalListener;
 	}
 
 	QMetaObject *DynamicQMetaObjectBuilder::build()
@@ -66,14 +67,14 @@ namespace Brig {
 		return builder.toMetaObject();
 	}
 
-	void DynamicQMetaObjectBuilder::addSignal(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb)
+	void DynamicQMetaObjectBuilder::addSignal(const char *name, const char *signature, QList<QByteArray> arguments)
 	{
 		Nan::HandleScope scope;
 
 		BrigMetaSignal *signal = new BrigMetaSignal();
 		signal->name = strdup(name);
 		signal->signature = strdup(signature);
-		signal->handler = new Nan::Callback(cb.As<Function>());
+//		signal->handler = new Nan::Callback(cb.As<Function>());
 		signal->arguments = arguments;
 		_signals.append(signal);
 #if 0
@@ -128,11 +129,37 @@ namespace Brig {
 	{
 		Nan::HandleScope scope;
 
+		// Signal
+		BrigMetaSignal *signal = new BrigMetaSignal();
+		std::string signalName(name);
+		signalName += "Changed";
+		signal->name = strdup(signalName.c_str());
+
+		//signalName += "(QVariant)";
+		signalName += "()";
+		signal->signature = strdup(signalName.c_str());
+
+		// Convert parameters
+		QList<QByteArray> arguments;
+//		arguments << QByteArray("QVariant");
+		signal->arguments = arguments;
+		_signals.append(signal);
+
+		// Property
 		BrigMetaProperty *property = new BrigMetaProperty();
 		property->name = strdup(name);
 		property->signature = strdup(name);
+		property->signalId = _signals.count() - 1;
 		property->readHandler = new Nan::Callback(readCallback.As<Function>());
 		property->writeHandler = new Nan::Callback(writeCallback.As<Function>());
 		_properties.append(property);
+
+	}
+
+	void DynamicQMetaObjectBuilder::addSignalListener(Local<Value> listener)
+	{
+		Nan::HandleScope scope;
+
+		signalListener = new Nan::Callback(listener.As<Function>());
 	}
 }

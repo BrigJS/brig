@@ -62,10 +62,8 @@ namespace Brig {
 		return -1;
 	}
 
-	int SignalHandler::findSignalId(const char *signal)
+	int SignalHandler::_findSignalId(const QMetaObject *meta, const char *signal)
 	{
-		const QMetaObject *meta = obj->metaObject();
-
 		// Finding signal id
 		for (int i = meta->methodOffset(); i < meta->methodCount(); ++i) {
 			QMetaMethod method = meta->method(i);
@@ -75,7 +73,15 @@ namespace Brig {
 				return i;
 		}
 
+		if (meta->superClass())
+			return _findSignalId(meta->superClass(), signal);
+
 		return -1;
+	}
+
+	int SignalHandler::findSignalId(const char *signal)
+	{
+		return _findSignalId(obj->metaObject(), signal);
 	}
 
 	bool SignalHandler::setObject(QObject *_obj)
@@ -108,7 +114,6 @@ namespace Brig {
 		Callback *callback = new Callback();
 		callback->signature = strdup(signal);
 		callback->handler = new Nan::Callback(cb.As<Function>());
-//		Persistent<Function>::New(Handle<Function>::Cast(cb));
 		callbacks.append(callback);
 
 		// No object can be hooked yet

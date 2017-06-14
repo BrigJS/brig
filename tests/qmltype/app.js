@@ -7,6 +7,10 @@ var brig = new Brig();
 
 brig.on('ready', function(brig) {
 
+	brig.on('window-all-closed', () => {
+		process.exit();
+	});
+
 	var qmlType = brig.createType('MyItem', {
 		property: {
 			prop1: 123
@@ -31,6 +35,32 @@ brig.on('ready', function(brig) {
 		}
 	});
 
+	qmlType.on('instance-created', function(instance) {
+		console.log('[Main Process]', '[MyItem]', 'Instance Created', instance.id);
+
+		setTimeout(() => {
+			console.log('TEST METHOD====>');
+			var ret = instance.invokeMethod('methodTest', 123, 222, 333, 444, 555);
+			console.log('RESULT', ret);
+
+			var x = instance.invokeMethod('xxx', 123);
+			console.log('RESULT', x);
+		}, 1000);
+
+		// Signals
+		instance.on('test', function(a) {
+			console.log('[Main Process]', '[MyItem]', '[signal]', 'test', a);
+		});
+
+		instance.on('test2', function() {
+			console.log('[Main Process]', '[MyItem]', '[signal]', 'test2');
+		});
+
+		instance.on('prop1Changed', function() {
+			console.log('[Main Process]', '[MyItem]', '[signal]', 'prop1Changed');
+		});
+	});
+
 	var qmlTypeSecond = brig.createType('Second', {
 		property: {
 			prop1: 123
@@ -47,7 +77,19 @@ brig.on('ready', function(brig) {
 		}
 	});
 
-	brig.open('application.qml', function(err, window) {
+	qmlTypeSecond.on('instance-created', function(instance) {
+		console.log('[Main Process]', '[Second]', 'Instance Created', instance.id);
 
+		// Signals
+		instance.on('test', function(a) {
+			console.log('[Main Process]', '[Second]', '[signal]', 'test', a);
+		});
+
+		instance.on('prop1Changed', function() {
+			console.log('[Main Process]', '[Second]', '[signal]', 'prop1Changed');
+		});
+	});
+
+	brig.open('application.qml', function(err, window) {
 	});
 });

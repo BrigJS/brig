@@ -20,6 +20,7 @@ namespace Brig {
 			QObject *GetObject() const { return obj; };
 
 			virtual int qt_metacall(QMetaObject::Call call, int id, void **arguments);
+			virtual int _findSignalId(const QMetaObject *meta, const char *signal);
 			virtual int findSignalId(const char *signal);
 			virtual bool setObject(QObject *_obj);
 			virtual int addCallback(const char *signal, Handle<Value> cb);

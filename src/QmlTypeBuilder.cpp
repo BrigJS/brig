@@ -1,34 +1,37 @@
 #include <unistd.h>
 #include <node.h>
-#include <QObject>
 #include "QmlTypeBuilder.h"
 #include "DynamicQObject.h"
 
 #define BRIG_QML_TYPE_IMPL(N) \
 	template<> QMetaObject BrigQMLType<N>::staticMetaObject = QMetaObject(); \
-	template<> DynamicQMetaObjectBuilder *BrigQMLType<N>::dynamicMetaObjectBuilder = 0;
+	template<> QmlTypeBuilder *BrigQMLType<N>::typeBuilder = 0;
 
 #define BRIG_QML_TYPE_INIT(N) \
-	BrigQMLType<N>::init(qmltype_builder->metaobject_builder); \
-	qmlRegisterType<BrigQMLType<N>>(*uriStr, major, minor, qmltype_builder->metaobject_builder->getTypeName()); \
+	BrigQMLType<N>::init(qmltype_builder); \
+	qmlRegisterType<BrigQMLType<N>>(*uriStr, major, minor, qmltype_builder->metaObjectBuilder()->getTypeName()); \
 	break;
 
 namespace Brig {
 
 	using namespace v8;
 	using namespace node;
-
 	template <int N>
 	class BrigQMLType : public DynamicQObject {
 		public:
-			BrigQMLType() : DynamicQObject(dynamicMetaObjectBuilder, &staticMetaObject, 0) {};
+			BrigQMLType(QObject *parent = 0) : DynamicQObject(typeBuilder, &staticMetaObject, parent) {
+				setParent(parent);
+				typeBuilder->createInstance(this);
+			};
 
-			static void init(DynamicQMetaObjectBuilder *metaObjectBuilder) {
-				dynamicMetaObjectBuilder = metaObjectBuilder;
-				static_cast<QMetaObject &>(staticMetaObject) = *reinterpret_cast<QMetaObject *>(metaObjectBuilder->build());
+			static void init(QmlTypeBuilder *_typeBuilder) {
+				typeBuilder = _typeBuilder;
+				static_cast<QMetaObject &>(staticMetaObject) = *reinterpret_cast<QMetaObject *>(_typeBuilder->metaObjectBuilder()->build());
 			}
 
-			static DynamicQMetaObjectBuilder *dynamicMetaObjectBuilder;
+			const QMetaObject *metaObject() const { return &staticMetaObject; };
+
+			static QmlTypeBuilder *typeBuilder;
 			static QMetaObject staticMetaObject;
 	};
 
@@ -67,15 +70,52 @@ namespace Brig {
 
 	Nan::Persistent<Function> QmlTypeBuilder::constructor;
 
-	QmlTypeBuilder::QmlTypeBuilder(const char *typeName) : ObjectWrap()
+	QmlTypeBuilder::QmlTypeBuilder(const char *_typeName) : ObjectWrap()
 	{
+		typeName = _typeName;
 		metaobject_builder = new DynamicQMetaObjectBuilder(typeName);
 		obj = NULL;
 	}
 
 	QmlTypeBuilder::~QmlTypeBuilder()
 	{
+		delete typeName;
 		delete metaobject_builder;
+		delete listener;
+	}
+
+	void QmlTypeBuilder::createInstance(DynamicQObject *instance)
+	{
+		Nan::HandleScope scope;
+
+		instance->setId(instCounter++);
+
+		// Store this instance
+		TypeInstance *typeInstance = new TypeInstance();
+		typeInstance->id = instance->getId();
+		typeInstance->instance = instance;
+		instances.append(typeInstance);
+
+		// Prepare arguments
+		int argc = 2;
+		Handle<Value> *argv = new Handle<Value>[argc];
+		argv[0] = Nan::New<String>("created").ToLocalChecked();
+		argv[1] = Nan::New<Number>(typeInstance->id);
+
+		// Invoke
+		listener->Call(argc, argv);
+	}
+
+	TypeInstance *QmlTypeBuilder::findInstance(int _id)
+	{
+		// Finding instance
+		for (int i = 0; i < instances.size(); ++i) {
+			TypeInstance *instance = instances.at(i);
+			if (instance->id == _id)
+				return instance;
+		}
+
+		return NULL;
 	}
 
 	NAN_MODULE_INIT(QmlTypeBuilder::Initialize) {
@@ -92,6 +132,10 @@ namespace Brig {
 		Nan::SetPrototypeMethod(tpl, "addMethod", QmlTypeBuilder::addMethod);
 		Nan::SetPrototypeMethod(tpl, "addProperty", QmlTypeBuilder::addProperty);
 		Nan::SetPrototypeMethod(tpl, "build", QmlTypeBuilder::build);
+		Nan::SetPrototypeMethod(tpl, "addSignalListener", QmlTypeBuilder::addSignalListener);
+		Nan::SetPrototypeMethod(tpl, "setListener", QmlTypeBuilder::setListener);
+		Nan::SetPrototypeMethod(tpl, "emitSignal", QmlTypeBuilder::emitSignal);
+		Nan::SetPrototypeMethod(tpl, "invokeMethod", QmlTypeBuilder::invokeMethod);
 
 		constructor.Reset(tpl->GetFunction());
 
@@ -202,7 +246,7 @@ namespace Brig {
 			arguments << QByteArray(*String::Utf8Value(val));
 		}
 
-		qmltype_builder->metaobject_builder->addSignal(*name, *signature, arguments, info[3]);
+		qmltype_builder->metaobject_builder->addSignal(*name, *signature, arguments);
 
 		info.GetReturnValue().SetUndefined();
 	}
@@ -237,5 +281,112 @@ namespace Brig {
 		qmltype_builder->metaobject_builder->addProperty(*name, info[1], info[2]);
 
 		info.GetReturnValue().SetUndefined();
+	}
+
+	NAN_METHOD(QmlTypeBuilder::addSignalListener) {
+
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
+
+		qmltype_builder->metaobject_builder->addSignalListener(info[0]);
+
+		info.GetReturnValue().SetUndefined();
+	}
+
+	NAN_METHOD(QmlTypeBuilder::setListener) {
+
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
+
+		qmltype_builder->listener = new Nan::Callback(info[0].As<Function>());
+
+		info.GetReturnValue().SetUndefined();
+	}
+
+	NAN_METHOD(QmlTypeBuilder::emitSignal) {
+
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
+
+//		qmltype_builder->emitSignal();
+
+		info.GetReturnValue().SetUndefined();
+	}
+
+	NAN_METHOD(QmlTypeBuilder::invokeMethod) {
+
+		QmlTypeBuilder *qmltype_builder = ObjectWrap::Unwrap<QmlTypeBuilder>(info.This());
+
+		if (!info[0]->IsNumber())
+			Nan::ThrowTypeError("First argument must be a number");
+
+		if (!info[1]->IsString())
+			Nan::ThrowTypeError("Second argument must be a string");
+
+		// Getting instance
+		TypeInstance *inst = qmltype_builder->findInstance(info[0]->NumberValue());
+		if (inst == NULL) {
+
+			// No such instance
+			info.GetReturnValue().SetUndefined();
+			return;
+		}
+
+		// Method name
+		String::Utf8Value methodSig(info[1]->ToString());
+
+		QVariant returnedValue;
+		int infoLen = info.Length() - 2;
+
+		// It supports only 10 arguments with limitation of Qt
+		inst->instance->invokeMethod(*methodSig,
+			Qt::AutoConnection,
+			Q_RETURN_ARG(QVariant, returnedValue),
+			(infoLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[2])) : QGenericArgument(),
+			(infoLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[3])) : QGenericArgument(),
+			(infoLen > 2) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[4])) : QGenericArgument(),
+			(infoLen > 3) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[5])) : QGenericArgument(),
+			(infoLen > 4) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[6])) : QGenericArgument(),
+			(infoLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[7])) : QGenericArgument(),
+			(infoLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
+			(infoLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[9])) : QGenericArgument(),
+			(infoLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[10])) : QGenericArgument(),
+			(infoLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[11])) : QGenericArgument());
+
+		// Convert Qvariant to V8 data type
+		if (returnedValue.isNull()) {
+			info.GetReturnValue().SetNull();
+			return;
+		}
+
+		switch(returnedValue.userType()) {
+		case QMetaType::Bool:
+			info.GetReturnValue().Set(Nan::New<Boolean>(returnedValue.toBool()));
+			break;
+		case QMetaType::Int:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toInt()));
+			break;
+		case QMetaType::UInt:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toUInt()));
+			break;
+		case QMetaType::Float:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toFloat()));
+			break;
+		case QMetaType::Double:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toDouble()));
+			break;
+		case QMetaType::LongLong:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toLongLong()));
+			break;
+		case QMetaType::ULongLong:
+			info.GetReturnValue().Set(Nan::New<Number>(returnedValue.toULongLong()));
+			break;
+		case QMetaType::QString:
+			info.GetReturnValue().Set(Nan::New(returnedValue.toString().toUtf8().constData()).ToLocalChecked());
+			break;
+		case QMetaType::QColor:
+			info.GetReturnValue().Set(Nan::New(returnedValue.value<QColor>().name(QColor::HexArgb).toUtf8().constData()).ToLocalChecked());
+			break;
+		default:
+			info.GetReturnValue().SetUndefined();
+		}
+
 	}
 }

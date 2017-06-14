@@ -31,14 +31,12 @@ namespace Brig {
 		char *name;
 		char *signature;
 		QList<QByteArray> arguments;
-		Nan::Callback *handler = NULL;
 
 		~BrigMetaSignal() {
 
 			arguments.clear();
 
 			delete name;
-			delete handler;
 			delete signature;
 		}
 	};
@@ -71,9 +69,12 @@ namespace Brig {
 			QVector<BrigMetaMethod *> getMethods() { return _methods; };
 			QVector<BrigMetaProperty *> getProperties() { return _properties; };
 
-			void addSignal(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
+			Nan::Callback *getSignalListener() { return signalListener; };
+
+			void addSignal(const char *name, const char *signature, QList<QByteArray> arguments);
 			void addMethod(const char *name, const char *signature, QList<QByteArray> arguments, Local<Value> cb);
 			void addProperty(const char *name, Local<Value> readCallback, Local<Value> writeCallback);
+			void addSignalListener(Local<Value> listener);
 
 		private:
 
@@ -82,6 +83,7 @@ namespace Brig {
 			QVector<BrigMetaMethod *> _methods;
 			QVector<BrigMetaSignal *> _signals;
 			QVector<BrigMetaProperty *> _properties;
+			Nan::Callback *signalListener = NULL;
 	};
 
 }

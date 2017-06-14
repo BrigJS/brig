@@ -14,23 +14,37 @@ namespace Brig {
 	class DynamicQObject : public QObject {
 
 		public:
-			DynamicQObject(DynamicQMetaObjectBuilder *dynamicMetaObjectBuilder, QMetaObject *metaObject, QObject *parent);
+			DynamicQObject(QmlTypeBuilder *_typeBuilder, QMetaObject *metaObject, QObject *parent);
 			~DynamicQObject(void);
 
-			QObject *GetObject() const { return obj; };
+			void setId(int _id) { id = _id; };
+			int getId() const { return id; };
 
-			const QMetaObject *metaObject() const { return _metaObject; };
-			virtual int printAllMeta(const QMetaObject *meta);
 			virtual int qt_metacall(QMetaObject::Call call, int id, void **arguments);
 			virtual int findSignalId(const char *signal);
 			virtual bool setObject(QObject *_obj);
 			virtual int addCallback(const char *signal, Handle<Value> cb);
+			virtual void emitSignal();
+			virtual bool invokeMethod(const char *member,
+					Qt::ConnectionType type,
+					QGenericReturnArgument ret,
+					QGenericArgument val0 = QGenericArgument( Q_NULLPTR ),
+					QGenericArgument val1 = QGenericArgument(),
+					QGenericArgument val2 = QGenericArgument(),
+					QGenericArgument val3 = QGenericArgument(),
+					QGenericArgument val4 = QGenericArgument(),
+					QGenericArgument val5 = QGenericArgument(),
+					QGenericArgument val6 = QGenericArgument(),
+					QGenericArgument val7 = QGenericArgument(),
+					QGenericArgument val8 = QGenericArgument(),
+					QGenericArgument val9 = QGenericArgument());
 
 		private:
 
-			QObject *obj;
+			int id;
 			QMetaObject *_metaObject;
 			DynamicQMetaObjectBuilder *_builder;
+			QmlTypeBuilder *typeBuilder;
 
 		protected:
 
