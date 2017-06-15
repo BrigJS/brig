@@ -307,6 +307,41 @@ namespace Brig {
 
 //		qmltype_builder->emitSignal();
 
+		if (!info[0]->IsNumber())
+			Nan::ThrowTypeError("First argument must be a number");
+
+		if (!info[1]->IsString())
+			Nan::ThrowTypeError("Second argument must be a string");
+
+		// Getting instance
+		TypeInstance *inst = qmltype_builder->findInstance(info[0]->NumberValue());
+		if (inst == NULL) {
+
+			// No such instance
+			info.GetReturnValue().SetUndefined();
+			return;
+		}
+
+		// Method name
+		String::Utf8Value methodSig(info[1]->ToString());
+
+		QVariant returnedValue;
+		int infoLen = info.Length() - 2;
+
+		// It supports only 10 arguments with limitation of Qt
+		inst->instance->emitSignal(*methodSig,
+			Qt::AutoConnection,
+			(infoLen > 0) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[2])) : QGenericArgument(),
+			(infoLen > 1) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[3])) : QGenericArgument(),
+			(infoLen > 2) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[4])) : QGenericArgument(),
+			(infoLen > 3) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[5])) : QGenericArgument(),
+			(infoLen > 4) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[6])) : QGenericArgument(),
+			(infoLen > 5) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[7])) : QGenericArgument(),
+			(infoLen > 6) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[8])) : QGenericArgument(),
+			(infoLen > 7) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[9])) : QGenericArgument(),
+			(infoLen > 8) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[10])) : QGenericArgument(),
+			(infoLen > 9) ? Q_ARG(QVariant, Utils::V8ToQVariant(info[11])) : QGenericArgument());
+
 		info.GetReturnValue().SetUndefined();
 	}
 

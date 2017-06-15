@@ -291,9 +291,89 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 #endif
 	}
 
-	void DynamicQObject::emitSignal()
+	bool DynamicQObject::emitSignal(const char *member,
+					Qt::ConnectionType type,
+					QGenericArgument val0,
+					QGenericArgument val1,
+					QGenericArgument val2,
+					QGenericArgument val3,
+					QGenericArgument val4,
+					QGenericArgument val5,
+					QGenericArgument val6,
+					QGenericArgument val7,
+					QGenericArgument val8,
+					QGenericArgument val9)
 	{
-		printf("EMITTTTTTTTT SIGGGGGGGGGGGGGGG\n");
+		QVarLengthArray<char, 512> sig;
+
+		int len = qstrlen(member);
+		if (len <= 0)
+			return false;
+
+		sig.append(member, len);
+		sig.append('(');
+
+		const char *typeNames[] = {
+			val0.name(),
+			val1.name(),
+			val2.name(),
+			val3.name(),
+			val4.name(),
+			val5.name(),
+			val6.name(),
+			val7.name(),
+			val8.name(),
+			val9.name()
+		};
+
+		// Preparing parameters
+		int paramCount;
+		for (paramCount = 1; paramCount < 10; ++paramCount) {
+			len = qstrlen(typeNames[paramCount]);
+			if (len <= 0)
+				break;
+
+			sig.append(typeNames[paramCount], len);
+			sig.append(',');
+		}
+
+		if (paramCount == 1) {
+			sig.append(')'); // no parameters
+		} else {
+			sig[sig.size() - 1] = ')';
+		}
+		sig.append('\0');
+
+		const QMetaObject *metaObj = DynamicQObject::metaObject();
+
+		// Finding method
+		int idx = metaObj->indexOfMethod(sig.constData());
+		if (idx < 0) {
+			QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+			idx = metaObj->indexOfMethod(norm.constData());
+		}
+
+		if (idx < 0 || idx >= metaObject()->methodCount()) {
+
+			metaObj = QObject::metaObject();
+
+			// Finding method from QML
+			idx = metaObj->indexOfMethod(sig.constData());
+			if (idx < 0) {
+				QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+				idx = metaObj->indexOfMethod(norm.constData());
+			}
+
+			if (idx < 0 || idx >= metaObj->methodCount()) {
+				return false;
+			}
+		}
+
+		// Getting method to invoke
+		QMetaMethod method = metaObj->method(idx);
+
+		return method.invoke(this, type,
+		                     val0, val1, val2, val3, val4, val5, val6, val7, val8, val9);
 	}
 
 	bool DynamicQObject::invokeMethod(const char *member,

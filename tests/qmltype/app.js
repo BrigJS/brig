@@ -45,6 +45,8 @@ brig.on('ready', function(brig) {
 
 			var x = instance.invokeMethod('xxx', 123);
 			console.log('RESULT', x);
+
+			instance.emit('test2');
 		}, 1000);
 
 		// Signals
