@@ -113,11 +113,9 @@ var myQmlType = brig.createType('MyItem', {
 			return require('fs').readFileSync(filename).toString();
 		}
 	},
-	signal: {
-		'test(a)': function(a) {
-			console.log('Signal TEST', a);
-		}
-	}
+	signal: [
+		'test(a)'
+	]
 });
 
 // Triggered when instance of customized type was created
