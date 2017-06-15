@@ -25,14 +25,10 @@ brig.on('ready', function(brig) {
 				return fs.readFileSync(filename).toString();
 			}
 		},
-		signal: {
-			'test(a)': function(a) {
-				console.log('Signal TEST', a);
-			},
-			'test2()': function() {
-				console.log('Signal TEST 2');
-			}
-		}
+		signal: [
+			'test(a)',
+			'test2()',
+		]
 	});
 
 	qmlType.on('instance-created', function(instance) {
@@ -72,11 +68,9 @@ brig.on('ready', function(brig) {
 				return a + b;
 			}
 		},
-		signal: {
-			'test(a)': function(a) {
-				console.log('Signal TEST', a);
-			}
-		}
+		signal: [
+			'test(a)'
+		]
 	});
 
 	qmlTypeSecond.on('instance-created', function(instance) {
