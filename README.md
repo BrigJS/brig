@@ -97,6 +97,54 @@ brig.on('ready', function(brig) {
 
 ```
 
+## Customized Type (Experimental)
+
+_(This is experimental feature, API might be changed in the next version)_
+
+You can create a customized type in order to expose some APIs or functionality from Node.js to QML, see below:
+
+```javascript
+var myQmlType = brig.createType('MyItem', {
+	property: {
+		prop1: 123
+	},
+	method: {
+		'readFile(a)': function(filename) {
+			return require('fs').readFileSync(filename).toString();
+		}
+	},
+	signal: {
+		'test(a)': function(a) {
+			console.log('Signal TEST', a);
+		}
+	}
+});
+
+// Triggered when instance of customized type was created
+myQmlType.on('instance-created', function(instance) {
+
+	// Signals
+	instance.on('test', function(a) {
+		// test(a) signal was emitted
+		console.log(a);
+	});
+});
+```
+
+In QML, we can import customized type with its type name and use it directly:
+
+```qml
+import Brig.MyItem 1.0
+```
+
+Usage:
+```
+MyItem {
+	// attributes...
+}
+```
+
+
 ## Demonstration
 
 Here is a great countdown timer with `Brig` for hackathon event to show off, you can click image to play YouTube video:
