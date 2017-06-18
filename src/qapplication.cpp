@@ -18,12 +18,32 @@ namespace Brig {
 	{
 		app_argc = 0;
 		app_argv = NULL;
+#if 0
+		QStringList libPaths;
+		libPaths << "../../node_modules/qt-darwin/PlugIns";
+		libPaths << "../../node_modules/qt-darwin/Frameworks";
+		libPaths << "../../node_modules/qt-darwin/Resources/qml";
+		QCoreApplication::setLibraryPaths(libPaths);
+#endif
+#if 1
+		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/Frameworks");
+		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/PlugIns");
+		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/Resources/qml");
+#endif
 		dispatcher = new BrigEventDispatcher;
 		QGuiApplication::setEventDispatcher(dispatcher);
 
 		app = new QGuiApplication(app_argc, app_argv);
 		QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
+#if 0
+		qDebug() << QCoreApplication::applicationDirPath();
+		QStringList paths = QCoreApplication::libraryPaths();
+		for (int i = 0; i < paths.count(); ++i) {
+			const QString &pluginDir = paths.at(i);
+			qDebug() << pluginDir;
+		}
+#endif
 //		QCoreApplication *app1 = QCoreApplication::instance();
 //		QCoreApplication::removePostedEvents(app1, QEvent::Quit);
 
@@ -34,7 +54,6 @@ namespace Brig {
 
 	QApplicationWrap::~QApplicationWrap()
 	{
-printf("RELEASE QApplication\n");
 		delete app;
 		delete dispatcher;
 	}

@@ -17,3 +17,8 @@ var item = component.create(context);
 
 // Getting global variable
 console.log(context.contextProperty('helloGlobal'));
+
+brig.on('ready', function(brig) {
+	brig.open('application.qml', function(err, window) {
+	});
+});

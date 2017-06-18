@@ -46,7 +46,6 @@
 					'src/eventdispatcher/platform/mac.mm'
 				],
 				'xcode_settings': {
-					'DYLIB_INSTALL_NAME_BASE': '@loader_path/../../node_modules/qt-darwin/Frameworks',
 					'LD_RUNPATH_SEARCH_PATHS': [
 						'@excutable_path/node_modules/qt-darwin/Frameworks',
 						'@loader_path/node_modules/qt-darwin/Frameworks',

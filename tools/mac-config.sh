@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NODE_QT_MOD=../node_modules/qt-darwin/Frameworks
+NODE_QT_MOD=../../node_modules/qt-darwin/Frameworks
 QMAKE=`which qmake`
 if [ "$QMAKE" == "" ]; then
 	QT_LIBS_PATH=$NODE_QT_MOD

@@ -16,6 +16,38 @@ namespace Brig {
 		obj = new QQmlEngine();
 		obj->setOutputWarningsToStandardError(true);
 		signal = new SignalHandler(obj);
+#if 0
+		QStringList importPaths;
+		importPaths << "../../node_modules/qt-darwin/Resources/qml";
+		importPaths << "qrc:/qt-project.org/imports";
+		importPaths << "/Users/fred/Qt/5.7/clang_64/qml";
+		obj->setImportPathList(importPaths);
+#endif
+
+		obj->addImportPath("../../node_modules/qt-darwin/Resources/qml");
+#if 0
+		qDebug() << "importPathList";
+		QStringList paths = obj->importPathList();
+		for (int i = 0; i < paths.count(); ++i) {
+			const QString &pluginDir = paths.at(i);
+			qDebug() << pluginDir;
+		}
+#endif
+#if 1
+		QStringList pluginPaths;
+		pluginPaths << ".";
+		pluginPaths << "../../node_modules/qt-darwin/PlugIns";
+		obj->setPluginPathList(pluginPaths);
+#endif
+
+#if 0
+		qDebug() << "pluginPathList";
+		QStringList _paths = obj->pluginPathList();
+		for (int i = 0; i < _paths.count(); ++i) {
+			const QString &pluginDir = _paths.at(i);
+			qDebug() << pluginDir;
+		}
+#endif
 	}
 
 	QmlEngineWrap::~QmlEngineWrap()
