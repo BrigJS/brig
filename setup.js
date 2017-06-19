@@ -12,8 +12,8 @@ function setupAddon() {
 		});
 	}
 }
-
-if (process.platform ==='darwin') {
+console.log('PLATFORM', process.platform);
+if (process.platform === 'darwin') {
 	console.log('Downloading Darwin backend ...');
 	var downloadBackend = child_process.spawn('npm', [ 'install', 'qt-darwin' ], { stdio: 'inherit' });
 	downloadBackend.on('error', function() {
