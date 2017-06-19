@@ -1,7 +1,7 @@
 {
 	'targets': [
 	{
-		'target_name': 'brig',
+		'target_name': '<(module_name)',
 		'sources': [
 			'<!@(tools/genmoc.sh)',
 			'src/brig.cpp',
@@ -22,6 +22,7 @@
 		'include_dirs': [
 			"<!(node -e \"require('nan')\")"
 		],
+		'product_dir': '<(module_path)',
 		'conditions': [
 			['OS=="linux"', {
 				'sources': [

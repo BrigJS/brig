@@ -7,6 +7,13 @@
     "type": "git",
     "url": "git://github.com/cfsghost/brig.git"
   },
+  "binary": {
+    "module_name": "brig",
+    "module_path": "./native/{node_abi}-{platform}-{arch}",
+    "host": "https://github.com/cfsghost/brig/releases/download/",
+    "remote_path": "{version}",
+    "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
+  },
   "homepage": "http://github.com/cfsghost/brig",
   "main": "./lib/brig.js",
   "keywords": [
@@ -18,11 +25,14 @@
     "node": ">=0.10.0"
   },
   "scripts": {
-    "install": "node setup.js"
+    "install": "node-pre-gyp install --fallback-to-build",
+	"postinstall": "node setup.js"
   },
+  "bundledDependencies":["node-pre-gyp"],
   "devDependencies": {},
   "optionalDependencies": {},
   "dependencies": {
+    "node-pre-gyp": ">=0.6.36",
     "nan": ">=2.0.9"
   }
 }
