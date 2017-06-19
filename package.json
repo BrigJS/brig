@@ -1,6 +1,6 @@
 {
   "name": "brig",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "author": "Fred Chiend <cfsghost@gmail.com>",
   "description": "Graphical render engine for Node.js",
   "repository": {
@@ -26,9 +26,11 @@
   },
   "scripts": {
     "install": "node-pre-gyp install --fallback-to-build",
-	"postinstall": "node setup.js"
+    "postinstall": "node setup.js"
   },
-  "bundledDependencies":["node-pre-gyp"],
+  "bundledDependencies": [
+    "node-pre-gyp"
+  ],
   "devDependencies": {},
   "optionalDependencies": {},
   "dependencies": {
