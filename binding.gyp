@@ -52,7 +52,7 @@
 						'@excutable_path/../node_modules/qt-darwin/Frameworks',
 						'@loader_path/../node_modules/qt-darwin/Frameworks',
 						'@excutable_path/../../node_modules/qt-darwin/Frameworks',
-						'@loader_path/../../node_modules/qt-darwin/Frameworks',
+						'@loader_path/../../node_modules/qt-darwin/Frameworks'
 					],
 					'OTHER_CPLUSPLUSFLAGS': [
 						'-stdlib=libc++',

@@ -25,6 +25,8 @@ namespace Brig {
 #endif
 
 		obj->addImportPath("../../node_modules/qt-darwin/Resources/qml");
+		obj->addImportPath("node_modules/qt-darwin/Resources/qml");
+		obj->addImportPath("node_modules/brig/node_modules/qt-darwin/Resources/qml");
 #if 0
 		qDebug() << "importPathList";
 		QStringList paths = obj->importPathList();
@@ -37,6 +39,8 @@ namespace Brig {
 		QStringList pluginPaths;
 		pluginPaths << ".";
 		pluginPaths << "../../node_modules/qt-darwin/PlugIns";
+		pluginPaths << "node_modules/qt-darwin/PlugIns";
+		pluginPaths << "node_modules/brig/node_modules/qt-darwin/PlugIns";
 		obj->setPluginPathList(pluginPaths);
 #endif
 

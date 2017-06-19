@@ -29,6 +29,12 @@ namespace Brig {
 		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/Frameworks");
 		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/PlugIns");
 		QCoreApplication::addLibraryPath("../../node_modules/qt-darwin/Resources/qml");
+		QCoreApplication::addLibraryPath("node_modules/qt-darwin/Frameworks");
+		QCoreApplication::addLibraryPath("node_modules/brig/node_modules/qt-darwin/Frameworks");
+		QCoreApplication::addLibraryPath("node_modules/qt-darwin/PlugIns");
+		QCoreApplication::addLibraryPath("node_modules/brig/node_modules/qt-darwin/PlugIns");
+		QCoreApplication::addLibraryPath("node_modules/qt-darwin/Resources/qml");
+		QCoreApplication::addLibraryPath("node_modules/brig/node_modules/qt-darwin/Resources/qml");
 #endif
 		dispatcher = new BrigEventDispatcher;
 		QGuiApplication::setEventDispatcher(dispatcher);
