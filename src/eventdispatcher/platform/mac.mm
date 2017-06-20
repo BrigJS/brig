@@ -3,12 +3,12 @@
 
 BOOL powersave = FALSE;
 NSApplication *app;
-@class RunLoopModeTracker;
-@interface RunLoopModeTracker : NSObject {
+@class BrigRunLoopModeTracker;
+@interface BrigRunLoopModeTracker : NSObject {
 }
 @end
 
-@implementation RunLoopModeTracker
+@implementation BrigRunLoopModeTracker
 
 - (id) init
 {
@@ -36,15 +36,15 @@ NSApplication *app;
 	// Trying to save power
 	if ([notification name] == NSApplicationDidChangeOcclusionStateNotification) {
 		if ([app occlusionState] & NSApplicationOcclusionStateVisible) {
-			//printf("NORMAL POWER\n");
+//			printf("NORMAL POWER\n");
 			powersave = FALSE;
 		} else {
-			//printf("POWERSAVED\n");
+//			printf("POWERSAVED\n");
 			powersave = TRUE;
 		}
 	} else if ([notification name] == NSApplicationWillBecomeActiveNotification ||
 		[notification name] == NSApplicationWillFinishLaunchingNotification) {
-		//printf("NORMAL POWER\n");
+//		printf("NORMAL POWER\n");
 		powersave = FALSE;
 	}
 }
@@ -60,7 +60,7 @@ void prepareMacWindowSystem()
 {
 	app = [NSApplication sharedApplication];
 
-	[[RunLoopModeTracker alloc] init];
+	[[BrigRunLoopModeTracker alloc] init];
 
     [app finishLaunching];
 }
