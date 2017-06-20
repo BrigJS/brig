@@ -97,7 +97,7 @@ brig.on('ready', function(brig) {
 
 ```
 
-## Customized Type (Experimental)
+## Customized Type
 
 _(This is experimental feature, API might be changed in the next version)_
 
@@ -144,13 +144,13 @@ MyItem {
 
 ## Examples
 
-Some exmaples you can found which is used brig:
+Some exmaples you can found which used brig:
 
 * [Example App](https://github.com/cfsghost/brig-example-app)
 	* Example application for a demo
-* [FishFarmingBrowser](https://github.com/cfsghost/FishFarmingBrowser)
+* [FishFarming](https://github.com/cfsghost/FishFarmingBrowser)
 	* Web browser
-* [Hankathon Timer](https://github.com/HanGee/Hankathon)
+* [Hankathon](https://github.com/HanGee/Hankathon)
 	* A countdown timer for hackathon event
 
 ## Demonstration
