@@ -29,8 +29,6 @@ namespace Brig {
 			/* Methods */
 			static NAN_METHOD(setStyle);
 			static NAN_METHOD(setApplicationName);
-			static NAN_METHOD(Exec);
-			static NAN_METHOD(Test);
 
 			QGuiApplication *app;
 			int app_argc;

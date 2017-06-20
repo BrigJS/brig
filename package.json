@@ -34,7 +34,8 @@
   "devDependencies": {},
   "optionalDependencies": {},
   "dependencies": {
+    "nan": ">=2.0.9",
     "node-pre-gyp": ">=0.6.36",
-    "nan": ">=2.0.9"
+    "qt-darwin": "0.0.4"
   }
 }
