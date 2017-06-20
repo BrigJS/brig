@@ -26,7 +26,7 @@ namespace Brig {
 }
 
 #include "utils.h"
-#include "qapplication.h"
+#include "QApplication.h"
 #include "callback.h"
 #include "signal_handler.h"
 #include "DynamicQMetaObjectBuilder.h"

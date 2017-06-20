@@ -1,6 +1,6 @@
 #include <node.h>
 #include "brig.h"
-#include "qapplication.h"
+#include "QApplication.h"
 
 namespace Brig {
 

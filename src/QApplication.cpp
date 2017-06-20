@@ -5,7 +5,7 @@
 #include <QTextCodec>
 #include <QQuickStyle>
 #include <uv.h>
-#include "qapplication.h"
+#include "QApplication.h"
 #include "eventloop.h"
 
 namespace Brig {
