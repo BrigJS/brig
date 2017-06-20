@@ -25,7 +25,8 @@ namespace Brig {
 			static NAN_METHOD(New);
 
 			/* Methods */
-			static NAN_METHOD(setEngine);
+			static NAN_METHOD(setContextProperty);
+			static NAN_METHOD(getContextProperty);
 
 			QQmlContext *obj;
 
