@@ -3,6 +3,7 @@
 #include <QtGui>
 #include <QObject>
 #include <QTextCodec>
+#include <QQuickStyle>
 #include <uv.h>
 #include "qapplication.h"
 #include "eventloop.h"
@@ -78,6 +79,7 @@ namespace Brig {
 
 		/* Prototype */
 		Nan::SetPrototypeMethod(tpl, "setApplicationName", QApplicationWrap::setApplicationName);
+		Nan::SetPrototypeMethod(tpl, "setStyle", QApplicationWrap::setStyle);
 		Nan::SetPrototypeMethod(tpl, "exec", QApplicationWrap::Exec);
 		Nan::SetPrototypeMethod(tpl, "test", QApplicationWrap::Test);
 //		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
@@ -99,9 +101,19 @@ namespace Brig {
 		info.GetReturnValue().Set(info.This());
 	}
 
+	NAN_METHOD(QApplicationWrap::setStyle) {
+
+		// style name
+		String::Utf8Value style(info[0]->ToString());
+
+		QQuickStyle::setStyle(QString(*style));
+
+		info.GetReturnValue().Set(Nan::Undefined());
+	}
+
 	NAN_METHOD(QApplicationWrap::setApplicationName) {
 
-		// Signal name
+		// application name
 		String::Utf8Value name(info[0]->ToString());
 
 		QCoreApplication::setApplicationName(QString(*name));
