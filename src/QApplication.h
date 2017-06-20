@@ -33,8 +33,6 @@ namespace Brig {
 			char **app_argv;
 			BrigEventDispatcher *dispatcher;
 
-			QQuickView *quickview;
-
 			static Nan::Persistent<Function> constructor;
 	};
 
