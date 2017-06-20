@@ -6,7 +6,6 @@
 #include <QQuickStyle>
 #include <uv.h>
 #include "QApplication.h"
-#include "eventloop.h"
 
 namespace Brig {
 
@@ -55,10 +54,6 @@ namespace Brig {
 #endif
 //		QCoreApplication *app1 = QCoreApplication::instance();
 //		QCoreApplication::removePostedEvents(app1, QEvent::Quit);
-
-		// Initializing event loop
-		//eventloop = new EventLoop(app);
-		//eventloop->Main();
 	}
 
 	QApplicationWrap::~QApplicationWrap()

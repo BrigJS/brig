@@ -5,7 +5,6 @@
 #include <QGuiApplication>
 #include <QQuickView>
 #include "eventdispatcher/eventdispatcher.h"
-#include "eventloop.h"
 
 namespace Brig {
 
@@ -18,7 +17,6 @@ namespace Brig {
 			static NAN_MODULE_INIT(Initialize);
 
 			QGuiApplication *GetApp() const { return app; };
-			EventLoop *GetEventLoop() const { return eventloop; };
 
 		private:
 			QApplicationWrap();
@@ -33,7 +31,6 @@ namespace Brig {
 			QGuiApplication *app;
 			int app_argc;
 			char **app_argv;
-			EventLoop *eventloop;
 			BrigEventDispatcher *dispatcher;
 
 			QQuickView *quickview;

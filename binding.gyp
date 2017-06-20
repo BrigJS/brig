@@ -8,7 +8,6 @@
 			'src/utils.cpp',
 			'src/eventdispatcher/eventdispatcher.cpp',
 			'src/QApplication.cpp',
-			'src/eventloop.cpp',
 			'src/callback.cpp',
 			'src/signal_handler.cpp',
 			'src/QmlEngine.cpp',
