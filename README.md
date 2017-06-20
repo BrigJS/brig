@@ -97,7 +97,7 @@ brig.on('ready', function(brig) {
 
 ```
 
-## Customized Type (Experimental)
+## Customized Type
 
 _(This is experimental feature, API might be changed in the next version)_
 
