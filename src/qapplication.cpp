@@ -77,6 +77,7 @@ namespace Brig {
 		tpl->SetClassName(name);
 
 		/* Prototype */
+		Nan::SetPrototypeMethod(tpl, "setApplicationName", QApplicationWrap::setApplicationName);
 		Nan::SetPrototypeMethod(tpl, "exec", QApplicationWrap::Exec);
 		Nan::SetPrototypeMethod(tpl, "test", QApplicationWrap::Test);
 //		NODE_SET_PROTOTYPE_METHOD(tpl, "exec", QApplicationWrap::Exec);
@@ -96,6 +97,16 @@ namespace Brig {
 		app_wrap->Wrap(info.This());
 
 		info.GetReturnValue().Set(info.This());
+	}
+
+	NAN_METHOD(QApplicationWrap::setApplicationName) {
+
+		// Signal name
+		String::Utf8Value name(info[0]->ToString());
+
+		QCoreApplication::setApplicationName(QString(*name));
+
+		info.GetReturnValue().Set(Nan::Undefined());
 	}
 /*
 	Handle<Value> QApplicationWrap::Exec(const Arguments& args)

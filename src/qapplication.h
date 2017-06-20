@@ -27,6 +27,7 @@ namespace Brig {
 			static NAN_METHOD(New);
 
 			/* Methods */
+			static NAN_METHOD(setApplicationName);
 			static NAN_METHOD(Exec);
 			static NAN_METHOD(Test);
 
