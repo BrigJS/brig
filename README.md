@@ -142,6 +142,16 @@ MyItem {
 }
 ```
 
+## Examples
+
+Some exmaples you can found which is used brig:
+
+* [Example App](https://github.com/cfsghost/brig-example-app)
+	* Example application for a demo
+* [FishFarmingBrowser](https://github.com/cfsghost/FishFarmingBrowser)
+	* Web browser
+* [Hankathon Timer](https://github.com/HanGee/Hankathon)
+	* A countdown timer for hackathon event
 
 ## Demonstration
 
