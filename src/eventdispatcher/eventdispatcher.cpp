@@ -44,8 +44,6 @@ namespace Brig {
 
 	BrigEventDispatcher::BrigEventDispatcher(QObject *parent) : QAbstractEventDispatcher(parent)
 	{
-		// Create a new mainloop
-		//mainloop = uv_loop_new();
 		mainloop = uv_default_loop();
 
 #ifdef __MACOSX_CORE__
@@ -81,7 +79,7 @@ namespace Brig {
 	void BrigEventDispatcher::interrupt(void)
 	{
 		wakeUp();
-		//printf("interrupt\n");
+//		printf("interrupt\n");
 	}
 
 	void BrigEventDispatcher::flush(void)
@@ -91,22 +89,26 @@ namespace Brig {
 
 	bool BrigEventDispatcher::processEvents(QEventLoop::ProcessEventsFlags flags)
 	{
-//printf("__ProcessEvents %d\n", qGlobalPostedEventsCount());
+//printf("__ProcessEvents %d %d\n", qGlobalPostedEventsCount(), (flags & QEventLoop::WaitForMoreEvents));
+
+		if ((flags & QEventLoop::WaitForMoreEvents)) {
+			emit aboutToBlock();
+			return hasPendingEvents();
+		}
+
 		emit awake();
 
 		QCoreApplication::sendPostedEvents();
+		QWindowSystemInterface::sendWindowSystemEvents(QEventLoop::AllEvents);
 
-		QWindowSystemInterface::sendWindowSystemEvents(flags);
+//printf("END ProcessEvents %d\n", qGlobalPostedEventsCount());
 
-		emit aboutToBlock();
-//printf("ProcessEvents %d\n", qGlobalPostedEventsCount());
-
-		return (qGlobalPostedEventsCount()) ? true : false;
+		return hasPendingEvents();
 	}
 
 	bool BrigEventDispatcher::hasPendingEvents(void)
 	{
-		return qGlobalPostedEventsCount();
+		return (qGlobalPostedEventsCount()) || QWindowSystemInterface::windowSystemEventsQueued();
 	}
 
 	void socket_watcher_handle(uv_poll_t *req, int status, int events)
@@ -330,7 +332,7 @@ namespace Brig {
 
 	int BrigEventDispatcher::remainingTime(int timerId)
 	{
-		//printf("remainingTime\n");
+//		printf("remainingTime\n");
 
 		BrigTimer *timer = timers[timerId];
 		return timer->interval + timer->timestamp - (uv_hrtime() / 1000000);

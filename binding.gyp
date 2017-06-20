@@ -70,11 +70,11 @@
 				],
 				'include_dirs': [
 					'build/src',
-					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets)'
+					'<!@(tools/mac-config.sh --include-dirs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets QtWebEngine)'
 				],
 				'libraries': [
 					'-undefined dynamic_lookup',
-					'<!@(tools/mac-config.sh --libs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets)'
+					'<!@(tools/mac-config.sh --libs QtGui QtCore QtQuick QtQml QtMultimedia QtWidgets QtWebEngine)'
 				]
 			}]
 		]

@@ -38,6 +38,8 @@ namespace Brig {
 #endif
 		dispatcher = new BrigEventDispatcher;
 		QGuiApplication::setEventDispatcher(dispatcher);
+		QCoreApplication::setAttribute(Qt::AA_ShareOpenGLContexts);
+		QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 		app = new QGuiApplication(app_argc, app_argv);
 		QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
