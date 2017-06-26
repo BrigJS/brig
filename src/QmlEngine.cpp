@@ -71,6 +71,8 @@ namespace Brig {
 
 		/* Prototype */
 		Nan::SetPrototypeMethod(tpl, "on", QmlEngineWrap::on);
+		Nan::SetPrototypeMethod(tpl, "addImportPath", QmlEngineWrap::addImportPath);
+		Nan::SetPrototypeMethod(tpl, "addPluginPath", QmlEngineWrap::addPluginPath);
 //		Nan::SetPrototypeMethod(tpl, "rootContext", QmlEngineWrap::rootContext);
 
 		//constructor = Nan::Persistent<Function>::New(tpl->GetFunction());
@@ -96,6 +98,28 @@ namespace Brig {
 		String::Utf8Value name(info[0]->ToString());
 
 		obj_wrap->signal->addCallback(*name, info[1]);
+
+		info.GetReturnValue().Set(info.This());
+	}
+
+	NAN_METHOD(QmlEngineWrap::addImportPath) {
+
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info.This());
+
+		String::Utf8Value path(info[0]->ToString());
+
+		obj_wrap->obj->addImportPath(*path);
+
+		info.GetReturnValue().Set(info.This());
+	}
+
+	NAN_METHOD(QmlEngineWrap::addPluginPath) {
+
+		QmlEngineWrap *obj_wrap = ObjectWrap::Unwrap<QmlEngineWrap>(info.This());
+
+		String::Utf8Value path(info[0]->ToString());
+
+		obj_wrap->obj->addPluginPath(*path);
 
 		info.GetReturnValue().Set(info.This());
 	}

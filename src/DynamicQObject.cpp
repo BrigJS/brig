@@ -363,6 +363,18 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 				QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
 				idx = metaObj->indexOfMethod(norm.constData());
 			}
+		}
+
+		if (idx < 0 || idx >= QObject::metaObject()->methodCount()) {
+
+			metaObj = _metaObject;
+
+			// Finding method from QML
+			idx = metaObj->indexOfMethod(sig.constData());
+			if (idx < 0) {
+				QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+				idx = metaObj->indexOfMethod(norm.constData());
+			}
 
 			if (idx < 0 || idx >= metaObj->methodCount()) {
 				return false;
@@ -443,6 +455,18 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 		if (idx < 0 || idx >= metaObject()->methodCount()) {
 
 			metaObj = QObject::metaObject();
+
+			// Finding method from QML
+			idx = metaObj->indexOfMethod(sig.constData());
+			if (idx < 0) {
+				QByteArray norm = QMetaObject::normalizedSignature(sig.constData());
+				idx = metaObj->indexOfMethod(norm.constData());
+			}
+		}
+
+		if (idx < 0 || idx >= QObject::metaObject()->methodCount()) {
+
+			metaObj = _metaObject;
 
 			// Finding method from QML
 			idx = metaObj->indexOfMethod(sig.constData());

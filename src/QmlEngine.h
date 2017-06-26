@@ -26,6 +26,8 @@ namespace Brig {
 
 			/* Methods */
 			static NAN_METHOD(on);
+			static NAN_METHOD(addImportPath);
+			static NAN_METHOD(addPluginPath);
 			//static NAN_METHOD(rootContext);
 
 			QQmlEngine *obj;
