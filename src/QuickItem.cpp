@@ -60,12 +60,18 @@ printf("RELEASE QuickItem\n");
 	// Method
 	NAN_METHOD(QuickItem::create) {
 
-		QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(info[0]->ToObject());
 		QuickItem *obj_wrap = ObjectWrap::Unwrap<QuickItem>(info.This());
-
-		// Create QuickItem with component
-		obj_wrap->obj = static_cast<QQuickItem *>(component->GetObject()->create());
 		obj_wrap->signal = new SignalHandler(qobject_cast<QObject *>(obj_wrap->GetObject()));
+
+		if (info[0]->IsNumber()) {
+			obj_wrap->obj = (QQuickItem *)info[0]->IntegerValue();
+		} else {
+
+			QmlComponent *component = ObjectWrap::Unwrap<QmlComponent>(info[0]->ToObject());
+
+			// Create QuickItem with component
+			obj_wrap->obj = static_cast<QQuickItem *>(component->GetObject()->create());
+		}
 
 		info.GetReturnValue().SetUndefined();
 	}

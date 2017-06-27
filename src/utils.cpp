@@ -4,6 +4,7 @@
 #include <QMetaType>
 #include <QQmlComponent>
 #include "utils.h"
+#include "QuickItem.h"
 
 namespace Brig {
 
@@ -23,47 +24,75 @@ namespace Brig {
 		{
 			Nan::EscapableHandleScope scope;
 
+			Local<Object> obj = Nan::New<Object>();
+			Nan::Set(obj, Nan::New("t").ToLocalChecked(), Nan::New<Uint32>(type));
+
 			switch(type) {
 			case QMetaType::Bool:
-				//return scope.Escape(Boolean::New(v.toBool()));
-				return scope.Escape(Nan::New<Boolean>(v.toBool()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Boolean>(v.toBool()));
+				break;
+//				return scope.Escape(Nan::New<Boolean>(v.toBool()));
 
 			case QMetaType::Int:
-				//return scope.Escape(Nan::New<Number>(v.toInt()));
-				return scope.Escape(Nan::New<Int32>(v.toInt()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Int32>(v.toInt()));
+				break;
+//				return scope.Escape(Nan::New<Int32>(v.toInt()));
 
 			case QMetaType::UInt:
-				return scope.Escape(Nan::New<Uint32>(v.toUInt()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Uint32>(v.toUInt()));
+				break;
+//				return scope.Escape(Nan::New<Uint32>(v.toUInt()));
 
 			case QMetaType::Float:
-				return scope.Escape(Nan::New<Number>(v.toFloat()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toFloat()));
+				break;
+//				return scope.Escape(Nan::New<Number>(v.toFloat()));
 
 			case QMetaType::Double:
-				return scope.Escape(Nan::New<Number>(v.toDouble()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toDouble()));
+				break;
+//				return scope.Escape(Nan::New<Number>(v.toDouble()));
 
 			case QMetaType::LongLong:
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toLongLong()));
+				break;
 
-				return scope.Escape(Nan::New<Number>(v.toLongLong()));
+//				return scope.Escape(Nan::New<Number>(v.toLongLong()));
 
 			case QMetaType::ULongLong:
-				return scope.Escape(Nan::New<Number>(v.toULongLong()));
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toULongLong()));
+				break;
+//				return scope.Escape(Nan::New<Number>(v.toULongLong()));
 
 			case QMetaType::QString:
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<String>(v.toString().toStdString()).ToLocalChecked());
+				break;
 				//return scope.Escape(Nan::New<String>(v.toString().toUtf8().constData()));
-				return scope.Escape(Nan::New<String>(v.toString().toStdString()).ToLocalChecked());
+//				return scope.Escape(Nan::New<String>(v.toString().toStdString()).ToLocalChecked());
 
+			case QMetaType::QObjectStar:
+			{
+//				qvariant_cast<QQuickItem *>(v)->setProperty("scale", 5);
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>((long)qvariant_cast<QObject *>(v)));
+				break;
+
+//				return scope.Escape(Nan::New<Number>((long)qvariant_cast<QObject *>(v)));
+			}
 			default:
 
 				if (type == qMetaTypeId<QQmlComponent::Status>()) {
-					return scope.Escape(Nan::New<Number>(v.toInt()));
+					Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toInt()));
+					//return scope.Escape(Nan::New<Number>(v.toInt()));
 				} else if (type == qMetaTypeId<qreal>()) {
-					return scope.Escape(Nan::New<Number>(v.toDouble()));
+					Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>(v.toDouble()));
+					//return scope.Escape(Nan::New<Number>(v.toDouble()));
+				} else {
+					Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::Undefined());
 				}
-
-//			case QMetaType::QVariant:
 			}
 
-			return scope.Escape(Nan::Undefined());
+			return scope.Escape(obj);
+//			return scope.Escape(Nan::Undefined());
 		}
 
 		QVariant V8ToQVariant(Local<Value> value)
