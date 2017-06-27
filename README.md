@@ -9,7 +9,8 @@ Brig
 
 A user interface toolkit for Node.js, which is based on Qt for rendering. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js. That means developer is able to write desktop application in QML with pure JavaScript.
 
-[![NPM](https://nodei.co/npm/brig.png)](https://nodei.co/npm/brig/)
+[![NPM](https://nodei.co/npm/brig.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/brig/)
+[![NPM](https://nodei.co/npm-dl/brig.png?months=9&height=2)](https://nodei.co/npm/brig/)
 
 ## Requirements
 
