@@ -70,9 +70,14 @@ namespace Brig {
 				//return scope.Escape(Nan::New<String>(v.toString().toUtf8().constData()));
 //				return scope.Escape(Nan::New<String>(v.toString().toStdString()).ToLocalChecked());
 
+			case QMetaType::VoidStar:
+				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::Null());
+				break;
+
+			case QMetaType::User:
+				Nan::Set(obj, Nan::New("t").ToLocalChecked(), Nan::New<Uint32>(QMetaType::QObjectStar));
 			case QMetaType::QObjectStar:
 			{
-//				qvariant_cast<QQuickItem *>(v)->setProperty("scale", 5);
 				Nan::Set(obj, Nan::New("v").ToLocalChecked(), Nan::New<Number>((long)qvariant_cast<QObject *>(v)));
 				break;
 
@@ -95,6 +100,36 @@ namespace Brig {
 //			return scope.Escape(Nan::Undefined());
 		}
 
+		QVariant BrigValueToQVariant(Local<Value> value)
+		{
+			QVariant v;
+
+			Local<Object> brigValue = value->ToObject();
+
+			int type = brigValue->Get(Nan::New("t").ToLocalChecked())->Int32Value();
+			Local<Value> _value = brigValue->Get(Nan::New("v").ToLocalChecked());
+
+			//if (type == QMetaType::QObjectStar || type == QMetaType::User) {
+			if (type == QMetaType::QObjectStar) {
+				v.setValue(QVariant(type, (QObject *)brigValue->Get(Nan::New("v").ToLocalChecked())->Int32Value()));
+			} else if (type == QMetaType::User) {
+				v.setValue(QVariant(type == QMetaType::QObjectStar, (QObject *)brigValue->Get(Nan::New("v").ToLocalChecked())->Int32Value()));
+			} else if (_value->IsNull()) {
+				v.setValue(QVariant(QMetaType::VoidStar, 0));
+			} else if (_value->IsTrue() || _value->IsFalse() || _value->IsBoolean() ) {
+				v.setValue(QVariant(_value->BooleanValue()));
+			} else if (_value->IsNumber()) {
+				v.setValue(QVariant(_value->NumberValue()));
+			} else if (_value->IsInt32()) {
+				v.setValue(QVariant(_value->Int32Value()));
+			} else if (_value->IsString()) {
+				String::Utf8Value _v(_value->ToString());
+				v.setValue(QVariant(static_cast<char *>(*_v)));
+			}
+
+			return v;
+		}
+
 		QVariant V8ToQVariant(Local<Value> value)
 		{
 			QVariant v;
@@ -111,6 +146,18 @@ namespace Brig {
 			} else if (value->IsString()) {
 				String::Utf8Value _v(value->ToString());
 				v.setValue(QVariant(static_cast<char *>(*_v)));
+			} else if (value->IsUint8Array()) {
+				Local<Uint8Array> array = Local<Uint8Array>::Cast(value);
+
+				QByteArray bytes;
+				bytes.resize(array->ByteLength());
+//				printf("%d\n", array->ByteLength());
+
+				for (int i = 0; i < array->ByteLength(); i++) {
+					bytes[i] = array->Get(i)->IntegerValue();
+//					printf("%d\n", array->Get(i)->IntegerValue());
+				}
+				v.setValue(bytes);
 			}
 
 			// Undefined

@@ -90,6 +90,7 @@ namespace Brig {
 
 		Local<Value> QDataToV8(int type, void *value);
 		Local<Value> QVariantToV8(int type, QVariant v);
+		QVariant BrigValueToQVariant(Local<Value> value);
 		QVariant V8ToQVariant(Local<Value> value);
 		QJSValue V8ToQJSValue(QQmlEngine *engine, Local<Value> value);
 		ParamData *MakeParameter(int type, Local<Value> value);

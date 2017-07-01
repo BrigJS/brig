@@ -98,7 +98,8 @@ printf("after QObject::qt_metacall id=%x\n", idx);
 				Handle<Value> ret = handler->Call(argc, argv);
 
 				QVariant value;
-				value.setValue(Utils::V8ToQVariant(ret));
+				//value.setValue(Utils::V8ToQVariant(ret));
+				value.setValue(Utils::BrigValueToQVariant(ret));
 				*reinterpret_cast<QVariant *>(arguments[0]) = value;
 
 				break;

@@ -19,7 +19,7 @@ namespace Brig {
 
 	QuickItem::~QuickItem()
 	{
-printf("RELEASE QuickItem\n");
+		printf("RELEASE QuickItem\n");
 		delete signal;
 		delete obj;
 	}
@@ -83,7 +83,7 @@ printf("RELEASE QuickItem\n");
 		Handle<Array> keys = Nan::New<Array>();
 
 		// Getting property names
-		static const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
+		const QMetaObject *meta = obj_wrap->GetObject()->metaObject();
 		for (int i = 0; i < meta->propertyCount(); i++) {
 			keys->Set(i, Nan::New(QString(meta->property(i).name()).toUtf8().constData()).ToLocalChecked());
 		}
@@ -196,6 +196,8 @@ printf("RELEASE QuickItem\n");
 			return;
 		}
 
+		info.GetReturnValue().Set(Utils::QVariantToV8(returnedValue.userType(), returnedValue));
+#if 0
 		switch(returnedValue.userType()) {
 		case QMetaType::Bool:
 			info.GetReturnValue().Set(Nan::New<Boolean>(returnedValue.toBool()));
@@ -227,6 +229,7 @@ printf("RELEASE QuickItem\n");
 		default:
 			info.GetReturnValue().SetUndefined();
 		}
+#endif
 	}
 
 	NAN_METHOD(QuickItem::emitEvent) {
