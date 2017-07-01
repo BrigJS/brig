@@ -16,6 +16,12 @@ A user interface toolkit for Node.js, which is based on Qt for rendering. This p
 
 Ensure Qt 5+ tookits and Node.js 0.10+ are ready to go on your system.
 
+For MacOSX user, no need to install Qt development environment for brig anymore. :-)
+
+## Known Issues
+
+* Failed to build brig for Qt 5.8+
+
 ## Installation
 
 Install module via NPM
