@@ -5,16 +5,16 @@
   "description": "Graphical render engine for Node.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/cfsghost/brig.git"
+    "url": "git://github.com/BrigJS/brig.git"
   },
   "binary": {
     "module_name": "brig",
     "module_path": "./native/{node_abi}-{platform}-{arch}",
-    "host": "https://github.com/cfsghost/brig/releases/download/",
+    "host": "https://github.com/BrigJS/brig/releases/download/",
     "remote_path": "{version}",
     "package_name": "{node_abi}-{platform}-{arch}.tar.gz"
   },
-  "homepage": "http://github.com/cfsghost/brig",
+  "homepage": "http://github.com/BrigJS/brig",
   "main": "./lib/brig.js",
   "keywords": [
     "gui",
