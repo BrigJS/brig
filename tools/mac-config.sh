@@ -8,6 +8,8 @@ else
 	QT_LIBS_PATH=`qmake -query QT_INSTALL_LIBS`
 fi
 
+QTVERSION=`qmake -query QT_VERSION`
+
 if [ "$1" == "--include-dirs" ]; then
 	shift 1
 
@@ -16,6 +18,12 @@ if [ "$1" == "--include-dirs" ]; then
 
 		if [ -d "$INCPATH" ]; then
 			echo $INCPATH
+		fi
+
+		PRIINCPATH=$QT_LIBS_PATH/${i}.framework/Versions/Current/Headers/$QTVERSION
+
+		if [ -d "$PRIINCPATH" ]; then
+			echo $PRIINCPATH
 		fi
 	done
 
@@ -42,7 +50,6 @@ elif [ "$1" == "--libs" ]; then
 
 elif [ "$1" == '--internal' ]; then
 	OUT=build/src
-	QTVERSION=`qmake -query QT_VERSION`
 	FILES="
 		$QT_LIBS_PATH/QtGui.framework/Versions/Current/Headers/$QTVERSION/QtGui/qpa/qwindowsysteminterface.h
 		$QT_LIBS_PATH/QtCore.framework/Versions/Current/Headers/$QTVERSION/QtCore/private/qmetaobjectbuilder_p.h
