@@ -18,10 +18,6 @@ The JavaScript in QML is limited, which is used for QML components control only.
 
 In order to make QML application in pure JavaScript possible, `Brig` provides a way to use Node.js to extends QML without C/C++. That means developer can do more thing in QML with NPM modules and Node.js APIs.
 
-## Wht
-
-The JavaScript in QML is limited, which is used for QML components control only. If developer need more functions that something's like system calls(FileSystem, Socket, crypto ...etc) or using external libraries, C/C++ is the only way to make it. Now, `Brig` provides a way to use Node.js to extends QML without C/C++, that means developer can do more thing in QML with NPM modules and Node.js APIs.
-
 ## Requirements
 
 Ensure Qt 5+ tookits and Node.js 0.10+ are ready to go on your system.
