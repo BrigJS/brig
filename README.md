@@ -7,10 +7,20 @@
 Brig
 ====
 
-A user interface toolkit for Node.js, which is based on Qt for rendering. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js. That means developer is able to write desktop application in QML with pure JavaScript.
+A user interface toolkit for Node.js, which is based on Qt for rendering. This project can be used to load and play QML file, make it possible to have a easy way to communicate between QML and Node.js for desktop application.
 
 [![NPM](https://nodei.co/npm/brig.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/brig/)
 [![NPM](https://nodei.co/npm-dl/brig.png?months=9&height=2)](https://nodei.co/npm/brig/)
+
+## The JavaScript in QML is limited, so `Brig`
+
+The JavaScript in QML is limited, which is used for QML components control only. If developer need more functions that something's like system calls(FileSystem, Socket, crypto ...etc) or using external libraries, C/C++ is the only way to make it.
+
+In order to make QML application in pure JavaScript possible, `Brig` provides a way to use Node.js to extends QML without C/C++. That means developer can do more thing in QML with NPM modules and Node.js APIs.
+
+## Wht
+
+The JavaScript in QML is limited, which is used for QML components control only. If developer need more functions that something's like system calls(FileSystem, Socket, crypto ...etc) or using external libraries, C/C++ is the only way to make it. Now, `Brig` provides a way to use Node.js to extends QML without C/C++, that means developer can do more thing in QML with NPM modules and Node.js APIs.
 
 ## Requirements
 
