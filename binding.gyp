@@ -1,7 +1,9 @@
 {
 	'targets': [
 	{
-		'target_name': '<(module_name)',
+		'target_name': '<!(node -e \"require(\'./package.json\').binary.module_name\")',
+		'module_name': '<!(node -e \"require(\'./package.json\').binary.module_name\")',
+		'module_path': '<!(node -e \"require(\'./package.json\').binary.module_path\")',
 		'sources': [
 			'<!@(tools/genmoc.sh)',
 			'src/brig.cpp',
@@ -21,7 +23,6 @@
 		'include_dirs': [
 			"<!(node -e \"require('nan')\")"
 		],
-		'product_dir': '<(module_path)',
 		'conditions': [
 			['OS=="linux"', {
 				'sources': [
